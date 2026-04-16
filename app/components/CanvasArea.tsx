@@ -5,8 +5,9 @@ import {
     SortableContext,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import { useCallback } from 'react';
 import LayoutCard from './LayoutCard';
-import type { NestedLayout } from './types';
+import type { NestedLayout, PageVersion } from './types';
 
 /*  插入線  */
 export function InsertLine() {
@@ -39,13 +40,46 @@ export default function CanvasArea({
         data: { type: 'canvas' },
     });
 
+    const handlePublish = useCallback(() => {
+        const pageVersion: PageVersion = {
+            id: crypto.randomUUID(),
+            pageId: 'page-1',
+            version: 1,
+            status: 'published',
+            data: layouts,
+            createdAt: new Date().toISOString(),
+        };
+        console.log('📦 PageVersion:', pageVersion);
+    }, [layouts]);
+
     return (
         <main className='flex-1 flex flex-col h-full overflow-hidden'>
-            <div className='px-6 py-4 border-b border-zinc-200 bg-white'>
-                <h2 className='text-base font-bold text-zinc-800'>畫布</h2>
-                <p className='text-xs text-zinc-500 mt-0.5'>
-                    拖曳 Layout 到此畫布，或將 Layout 放入 Slot 中
-                </p>
+            <div className='flex justify-between px-6 py-4 border-b border-zinc-200 bg-white'>
+                <div>
+                    <h2 className='text-base font-bold text-zinc-800'>畫布</h2>
+                    <p className='text-xs text-zinc-500 mt-0.5'>
+                        拖曳 Layout 到此畫布，或將 Layout 放入 Slot 中
+                    </p>
+                </div>
+                <button
+                    onClick={handlePublish}
+                    className='flex items-center gap-2 px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold transition-colors shadow-sm'
+                >
+                    <svg
+                        width='14'
+                        height='14'
+                        viewBox='0 0 14 14'
+                        fill='none'
+                        stroke='currentColor'
+                        strokeWidth='2'
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                    >
+                        <path d='M7 1v8M4 6l3 3 3-3' />
+                        <path d='M1 10v1a2 2 0 002 2h8a2 2 0 002-2v-1' />
+                    </svg>
+                    發布
+                </button>
             </div>
 
             <div className='flex-1 overflow-y-auto p-6 bg-zinc-100'>

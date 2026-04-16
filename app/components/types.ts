@@ -1,4 +1,4 @@
-export type LayoutType = 'block' | 'flex';
+export type LayoutType = 'block' | 'flex' | 'grid';
 
 export interface LayoutItem {
     id: string;
@@ -10,6 +10,7 @@ export interface LayoutItem {
 export const LAYOUT_CONFIG: Record<LayoutType, { slotLabels: string[] }> = {
     block: { slotLabels: ['內容區'] },
     flex: { slotLabels: ['左欄', '右欄'] },
+    grid: { slotLabels: ['格子1', '格子2', '格子3', '格子4'] },
 };
 
 /**
@@ -47,7 +48,7 @@ export type PageVersion = {
     pageId: string;
     version: number;
     status: 'draft' | 'published';
-    data: PageDocument[];
+    data: NestedLayout[];
     createdAt: string;
 };
 
@@ -68,5 +69,10 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
         type: 'flex',
         label: 'Flex Layout',
         description: 'Flex — 子元素水平排列，支援換行',
+    },
+    {
+        type: 'grid',
+        label: 'Grid Layout',
+        description: 'Grid — 二維格狀排列，同時控制列與欄',
     },
 ];

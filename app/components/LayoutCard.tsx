@@ -120,23 +120,21 @@ export default function LayoutCard({
     };
 
     const isBlock = layout.type === 'block';
+    const isFlex = layout.type === 'flex';
+    const isGrid = layout.type === 'grid';
 
     // 隨巢狀深度調暗邊框色
     const borderColor = isBlock
-        ? depth === 0
-            ? 'border-violet-300'
-            : 'border-violet-200'
-        : depth === 0
-          ? 'border-sky-300'
-          : 'border-sky-200';
+        ? depth === 0 ? 'border-violet-300' : 'border-violet-200'
+        : isFlex
+          ? depth === 0 ? 'border-sky-300' : 'border-sky-200'
+          : depth === 0 ? 'border-emerald-300' : 'border-emerald-200';
 
     const bgColor = isBlock
-        ? depth === 0
-            ? 'bg-violet-50'
-            : 'bg-violet-50/70'
-        : depth === 0
-          ? 'bg-sky-50'
-          : 'bg-sky-50/70';
+        ? depth === 0 ? 'bg-violet-50' : 'bg-violet-50/70'
+        : isFlex
+          ? depth === 0 ? 'bg-sky-50' : 'bg-sky-50/70'
+          : depth === 0 ? 'bg-emerald-50' : 'bg-emerald-50/70';
 
     return (
         <div
@@ -172,10 +170,12 @@ export default function LayoutCard({
                     className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ${
                         isBlock
                             ? 'bg-violet-200 text-violet-700'
-                            : 'bg-sky-200 text-sky-700'
+                            : isFlex
+                              ? 'bg-sky-200 text-sky-700'
+                              : 'bg-emerald-200 text-emerald-700'
                     }`}
                 >
-                    {isBlock ? 'Block' : 'Flex'}
+                    {isBlock ? 'Block' : isFlex ? 'Flex' : 'Grid'}
                 </span>
 
                 <span className='text-sm font-semibold text-zinc-700 flex-1 truncate'>
@@ -205,9 +205,13 @@ export default function LayoutCard({
             {/* Slots */}
             {layout.slots && layout.slots.length > 0 && (
                 <div
-                    className={`flex gap-2 ${
-                        isBlock ? 'flex-col' : 'flex-row'
-                    }`}
+                    className={
+                        isBlock
+                            ? 'flex flex-col gap-2'
+                            : isFlex
+                              ? 'flex flex-row gap-2'
+                              : 'grid grid-cols-2 gap-2'
+                    }
                 >
                     {layout.slots.map(slot => (
                         <SlotZone

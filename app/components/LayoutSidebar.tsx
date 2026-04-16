@@ -31,9 +31,13 @@ function DraggableSidebarItem({ item }: { item: SidebarItem }) {
                     <span className='inline-flex items-center justify-center w-7 h-7 rounded bg-violet-100 text-violet-600 text-xs font-bold'>
                         B
                     </span>
-                ) : (
+                ) : item.type === 'flex' ? (
                     <span className='inline-flex items-center justify-center w-7 h-7 rounded bg-sky-100 text-sky-600 text-xs font-bold'>
                         F
+                    </span>
+                ) : (
+                    <span className='inline-flex items-center justify-center w-7 h-7 rounded bg-emerald-100 text-emerald-600 text-xs font-bold'>
+                        G
                     </span>
                 )}
                 <span className='font-semibold text-sm text-zinc-800'>
