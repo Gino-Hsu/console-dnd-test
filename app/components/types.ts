@@ -6,6 +6,33 @@ export interface LayoutItem {
     label: string;
 }
 
+/** 每種 Layout 預設要有幾個 Slot */
+export const LAYOUT_CONFIG: Record<LayoutType, { slotLabels: string[] }> = {
+    block: { slotLabels: ['內容區'] },
+    flex: { slotLabels: ['左欄', '右欄'] },
+};
+
+/**
+ * Slot 代表一個可放置 Layout 的區域
+ */
+export interface Slot {
+    id: string;
+    label: string;
+    // 一個 slot 可以放多個 layout
+    children: NestedLayout[];
+}
+
+/**
+ * NestedLayout 支援巢狀 slot 結構
+ */
+export interface NestedLayout {
+    id: string;
+    type: LayoutType;
+    label: string;
+    // 一個 layout 可以有多個 slot
+    slots?: Slot[];
+}
+
 /** 畫布上單一渲染項目 */
 export interface PageDocument {
     id: string;

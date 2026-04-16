@@ -15,32 +15,154 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { useCallback, useId, useState } from 'react';
 import CanvasArea from './CanvasArea';
 import LayoutSidebar from './LayoutSidebar';
-import type { LayoutType, PageDocument, PageVersion } from './types';
+import type { LayoutType, NestedLayout } from './types';
+import { LAYOUT_CONFIG } from './types';
+
+/* ── 工具函式 ─────────────────────────────────────── */
 
 function genId() {
-    return `canvas-item-${crypto.randomUUID()}`;
+    return crypto.randomUUID();
 }
 
-function createPageVersion(data: PageDocument[] = []): PageVersion {
+/** 建立一個帶預設 slots 的 NestedLayout */
+export function createLayout(type: LayoutType, label: string): NestedLayout {
+    const config = LAYOUT_CONFIG[type];
     return {
-        id: 'page-version-1',
-        pageId: 'page-1',
-        version: 1,
-        status: 'draft',
-        data,
-        createdAt: new Date().toISOString(),
+        id: genId(),
+        type,
+        label,
+        slots: config.slotLabels.map(slotLabel => ({
+            id: genId(),
+            label: slotLabel,
+            children: [],
+        })),
     };
 }
 
-export default function DndBuilder() {
-    const [pageVersion, setPageVersion] =
-        useState<PageVersion>(createPageVersion());
+/**
+ * 遞迴找出某個 item 所在的容器
+ * 回傳 'root' 或 slotId，找不到回傳 null
+ */
+export function findContainer(
+    itemId: string,
+    items: NestedLayout[],
+): string | null {
+    if (items.some(l => l.id === itemId)) return 'root';
+    for (const layout of items) {
+        if (!layout.slots) continue;
+        for (const slot of layout.slots) {
+            if (slot.children.some(c => c.id === itemId)) return slot.id;
+            const found = findContainer(itemId, slot.children);
+            if (found) return found;
+        }
+    }
+    return null;
+}
 
+/** 遞迴在指定 slot 內插入一個 layout（可指定位置） */
+export function insertIntoSlot(
+    items: NestedLayout[],
+    slotId: string,
+    newLayout: NestedLayout,
+    atIndex?: number,
+): NestedLayout[] {
+    return items.map(layout => {
+        if (!layout.slots) return layout;
+        const slotIdx = layout.slots.findIndex(s => s.id === slotId);
+        if (slotIdx !== -1) {
+            return {
+                ...layout,
+                slots: layout.slots.map((s, i) => {
+                    if (i !== slotIdx) return s;
+                    const next = [...s.children];
+                    next.splice(atIndex ?? next.length, 0, newLayout);
+                    return { ...s, children: next };
+                }),
+            };
+        }
+        return {
+            ...layout,
+            slots: layout.slots.map(slot => ({
+                ...slot,
+                children: insertIntoSlot(
+                    slot.children,
+                    slotId,
+                    newLayout,
+                    atIndex,
+                ),
+            })),
+        };
+    });
+}
+
+/** 遞迴在指定容器內對兩個 item 做排序 */
+export function sortInContainer(
+    items: NestedLayout[],
+    containerId: string,
+    activeId: string,
+    overId: string,
+): NestedLayout[] {
+    if (containerId === 'root') {
+        const oldIndex = items.findIndex(i => i.id === activeId);
+        const newIndex = items.findIndex(i => i.id === overId);
+        if (oldIndex === -1 || newIndex === -1) return items;
+        return arrayMove(items, oldIndex, newIndex);
+    }
+    return items.map(layout => {
+        if (!layout.slots) return layout;
+        const slotIdx = layout.slots.findIndex(s => s.id === containerId);
+        if (slotIdx !== -1) {
+            return {
+                ...layout,
+                slots: layout.slots.map((s, i) => {
+                    if (i !== slotIdx) return s;
+                    const oldIndex = s.children.findIndex(
+                        c => c.id === activeId,
+                    );
+                    const newIndex = s.children.findIndex(c => c.id === overId);
+                    if (oldIndex === -1 || newIndex === -1) return s;
+                    return {
+                        ...s,
+                        children: arrayMove(s.children, oldIndex, newIndex),
+                    };
+                }),
+            };
+        }
+        return {
+            ...layout,
+            slots: layout.slots.map(slot => ({
+                ...slot,
+                children: sortInContainer(
+                    slot.children,
+                    containerId,
+                    activeId,
+                    overId,
+                ),
+            })),
+        };
+    });
+}
+
+/** 遞迴移除某個 item */
+export function removeItem(items: NestedLayout[], id: string): NestedLayout[] {
+    return items
+        .filter(l => l.id !== id)
+        .map(layout => ({
+            ...layout,
+            slots: layout.slots?.map(slot => ({
+                ...slot,
+                children: removeItem(slot.children, id),
+            })),
+        }));
+}
+
+export default function DndBuilder() {
+    const [layouts, setLayouts] = useState<NestedLayout[]>([]);
     const [activeSidebarType, setActiveSidebarType] =
         useState<LayoutType | null>(null);
-
-    // ⭐ 改用 state，CanvasArea 才能即時拿到最新插入線位置
+    // insertIndex：根層插入位置；insertSlotId：目前懸停的 slot（null 表示根層）
     const [insertIndex, setInsertIndex] = useState<number | null>(null);
+    const [insertSlotId, setInsertSlotId] = useState<string | null>(null);
 
     const dndId = useId();
 
@@ -62,42 +184,71 @@ export default function DndBuilder() {
         if (data?.source === 'sidebar') {
             setActiveSidebarType(data.type as LayoutType);
             setInsertIndex(null);
+            setInsertSlotId(null);
         }
     }, []);
 
-    // ── DragOver：用 active.rect 取得即時滑鼠位置 ─────────────────
+    // ── DragOver：計算插入線位置 ─────────────────
     const handleDragOver = useCallback((event: DragOverEvent) => {
         const activeData = event.active.data.current;
         if (activeData?.source !== 'sidebar') return;
 
+        const overData = event.over?.data.current;
         const translated = event.active.rect.current.translated;
         if (!translated) return;
 
         const activeMidY = translated.top + translated.height / 2;
 
-        const elements = Array.from(
-            document.querySelectorAll('[data-canvas-item]'),
-        ) as HTMLElement[];
+        console.log('DragOver:', overData);
 
-        if (elements.length === 0) {
-            setInsertIndex(0);
-            return;
-        }
+        if (overData?.type === 'slot') {
+            // 懸停在某個 slot 上
+            const slotId = event.over!.id as string;
+            const elements = Array.from(
+                document.querySelectorAll(
+                    `[data-slot-id="${slotId}"] [data-canvas-item]`,
+                ),
+            ) as HTMLElement[];
 
-        let newIndex = elements.length;
+            let newIndex = elements.length;
 
-        for (let i = 0; i < elements.length; i++) {
-            const rect = elements[i].getBoundingClientRect();
-            const midY = rect.top + rect.height / 2;
+            for (let i = 0; i < elements.length; i++) {
+                const rect = elements[i].getBoundingClientRect();
 
-            if (activeMidY < midY) {
-                newIndex = i;
-                break;
+                if (activeMidY < rect.top + rect.height / 2) {
+                    newIndex = i;
+                    break;
+                }
             }
-        }
 
-        // 只有真正改變才更新，避免不必要的 re-render
-        setInsertIndex(prev => (prev === newIndex ? prev : newIndex));
+            console.log('newIndex:', newIndex);
+
+            setInsertSlotId(slotId);
+            setInsertIndex(newIndex);
+        } else if (overData?.type === 'canvas') {
+            // 懸停在根畫布
+            const elements = Array.from(
+                document.querySelectorAll(
+                    '[data-root-canvas] > [data-canvas-item]',
+                ),
+            ) as HTMLElement[];
+
+            console.log('activeMidY:', activeMidY, 'elements:', elements);
+
+            let newIndex = elements.length;
+            for (let i = 0; i < elements.length; i++) {
+                const rect = elements[i].getBoundingClientRect();
+                if (activeMidY < rect.top + rect.height / 2) {
+                    newIndex = i;
+                    break;
+                }
+            }
+            setInsertSlotId(null);
+            setInsertIndex(prev => (prev === newIndex ? prev : newIndex));
+        } else {
+            setInsertSlotId(null);
+            setInsertIndex(null);
+        }
     }, []);
 
     // ── DragEnd ─────────────────────────
@@ -106,60 +257,81 @@ export default function DndBuilder() {
             const { active, over } = event;
             const activeData = active.data.current;
 
-            // ⭐ 先讀 insertIndex，再清除
             const currentInsertIndex = insertIndex;
+
             setActiveSidebarType(null);
             setInsertIndex(null);
+            setInsertSlotId(null);
+            if (!over) return;
 
-            // ⭐ Sidebar → Canvas
+            // Sidebar → Canvas
             if (activeData?.source === 'sidebar') {
-                if (!over) return;
+                const newLayout = createLayout(
+                    activeData.type as LayoutType,
+                    activeData.label as string,
+                );
+                const overData = over.data.current;
 
-                const newDoc: PageDocument = {
-                    id: genId(),
-                    type: activeData.type as LayoutType,
-                    label: activeData.label as string,
-                };
-
-                setPageVersion(prev => {
-                    const next = [...prev.data];
-                    const idx = currentInsertIndex ?? prev.data.length;
-                    next.splice(idx, 0, newDoc);
-                    return { ...prev, data: next };
-                });
-
+                if (overData?.type === 'slot') {
+                    // 拖到某個 slot → 插入該 slot（依 insertIndex 位置）
+                    setLayouts(prev =>
+                        insertIntoSlot(
+                            prev,
+                            over.id as string,
+                            newLayout,
+                            currentInsertIndex ?? undefined,
+                        ),
+                    );
+                } else if (overData?.type === 'canvas') {
+                    // 拖到 root 畫布 → 插入指定位置
+                    setLayouts(prev => {
+                        const next = [...prev];
+                        next.splice(
+                            currentInsertIndex ?? prev.length,
+                            0,
+                            newLayout,
+                        );
+                        return next;
+                    });
+                }
                 return;
             }
 
-            // ⭐ Canvas 排序
-            if (!over || active.id === over.id) return;
+            // Canvas 內排序
+            const activeId = active.id as string;
+            const overId = over.id as string;
+            if (activeId === overId) return;
 
-            setPageVersion(prev => {
-                const oldIndex = prev.data.findIndex(i => i.id === active.id);
-                const newIndex = prev.data.findIndex(i => i.id === over.id);
+            setLayouts(prev => {
+                const activeContainer = findContainer(activeId, prev);
+                const overContainer = findContainer(overId, prev);
 
-                if (oldIndex === -1 || newIndex === -1) return prev;
+                if (!activeContainer || !overContainer) return prev;
 
-                return {
-                    ...prev,
-                    data: arrayMove(prev.data, oldIndex, newIndex),
-                };
+                if (activeContainer === overContainer) {
+                    return sortInContainer(
+                        prev,
+                        activeContainer,
+                        activeId,
+                        overId,
+                    );
+                }
+
+                return prev;
             });
         },
-        [insertIndex], // ← 依賴 insertIndex
+        [insertIndex, insertSlotId],
     );
 
     // ── DragCancel ─────────────────────────
     const handleDragCancel = useCallback(() => {
         setActiveSidebarType(null);
         setInsertIndex(null);
+        setInsertSlotId(null);
     }, []);
 
     const handleRemove = useCallback((id: string) => {
-        setPageVersion(prev => ({
-            ...prev,
-            data: prev.data.filter(i => i.id !== id),
-        }));
+        setLayouts(prev => removeItem(prev, id));
     }, []);
 
     const overlayLabel =
@@ -182,11 +354,12 @@ export default function DndBuilder() {
         >
             <div className='flex h-screen w-full overflow-hidden'>
                 <LayoutSidebar />
-
                 <CanvasArea
-                    items={pageVersion.data}
-                    insertIndex={insertIndex}
+                    layouts={layouts}
                     onRemove={handleRemove}
+                    insertIndex={insertSlotId === null ? insertIndex : null}
+                    insertSlotId={insertSlotId}
+                    slotInsertIndex={insertSlotId !== null ? insertIndex : null}
                 />
             </div>
 
