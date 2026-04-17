@@ -6,22 +6,18 @@ export interface LayoutItem {
     label: string;
 }
 
-/** 每種 Layout 預設要有幾個 Slot */
-export const LAYOUT_CONFIG: Record<LayoutType, { slotLabels: string[] }> = {
-    block: { slotLabels: ['內容區'] },
-    flex: { slotLabels: ['左欄', '右欄'] },
-    grid: { slotLabels: ['格子1', '格子2', '格子3', '格子4'] },
-};
-
-/**
- * Slot 代表一個可放置 Layout 的區域
- */
+/** 執行時的 Slot，自帶 id，不需要 label */
 export interface Slot {
     id: string;
-    label: string;
-    // 一個 slot 可以放多個 layout
     children: NestedLayout[];
 }
+
+/** 每種 Layout 預設的 Slot 數量 */
+export const LAYOUT_CONFIG: Record<LayoutType, { slotCount: number }> = {
+    block: { slotCount: 1 },
+    flex: { slotCount: 2 },
+    grid: { slotCount: 4 },
+};
 
 /**
  * NestedLayout 支援巢狀 slot 結構
@@ -30,19 +26,13 @@ export interface NestedLayout {
     id: string;
     type: LayoutType;
     label: string;
-    // 一個 layout 可以有多個 slot
-    slots?: Slot[];
+    /** 任意 props，未來可存按鈕文字、顏色等設定 */
+    props: Record<string, unknown>;
+    /** slots 陣列，每個 slot 自帶 id */
+    slots: Slot[];
 }
 
-/** 畫布上單一渲染項目 */
-export interface PageDocument {
-    id: string;
-    type: LayoutType;
-    label: string;
-    isPlaceholder?: true; // 側邊欄拖曳進入時的暫時佔位
-}
-
-/** 畫布版本，渲染項目放在 data 陣列中 */
+/** 畫布版本 */
 export type PageVersion = {
     id: string;
     pageId: string;

@@ -12,10 +12,10 @@ import {
     useSensors,
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { useCallback, useId, useState } from 'react';
+import { useCallback, useId, useRef, useState } from 'react';
 import CanvasArea from './CanvasArea';
 import LayoutSidebar from './LayoutSidebar';
-import type { LayoutType, NestedLayout } from './types';
+import type { LayoutType, NestedLayout, Slot } from './types';
 import { LAYOUT_CONFIG } from './types';
 
 /* ── 工具函式 ─────────────────────────────────────── */
@@ -24,19 +24,18 @@ function genId() {
     return crypto.randomUUID();
 }
 
-/** 建立一個帶預設 slots 的 NestedLayout */
+function clone<T>(value: T): T {
+    return structuredClone(value);
+}
+
+/** 建立一個帶預設 slots 陣列的 NestedLayout，每個 slot 使用 UUID id */
 export function createLayout(type: LayoutType, label: string): NestedLayout {
     const config = LAYOUT_CONFIG[type];
-    return {
+    const slots: Slot[] = Array.from({ length: config.slotCount }, () => ({
         id: genId(),
-        type,
-        label,
-        slots: config.slotLabels.map(slotLabel => ({
-            id: genId(),
-            label: slotLabel,
-            children: [],
-        })),
-    };
+        children: [],
+    }));
+    return { id: genId(), type, label, props: {}, slots };
 }
 
 /**
@@ -49,7 +48,6 @@ export function findContainer(
 ): string | null {
     if (items.some(l => l.id === itemId)) return 'root';
     for (const layout of items) {
-        if (!layout.slots) continue;
         for (const slot of layout.slots) {
             if (slot.children.some(c => c.id === itemId)) return slot.id;
             const found = findContainer(itemId, slot.children);
@@ -62,30 +60,31 @@ export function findContainer(
 /** 遞迴在指定 slot 內插入一個 layout（可指定位置） */
 export function insertIntoSlot(
     items: NestedLayout[],
+    ownerId: string,
     slotId: string,
     newLayout: NestedLayout,
     atIndex?: number,
 ): NestedLayout[] {
     return items.map(layout => {
-        if (!layout.slots) return layout;
         const slotIdx = layout.slots.findIndex(s => s.id === slotId);
         if (slotIdx !== -1) {
             return {
                 ...layout,
                 slots: layout.slots.map((s, i) => {
                     if (i !== slotIdx) return s;
-                    const next = [...s.children];
-                    next.splice(atIndex ?? next.length, 0, newLayout);
-                    return { ...s, children: next };
+                    const children = [...s.children];
+                    children.splice(atIndex ?? children.length, 0, newLayout);
+                    return { ...s, children };
                 }),
             };
         }
         return {
             ...layout,
-            slots: layout.slots.map(slot => ({
-                ...slot,
+            slots: layout.slots.map(s => ({
+                ...s,
                 children: insertIntoSlot(
-                    slot.children,
+                    s.children,
+                    ownerId,
                     slotId,
                     newLayout,
                     atIndex,
@@ -109,7 +108,6 @@ export function sortInContainer(
         return arrayMove(items, oldIndex, newIndex);
     }
     return items.map(layout => {
-        if (!layout.slots) return layout;
         const slotIdx = layout.slots.findIndex(s => s.id === containerId);
         if (slotIdx !== -1) {
             return {
@@ -130,10 +128,10 @@ export function sortInContainer(
         }
         return {
             ...layout,
-            slots: layout.slots.map(slot => ({
-                ...slot,
+            slots: layout.slots.map(s => ({
+                ...s,
                 children: sortInContainer(
-                    slot.children,
+                    s.children,
                     containerId,
                     activeId,
                     overId,
@@ -149,20 +147,73 @@ export function removeItem(items: NestedLayout[], id: string): NestedLayout[] {
         .filter(l => l.id !== id)
         .map(layout => ({
             ...layout,
-            slots: layout.slots?.map(slot => ({
-                ...slot,
-                children: removeItem(slot.children, id),
+            slots: layout.slots.map(s => ({
+                ...s,
+                children: removeItem(s.children, id),
             })),
         }));
+}
+
+/** 遞迴找出指定 id 的 NestedLayout */
+export function findLayoutById(
+    id: string,
+    items: NestedLayout[],
+): NestedLayout | null {
+    for (const l of items) {
+        if (l.id === id) return l;
+        for (const s of l.slots) {
+            const found = findLayoutById(id, s.children);
+            if (found) return found;
+        }
+    }
+    return null;
+}
+
+/**
+ * 將 activeId 從原位置移除，插入到 targetContainerId（'root' 或 slotId）的 atIndex 位置
+ */
+export function moveItem(
+    items: NestedLayout[],
+    activeId: string,
+    targetContainerId: string,
+    atIndex?: number,
+): NestedLayout[] {
+    const moving = findLayoutById(activeId, items);
+    if (!moving) return items;
+
+    const withoutActive = removeItem(items, activeId);
+
+    if (targetContainerId === 'root') {
+        const next = [...withoutActive];
+        next.splice(atIndex ?? next.length, 0, moving);
+        return next;
+    }
+
+    return insertIntoSlot(
+        withoutActive,
+        '',
+        targetContainerId,
+        moving,
+        atIndex,
+    );
 }
 
 export default function DndBuilder() {
     const [layouts, setLayouts] = useState<NestedLayout[]>([]);
     const [activeSidebarType, setActiveSidebarType] =
         useState<LayoutType | null>(null);
-    // insertIndex：根層插入位置；insertSlotId：目前懸停的 slot（null 表示根層）
+    const [activeCanvasId, setActiveCanvasId] = useState<string | null>(null);
     const [insertIndex, setInsertIndex] = useState<number | null>(null);
     const [insertSlotId, setInsertSlotId] = useState<string | null>(null);
+    const [selectedLayoutId, setSelectedLayoutId] = useState<string | null>(
+        null,
+    );
+
+    // 用 ref 讓 handleDragStart/Over 能讀到最新 layouts 而不需要加入 deps
+    const layoutsRef = useRef(layouts);
+    layoutsRef.current = layouts;
+    // 記錄拖曳開始時的來源容器，用來判斷是否跨容器
+    const activeContainerRef = useRef<string | null>(null);
 
     const dndId = useId();
 
@@ -183,15 +234,21 @@ export default function DndBuilder() {
         const data = event.active.data.current;
         if (data?.source === 'sidebar') {
             setActiveSidebarType(data.type as LayoutType);
-            setInsertIndex(null);
-            setInsertSlotId(null);
+        } else {
+            setActiveCanvasId(event.active.id as string);
+            activeContainerRef.current = findContainer(
+                event.active.id as string,
+                layoutsRef.current,
+            );
         }
+        setInsertIndex(null);
+        setInsertSlotId(null);
     }, []);
 
     // ── DragOver：計算插入線位置 ─────────────────
     const handleDragOver = useCallback((event: DragOverEvent) => {
         const activeData = event.active.data.current;
-        if (activeData?.source !== 'sidebar') return;
+        const isSidebar = activeData?.source === 'sidebar';
 
         const overData = event.over?.data.current;
         const translated = event.active.rect.current.translated;
@@ -199,11 +256,16 @@ export default function DndBuilder() {
 
         const activeMidY = translated.top + translated.height / 2;
 
-        console.log('DragOver:', overData);
-
         if (overData?.type === 'slot') {
-            // 懸停在某個 slot 上
             const slotId = event.over!.id as string;
+
+            // canvas item 在同一個 slot 內移動：不顯示 InsertLine，讓 useSortable 處理
+            if (!isSidebar && activeContainerRef.current === slotId) {
+                setInsertSlotId(null);
+                setInsertIndex(null);
+                return;
+            }
+
             const elements = Array.from(
                 document.querySelectorAll(
                     `[data-slot-id="${slotId}"] [data-canvas-item]`,
@@ -211,29 +273,29 @@ export default function DndBuilder() {
             ) as HTMLElement[];
 
             let newIndex = elements.length;
-
             for (let i = 0; i < elements.length; i++) {
                 const rect = elements[i].getBoundingClientRect();
-
                 if (activeMidY < rect.top + rect.height / 2) {
                     newIndex = i;
                     break;
                 }
             }
 
-            console.log('newIndex:', newIndex);
-
             setInsertSlotId(slotId);
             setInsertIndex(newIndex);
         } else if (overData?.type === 'canvas') {
-            // 懸停在根畫布
+            // canvas item 在 root 排序：不顯示 InsertLine
+            if (!isSidebar && activeContainerRef.current === 'root') {
+                setInsertSlotId(null);
+                setInsertIndex(null);
+                return;
+            }
+
             const elements = Array.from(
                 document.querySelectorAll(
                     '[data-root-canvas] > [data-canvas-item]',
                 ),
             ) as HTMLElement[];
-
-            console.log('activeMidY:', activeMidY, 'elements:', elements);
 
             let newIndex = elements.length;
             for (let i = 0; i < elements.length; i++) {
@@ -260,8 +322,10 @@ export default function DndBuilder() {
             const currentInsertIndex = insertIndex;
 
             setActiveSidebarType(null);
+            setActiveCanvasId(null);
             setInsertIndex(null);
             setInsertSlotId(null);
+            activeContainerRef.current = null;
             if (!over) return;
 
             // Sidebar → Canvas
@@ -273,17 +337,18 @@ export default function DndBuilder() {
                 const overData = over.data.current;
 
                 if (overData?.type === 'slot') {
-                    // 拖到某個 slot → 插入該 slot（依 insertIndex 位置）
+                    const slotId = over.id as string;
+                    const ownerId = overData.ownerId as string;
                     setLayouts(prev =>
                         insertIntoSlot(
                             prev,
-                            over.id as string,
+                            ownerId,
+                            slotId,
                             newLayout,
                             currentInsertIndex ?? undefined,
                         ),
                     );
                 } else if (overData?.type === 'canvas') {
-                    // 拖到 root 畫布 → 插入指定位置
                     setLayouts(prev => {
                         const next = [...prev];
                         next.splice(
@@ -297,18 +362,30 @@ export default function DndBuilder() {
                 return;
             }
 
-            // Canvas 內排序
+            // Canvas 內排序 / 跨容器搬移
             const activeId = active.id as string;
             const overId = over.id as string;
             if (activeId === overId) return;
 
             setLayouts(prev => {
                 const activeContainer = findContainer(activeId, prev);
-                const overContainer = findContainer(overId, prev);
+                if (!activeContainer) return prev;
 
-                if (!activeContainer || !overContainer) return prev;
+                // 決定目標容器
+                const overData = over.data.current;
+                let targetContainer: string;
+                if (overData?.type === 'slot') {
+                    targetContainer = over.id as string;
+                } else if (overData?.type === 'canvas') {
+                    targetContainer = 'root';
+                } else {
+                    // over 是另一個 layout item，找它所在的容器
+                    targetContainer =
+                        findContainer(overId, prev) ?? activeContainer;
+                }
 
-                if (activeContainer === overContainer) {
+                // 同容器排序
+                if (activeContainer === targetContainer) {
                     return sortInContainer(
                         prev,
                         activeContainer,
@@ -317,7 +394,13 @@ export default function DndBuilder() {
                     );
                 }
 
-                return prev;
+                // 跨容器搬移
+                return moveItem(
+                    prev,
+                    activeId,
+                    targetContainer,
+                    currentInsertIndex ?? undefined,
+                );
             });
         },
         [insertIndex, insertSlotId],
@@ -326,21 +409,109 @@ export default function DndBuilder() {
     // ── DragCancel ─────────────────────────
     const handleDragCancel = useCallback(() => {
         setActiveSidebarType(null);
+        setActiveCanvasId(null);
         setInsertIndex(null);
         setInsertSlotId(null);
+        activeContainerRef.current = null;
     }, []);
 
     const handleRemove = useCallback((id: string) => {
         setLayouts(prev => removeItem(prev, id));
+        setSelectedLayoutId(prev => (prev === id ? null : prev));
+    }, []);
+
+    const handleSelect = useCallback((id: string) => {
+        setSelectedLayoutId(prev => (prev === id ? null : id));
+    }, []);
+
+    // 遞迴找到目前選取的 layout
+    const findLayout = (
+        id: string,
+        items: NestedLayout[],
+    ): NestedLayout | null => {
+        for (const l of items) {
+            if (l.id === id) return l;
+            for (const s of l.slots) {
+                const found = findLayout(id, s.children);
+                if (found) return found;
+            }
+        }
+        return null;
+    };
+    const selectedLayout = selectedLayoutId
+        ? findLayout(selectedLayoutId, layouts)
+        : null;
+
+    // 在指定 layout 新增一個空 slot
+    const handleAddSlot = useCallback((layoutId: string) => {
+        const addToLayout = (items: NestedLayout[]): NestedLayout[] =>
+            items.map(l => {
+                if (l.id === layoutId) {
+                    return {
+                        ...l,
+                        slots: [
+                            ...l.slots,
+                            { id: crypto.randomUUID(), children: [] },
+                        ],
+                    };
+                }
+                return {
+                    ...l,
+                    slots: l.slots.map(s => ({
+                        ...s,
+                        children: addToLayout(s.children),
+                    })),
+                };
+            });
+        setLayouts(prev => addToLayout(prev));
+    }, []);
+
+    // 在指定 layout 移除指定 slot（有子項目時不允許）
+    const handleRemoveSlot = useCallback((layoutId: string, slotId: string) => {
+        const removeFromLayout = (items: NestedLayout[]): NestedLayout[] =>
+            items.map(l => {
+                if (l.id === layoutId) {
+                    return {
+                        ...l,
+                        slots: l.slots.filter(s => s.id !== slotId),
+                    };
+                }
+                return {
+                    ...l,
+                    slots: l.slots.map(s => ({
+                        ...s,
+                        children: removeFromLayout(s.children),
+                    })),
+                };
+            });
+        setLayouts(prev => removeFromLayout(prev));
     }, []);
 
     const overlayLabel =
-        activeSidebarType === 'block' ? '塊級 Layout' : 'Flex Layout';
+        activeSidebarType === 'block'
+            ? '塊級 Layout'
+            : activeSidebarType === 'flex'
+              ? 'Flex Layout'
+              : 'Grid Layout';
 
     const overlayColor =
         activeSidebarType === 'block'
             ? 'border-violet-400 bg-violet-100 text-violet-700'
-            : 'border-sky-400 bg-sky-100 text-sky-700';
+            : activeSidebarType === 'flex'
+              ? 'border-sky-400 bg-sky-100 text-sky-700'
+              : 'border-emerald-400 bg-emerald-100 text-emerald-700';
+
+    const activeCanvasLayout = activeCanvasId
+        ? findLayoutById(activeCanvasId, layouts)
+        : null;
+
+    const canvasOverlayColor = activeCanvasLayout
+        ? activeCanvasLayout.type === 'block'
+            ? 'border-violet-400 bg-violet-100 text-violet-700'
+            : activeCanvasLayout.type === 'flex'
+              ? 'border-sky-400 bg-sky-100 text-sky-700'
+              : 'border-emerald-400 bg-emerald-100 text-emerald-700'
+        : '';
 
     return (
         <DndContext
@@ -353,10 +524,17 @@ export default function DndBuilder() {
             onDragCancel={handleDragCancel}
         >
             <div className='flex h-screen w-full overflow-hidden'>
-                <LayoutSidebar />
+                <LayoutSidebar
+                    selectedLayout={selectedLayout}
+                    onAddSlot={handleAddSlot}
+                    onRemoveSlot={handleRemoveSlot}
+                    onDeselect={() => setSelectedLayoutId(null)}
+                />
                 <CanvasArea
                     layouts={layouts}
                     onRemove={handleRemove}
+                    onSelect={handleSelect}
+                    selectedLayoutId={selectedLayoutId}
                     insertIndex={insertSlotId === null ? insertIndex : null}
                     insertSlotId={insertSlotId}
                     slotInsertIndex={insertSlotId !== null ? insertIndex : null}
@@ -369,6 +547,12 @@ export default function DndBuilder() {
                         className={`rounded-lg border-2 px-4 py-3 shadow-lg font-semibold text-sm ${overlayColor}`}
                     >
                         {overlayLabel}
+                    </div>
+                ) : activeCanvasLayout ? (
+                    <div
+                        className={`rounded-lg border-2 px-4 py-3 shadow-lg font-semibold text-sm opacity-80 ${canvasOverlayColor}`}
+                    >
+                        {activeCanvasLayout.label}
                     </div>
                 ) : null}
             </DragOverlay>

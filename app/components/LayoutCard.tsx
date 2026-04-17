@@ -8,32 +8,44 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { InsertLine } from './CanvasArea';
-import type { NestedLayout, Slot } from './types';
+import type { NestedLayout } from './types';
 
 /* ── 單個 Slot 區域 ── */
 function SlotZone({
     slot,
+    ownerId,
     onRemove,
+    onSelect,
+    selectedLayoutId,
     insertSlotId,
     slotInsertIndex,
 }: {
-    slot: Slot;
+    slot: {
+        id: string;
+        label?: string;
+        children: import('./types').NestedLayout[];
+    };
+    ownerId: string;
     onRemove: (id: string) => void;
+    onSelect: (id: string) => void;
+    selectedLayoutId: string | null;
     insertSlotId: string | null;
     slotInsertIndex: number | null;
 }) {
     const { setNodeRef, isOver } = useDroppable({
         id: slot.id,
-        data: { type: 'slot', slotId: slot.id },
+        data: { type: 'slot', ownerId, slotId: slot.id },
     });
 
     const isActiveSlot = insertSlotId === slot.id;
 
     return (
         <div className='flex-1 min-w-0' data-slot-id={slot.id}>
-            <div className='text-xs font-medium text-zinc-400 mb-1 select-none'>
-                {slot.label}
-            </div>
+            {slot.label && (
+                <div className='text-xs font-medium text-zinc-400 mb-1 select-none'>
+                    {slot.label}
+                </div>
+            )}
 
             <SortableContext
                 items={slot.children.map(c => c.id)}
@@ -71,6 +83,8 @@ function SlotZone({
                                         <LayoutCard
                                             layout={child}
                                             onRemove={onRemove}
+                                            onSelect={onSelect}
+                                            selectedLayoutId={selectedLayoutId}
                                             depth={1}
                                             insertSlotId={insertSlotId}
                                             slotInsertIndex={slotInsertIndex}
@@ -94,12 +108,16 @@ function SlotZone({
 export default function LayoutCard({
     layout,
     onRemove,
+    onSelect,
+    selectedLayoutId,
     depth = 0,
     insertSlotId,
     slotInsertIndex,
 }: {
     layout: NestedLayout;
     onRemove: (id: string) => void;
+    onSelect: (id: string) => void;
+    selectedLayoutId: string | null;
     depth?: number;
     insertSlotId: string | null;
     slotInsertIndex: number | null;
@@ -125,25 +143,44 @@ export default function LayoutCard({
 
     // 隨巢狀深度調暗邊框色
     const borderColor = isBlock
-        ? depth === 0 ? 'border-violet-300' : 'border-violet-200'
+        ? depth === 0
+            ? 'border-violet-300'
+            : 'border-violet-200'
         : isFlex
-          ? depth === 0 ? 'border-sky-300' : 'border-sky-200'
-          : depth === 0 ? 'border-emerald-300' : 'border-emerald-200';
+          ? depth === 0
+              ? 'border-sky-300'
+              : 'border-sky-200'
+          : depth === 0
+            ? 'border-emerald-300'
+            : 'border-emerald-200';
 
     const bgColor = isBlock
-        ? depth === 0 ? 'bg-violet-50' : 'bg-violet-50/70'
+        ? depth === 0
+            ? 'bg-violet-50'
+            : 'bg-violet-50/70'
         : isFlex
-          ? depth === 0 ? 'bg-sky-50' : 'bg-sky-50/70'
-          : depth === 0 ? 'bg-emerald-50' : 'bg-emerald-50/70';
+          ? depth === 0
+              ? 'bg-sky-50'
+              : 'bg-sky-50/70'
+          : depth === 0
+            ? 'bg-emerald-50'
+            : 'bg-emerald-50/70';
+
+    const isSelected = selectedLayoutId === layout.id;
+
+    console.log('layout', layout);
 
     return (
         <div
             ref={setNodeRef}
             style={style}
-            className={`relative rounded-lg border-2 p-3 group transition-colors ${borderColor} ${bgColor}`}
+            className={`relative rounded-lg border-2 p-3 group transition-colors ${borderColor} ${bgColor} ${isSelected ? 'ring-2 ring-blue-500 ring-offset-1' : ''}`}
         >
             {/* Header */}
-            <div className='flex items-center gap-2 mb-3'>
+            <div
+                className='flex items-center gap-2 mb-3 cursor-pointer'
+                onClick={() => onSelect(layout.id)}
+            >
                 {/* 拖曳把手 */}
                 <button
                     {...listeners}
@@ -185,7 +222,7 @@ export default function LayoutCard({
                 {/* 刪除按鈕 */}
                 <button
                     onClick={() => onRemove(layout.id)}
-                    className='opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400 hover:text-red-500 rounded p-0.5 shrink-0'
+                    className={`opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400 hover:text-red-500 rounded p-0.5 shrink-0`}
                     aria-label='移除此 Layout'
                 >
                     <svg
@@ -203,7 +240,7 @@ export default function LayoutCard({
             </div>
 
             {/* Slots */}
-            {layout.slots && layout.slots.length > 0 && (
+            {layout.slots.length > 0 && (
                 <div
                     className={
                         isBlock
@@ -217,7 +254,10 @@ export default function LayoutCard({
                         <SlotZone
                             key={slot.id}
                             slot={slot}
+                            ownerId={layout.id}
                             onRemove={onRemove}
+                            onSelect={onSelect}
+                            selectedLayoutId={selectedLayoutId}
                             insertSlotId={insertSlotId}
                             slotInsertIndex={slotInsertIndex}
                         />

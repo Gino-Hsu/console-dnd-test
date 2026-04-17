@@ -2,8 +2,9 @@
 
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import type { SidebarItem } from './types';
+import type { NestedLayout, SidebarItem } from './types';
 import { SIDEBAR_ITEMS } from './types';
+import LayoutEditor from './LayoutEditor';
 
 function DraggableSidebarItem({ item }: { item: SidebarItem }) {
     const { attributes, listeners, setNodeRef, transform, isDragging } =
@@ -51,22 +52,43 @@ function DraggableSidebarItem({ item }: { item: SidebarItem }) {
     );
 }
 
-export default function LayoutSidebar() {
+export default function LayoutSidebar({
+    selectedLayout,
+    onAddSlot,
+    onRemoveSlot,
+    onDeselect,
+}: {
+    selectedLayout: NestedLayout | null;
+    onAddSlot: (layoutId: string) => void;
+    onRemoveSlot: (layoutId: string, slotId: string) => void;
+    onDeselect: () => void;
+}) {
     return (
         <aside className='w-64 shrink-0 border-r border-zinc-200 bg-zinc-50 flex flex-col h-full overflow-x-hidden'>
-            <div className='px-4 py-4 border-b border-zinc-200'>
-                <h2 className='text-base font-bold text-zinc-800'>
-                    Layout 選單
-                </h2>
-                <p className='text-xs text-zinc-500 mt-0.5'>
-                    拖曳元素到右側畫布以新增 Layout
-                </p>
-            </div>
-            <div className='flex flex-col gap-3 p-4 overflow-y-auto overflow-x-hidden'>
-                {SIDEBAR_ITEMS.map(item => (
-                    <DraggableSidebarItem key={item.type} item={item} />
-                ))}
-            </div>
+            {selectedLayout ? (
+                <LayoutEditor
+                    layout={selectedLayout}
+                    onAddSlot={onAddSlot}
+                    onRemoveSlot={onRemoveSlot}
+                    onDeselect={onDeselect}
+                />
+            ) : (
+                <>
+                    <div className='px-4 py-4 border-b border-zinc-200'>
+                        <h2 className='text-base font-bold text-zinc-800'>
+                            Layout 選單
+                        </h2>
+                        <p className='text-xs text-zinc-500 mt-0.5'>
+                            拖曳元素到右側畫布以新增 Layout
+                        </p>
+                    </div>
+                    <div className='flex flex-col gap-3 p-4 overflow-y-auto overflow-x-hidden'>
+                        {SIDEBAR_ITEMS.map(item => (
+                            <DraggableSidebarItem key={item.type} item={item} />
+                        ))}
+                    </div>
+                </>
+            )}
         </aside>
     );
 }

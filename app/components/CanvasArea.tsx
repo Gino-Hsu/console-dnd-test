@@ -25,12 +25,16 @@ export function InsertLine() {
 export default function CanvasArea({
     layouts,
     onRemove,
+    onSelect,
+    selectedLayoutId,
     insertIndex,
     insertSlotId,
     slotInsertIndex,
 }: {
     layouts: NestedLayout[];
     onRemove: (id: string) => void;
+    onSelect: (id: string) => void;
+    selectedLayoutId: string | null;
     insertIndex: number | null;
     insertSlotId: string | null;
     slotInsertIndex: number | null;
@@ -118,6 +122,8 @@ export default function CanvasArea({
                                         <LayoutCard
                                             layout={layout}
                                             onRemove={onRemove}
+                                            onSelect={onSelect}
+                                            selectedLayoutId={selectedLayoutId}
                                             depth={0}
                                             insertSlotId={insertSlotId}
                                             slotInsertIndex={slotInsertIndex}
