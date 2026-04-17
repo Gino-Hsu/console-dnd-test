@@ -1,20 +1,17 @@
 'use client';
 
 import { useDraggable } from '@dnd-kit/core';
-import { CSS } from '@dnd-kit/utilities';
-import type { NestedLayout, SidebarItem } from './types';
+import type { LayoutSpacing, NestedLayout, SidebarItem } from './types';
 import { SIDEBAR_ITEMS } from './types';
 import LayoutEditor from './LayoutEditor';
 
 function DraggableSidebarItem({ item }: { item: SidebarItem }) {
-    const { attributes, listeners, setNodeRef, transform, isDragging } =
-        useDraggable({
-            id: `sidebar-${item.type}`,
-            data: { type: item.type, label: item.label, source: 'sidebar' },
-        });
+    const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+        id: `sidebar-${item.type}`,
+        data: { type: item.type, label: item.label, source: 'sidebar' },
+    });
 
     const style: React.CSSProperties = {
-        // transform: CSS.Translate.toString(transform),
         opacity: isDragging ? 0.5 : 1,
         cursor: isDragging ? 'grabbing' : 'grab',
     };
@@ -56,11 +53,13 @@ export default function LayoutSidebar({
     selectedLayout,
     onAddSlot,
     onRemoveSlot,
+    onUpdateSpacing,
     onDeselect,
 }: {
     selectedLayout: NestedLayout | null;
     onAddSlot: (layoutId: string) => void;
     onRemoveSlot: (layoutId: string, slotId: string) => void;
+    onUpdateSpacing: (layoutId: string, spacing: LayoutSpacing) => void;
     onDeselect: () => void;
 }) {
     return (
@@ -70,6 +69,7 @@ export default function LayoutSidebar({
                     layout={selectedLayout}
                     onAddSlot={onAddSlot}
                     onRemoveSlot={onRemoveSlot}
+                    onUpdateSpacing={onUpdateSpacing}
                     onDeselect={onDeselect}
                 />
             ) : (

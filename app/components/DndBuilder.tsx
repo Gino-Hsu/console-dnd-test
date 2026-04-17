@@ -15,8 +15,8 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { useCallback, useId, useRef, useState } from 'react';
 import CanvasArea from './CanvasArea';
 import LayoutSidebar from './LayoutSidebar';
-import type { LayoutType, NestedLayout, Slot } from './types';
-import { LAYOUT_CONFIG } from './types';
+import type { LayoutSpacing, LayoutType, NestedLayout, Slot } from './types';
+import { DEFAULT_SPACING, LAYOUT_CONFIG } from './types';
 
 /* ── 工具函式 ─────────────────────────────────────── */
 
@@ -35,7 +35,14 @@ export function createLayout(type: LayoutType, label: string): NestedLayout {
         id: genId(),
         children: [],
     }));
-    return { id: genId(), type, label, props: {}, slots };
+    return {
+        id: genId(),
+        type,
+        label,
+        props: {},
+        slots,
+        spacing: structuredClone(DEFAULT_SPACING),
+    };
 }
 
 /**
@@ -487,6 +494,24 @@ export default function DndBuilder() {
         setLayouts(prev => removeFromLayout(prev));
     }, []);
 
+    const handleUpdateSpacing = useCallback(
+        (layoutId: string, spacing: LayoutSpacing) => {
+            const update = (items: NestedLayout[]): NestedLayout[] =>
+                items.map(l => {
+                    if (l.id === layoutId) return { ...l, spacing };
+                    return {
+                        ...l,
+                        slots: l.slots.map(s => ({
+                            ...s,
+                            children: update(s.children),
+                        })),
+                    };
+                });
+            setLayouts(prev => update(prev));
+        },
+        [],
+    );
+
     const overlayLabel =
         activeSidebarType === 'block'
             ? '塊級 Layout'
@@ -528,6 +553,7 @@ export default function DndBuilder() {
                     selectedLayout={selectedLayout}
                     onAddSlot={handleAddSlot}
                     onRemoveSlot={handleRemoveSlot}
+                    onUpdateSpacing={handleUpdateSpacing}
                     onDeselect={() => setSelectedLayoutId(null)}
                 />
                 <CanvasArea
@@ -541,7 +567,7 @@ export default function DndBuilder() {
                 />
             </div>
 
-            <DragOverlay>
+            <DragOverlay dropAnimation={null}>
                 {activeSidebarType ? (
                     <div
                         className={`rounded-lg border-2 px-4 py-3 shadow-lg font-semibold text-sm ${overlayColor}`}

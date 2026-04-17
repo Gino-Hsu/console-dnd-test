@@ -19,6 +19,25 @@ export const LAYOUT_CONFIG: Record<LayoutType, { slotCount: number }> = {
     grid: { slotCount: 4 },
 };
 
+/** 四方向間距（px） */
+export interface SpacingValue {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+}
+
+/** Layout 的內距與外距 */
+export interface LayoutSpacing {
+    padding: SpacingValue;
+    margin: SpacingValue;
+}
+
+export const DEFAULT_SPACING: LayoutSpacing = {
+    padding: { top: 0, right: 0, bottom: 0, left: 0 },
+    margin: { top: 0, right: 0, bottom: 0, left: 0 },
+};
+
 /**
  * NestedLayout 支援巢狀 slot 結構
  */
@@ -30,11 +49,12 @@ export interface NestedLayout {
     props: Record<string, unknown>;
     /** slots 陣列，每個 slot 自帶 id */
     slots: Slot[];
+    /** 內距與外距設定 */
+    spacing: LayoutSpacing;
 }
 
 /** 畫布版本 */
 export type PageVersion = {
-    id: string;
     pageId: string;
     version: number;
     status: 'draft' | 'published';

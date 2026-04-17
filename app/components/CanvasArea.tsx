@@ -46,7 +46,6 @@ export default function CanvasArea({
 
     const handlePublish = useCallback(() => {
         const pageVersion: PageVersion = {
-            id: crypto.randomUUID(),
             pageId: 'page-1',
             version: 1,
             status: 'published',
