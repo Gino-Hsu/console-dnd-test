@@ -8,6 +8,7 @@ import {
 import { useCallback } from 'react';
 import LayoutCard from './LayoutCard';
 import type { NestedLayout, PageVersion } from './types';
+import { flattenToGraph } from './types';
 
 /*  插入線  */
 export function InsertLine() {
@@ -45,14 +46,27 @@ export default function CanvasArea({
     });
 
     const handlePublish = useCallback(() => {
-        const pageVersion: PageVersion = {
+        const now = new Date().toISOString();
+        const meta = {
             pageId: 'page-1',
             version: 1,
-            status: 'published',
-            data: layouts,
-            createdAt: new Date().toISOString(),
+            status: 'published' as const,
+            createdAt: now,
         };
-        console.log('📦 PageVersion:', pageVersion);
+
+        // 原始巢狀結構（保留備用）
+        const pageVersion: PageVersion = { ...meta, data: layouts };
+
+        // 扁平化 Graph（O(1) 查詢）
+        const pageGraph = flattenToGraph(layouts, meta);
+
+        console.log('📦 PageVersion (nested):', pageVersion);
+        console.log('🗂️  PageGraph  (flat)   :', pageGraph);
+        console.log(
+            `   layouts: ${Object.keys(pageGraph.layouts).length} 個`,
+            `| slots: ${Object.keys(pageGraph.slots).length} 個`,
+            `| rootOrder: [${pageGraph.rootOrder.join(', ')}]`,
+        );
     }, [layouts]);
 
     return (
@@ -108,8 +122,7 @@ export default function CanvasArea({
                                 <div className='text-center'>
                                     <p className='text-lg mb-1'></p>
                                     <p className='text-sm font-medium'>
-                                        拖曳 Layout 到此畫布，或將 Layout 放入
-                                        Slot 中
+                                        拖曳 Layout 到此畫布
                                     </p>
                                 </div>
                             </div>

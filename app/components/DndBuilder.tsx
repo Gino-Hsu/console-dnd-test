@@ -11,199 +11,19 @@ import {
     useSensor,
     useSensors,
 } from '@dnd-kit/core';
-import { arrayMove } from '@dnd-kit/sortable';
-import { useCallback, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import CanvasArea from './CanvasArea';
+import {
+    createLayout,
+    findContainer,
+    findLayoutById,
+    insertIntoSlot,
+    moveItem,
+    removeItem,
+    sortInContainer,
+} from '@/lib/layout';
 import LayoutSidebar from './LayoutSidebar';
-import type { LayoutSpacing, LayoutType, NestedLayout, Slot } from './types';
-import { DEFAULT_SPACING, LAYOUT_CONFIG } from './types';
-
-/* ── 工具函式 ─────────────────────────────────────── */
-
-function genId() {
-    return crypto.randomUUID();
-}
-
-function clone<T>(value: T): T {
-    return structuredClone(value);
-}
-
-/** 建立一個帶預設 slots 陣列的 NestedLayout，每個 slot 使用 UUID id */
-export function createLayout(type: LayoutType, label: string): NestedLayout {
-    const config = LAYOUT_CONFIG[type];
-    const slots: Slot[] = Array.from({ length: config.slotCount }, () => ({
-        id: genId(),
-        children: [],
-    }));
-    return {
-        id: genId(),
-        type,
-        label,
-        props: {},
-        slots,
-        spacing: structuredClone(DEFAULT_SPACING),
-    };
-}
-
-/**
- * 遞迴找出某個 item 所在的容器
- * 回傳 'root' 或 slotId，找不到回傳 null
- */
-export function findContainer(
-    itemId: string,
-    items: NestedLayout[],
-): string | null {
-    if (items.some(l => l.id === itemId)) return 'root';
-    for (const layout of items) {
-        for (const slot of layout.slots) {
-            if (slot.children.some(c => c.id === itemId)) return slot.id;
-            const found = findContainer(itemId, slot.children);
-            if (found) return found;
-        }
-    }
-    return null;
-}
-
-/** 遞迴在指定 slot 內插入一個 layout（可指定位置） */
-export function insertIntoSlot(
-    items: NestedLayout[],
-    ownerId: string,
-    slotId: string,
-    newLayout: NestedLayout,
-    atIndex?: number,
-): NestedLayout[] {
-    return items.map(layout => {
-        const slotIdx = layout.slots.findIndex(s => s.id === slotId);
-        if (slotIdx !== -1) {
-            return {
-                ...layout,
-                slots: layout.slots.map((s, i) => {
-                    if (i !== slotIdx) return s;
-                    const children = [...s.children];
-                    children.splice(atIndex ?? children.length, 0, newLayout);
-                    return { ...s, children };
-                }),
-            };
-        }
-        return {
-            ...layout,
-            slots: layout.slots.map(s => ({
-                ...s,
-                children: insertIntoSlot(
-                    s.children,
-                    ownerId,
-                    slotId,
-                    newLayout,
-                    atIndex,
-                ),
-            })),
-        };
-    });
-}
-
-/** 遞迴在指定容器內對兩個 item 做排序 */
-export function sortInContainer(
-    items: NestedLayout[],
-    containerId: string,
-    activeId: string,
-    overId: string,
-): NestedLayout[] {
-    if (containerId === 'root') {
-        const oldIndex = items.findIndex(i => i.id === activeId);
-        const newIndex = items.findIndex(i => i.id === overId);
-        if (oldIndex === -1 || newIndex === -1) return items;
-        return arrayMove(items, oldIndex, newIndex);
-    }
-    return items.map(layout => {
-        const slotIdx = layout.slots.findIndex(s => s.id === containerId);
-        if (slotIdx !== -1) {
-            return {
-                ...layout,
-                slots: layout.slots.map((s, i) => {
-                    if (i !== slotIdx) return s;
-                    const oldIndex = s.children.findIndex(
-                        c => c.id === activeId,
-                    );
-                    const newIndex = s.children.findIndex(c => c.id === overId);
-                    if (oldIndex === -1 || newIndex === -1) return s;
-                    return {
-                        ...s,
-                        children: arrayMove(s.children, oldIndex, newIndex),
-                    };
-                }),
-            };
-        }
-        return {
-            ...layout,
-            slots: layout.slots.map(s => ({
-                ...s,
-                children: sortInContainer(
-                    s.children,
-                    containerId,
-                    activeId,
-                    overId,
-                ),
-            })),
-        };
-    });
-}
-
-/** 遞迴移除某個 item */
-export function removeItem(items: NestedLayout[], id: string): NestedLayout[] {
-    return items
-        .filter(l => l.id !== id)
-        .map(layout => ({
-            ...layout,
-            slots: layout.slots.map(s => ({
-                ...s,
-                children: removeItem(s.children, id),
-            })),
-        }));
-}
-
-/** 遞迴找出指定 id 的 NestedLayout */
-export function findLayoutById(
-    id: string,
-    items: NestedLayout[],
-): NestedLayout | null {
-    for (const l of items) {
-        if (l.id === id) return l;
-        for (const s of l.slots) {
-            const found = findLayoutById(id, s.children);
-            if (found) return found;
-        }
-    }
-    return null;
-}
-
-/**
- * 將 activeId 從原位置移除，插入到 targetContainerId（'root' 或 slotId）的 atIndex 位置
- */
-export function moveItem(
-    items: NestedLayout[],
-    activeId: string,
-    targetContainerId: string,
-    atIndex?: number,
-): NestedLayout[] {
-    const moving = findLayoutById(activeId, items);
-    if (!moving) return items;
-
-    const withoutActive = removeItem(items, activeId);
-
-    if (targetContainerId === 'root') {
-        const next = [...withoutActive];
-        next.splice(atIndex ?? next.length, 0, moving);
-        return next;
-    }
-
-    return insertIntoSlot(
-        withoutActive,
-        '',
-        targetContainerId,
-        moving,
-        atIndex,
-    );
-}
+import type { LayoutSpacing, LayoutType, NestedLayout } from '@/types/layout';
 
 export default function DndBuilder() {
     const [layouts, setLayouts] = useState<NestedLayout[]>([]);
@@ -216,7 +36,6 @@ export default function DndBuilder() {
         null,
     );
 
-    // 用 ref 讓 handleDragStart/Over 能讀到最新 layouts 而不需要加入 deps
     const layoutsRef = useRef(layouts);
     layoutsRef.current = layouts;
     // 記錄拖曳開始時的來源容器，用來判斷是否跨容器
@@ -224,9 +43,11 @@ export default function DndBuilder() {
 
     const dndId = useId();
 
-    const isMobile =
-        typeof navigator !== 'undefined' &&
-        /iPhone|Android/i.test(navigator.userAgent);
+    // 避免 SSR / client 不一致導致 hydration mismatch
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        setIsMobile(/iPhone|Android/i.test(navigator.userAgent));
+    }, []);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
