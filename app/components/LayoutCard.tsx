@@ -7,7 +7,9 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useCallback, useRef } from 'react';
 import { InsertLine } from './CanvasArea';
+import ResizeHandle from './ResizeHandle';
 import type { NestedLayout } from './types';
 
 /* ── 單個 Slot 區域 ── */
@@ -19,6 +21,8 @@ function SlotZone({
     selectedLayoutId,
     insertSlotId,
     slotInsertIndex,
+    onUpdateSlotWidths,
+    flexBasis,
 }: {
     slot: {
         id: string;
@@ -31,6 +35,9 @@ function SlotZone({
     selectedLayoutId: string | null;
     insertSlotId: string | null;
     slotInsertIndex: number | null;
+    onUpdateSlotWidths?: (layoutId: string, widths: number[]) => void;
+    /** 僅 flex layout 使用，控制 slot 寬度百分比 */
+    flexBasis?: number;
 }) {
     const { setNodeRef, isOver } = useDroppable({
         id: slot.id,
@@ -40,7 +47,15 @@ function SlotZone({
     const isActiveSlot = insertSlotId === slot.id;
 
     return (
-        <div className='flex-1 min-w-0' data-slot-id={slot.id}>
+        <div
+            className={flexBasis !== undefined ? 'min-w-0' : 'flex-1 min-w-0'}
+            style={
+                flexBasis !== undefined
+                    ? { flexBasis: `${flexBasis}%`, flexShrink: 0, flexGrow: 0 }
+                    : undefined
+            }
+            data-slot-id={slot.id}
+        >
             {slot.label && (
                 <div className='text-xs font-medium text-zinc-400 mb-1 select-none'>
                     {slot.label}
@@ -88,6 +103,9 @@ function SlotZone({
                                             depth={1}
                                             insertSlotId={insertSlotId}
                                             slotInsertIndex={slotInsertIndex}
+                                            onUpdateSlotWidths={
+                                                onUpdateSlotWidths
+                                            }
                                         />
                                     </div>
                                     {isActiveSlot &&
@@ -113,6 +131,7 @@ export default function LayoutCard({
     depth = 0,
     insertSlotId,
     slotInsertIndex,
+    onUpdateSlotWidths,
 }: {
     layout: NestedLayout;
     onRemove: (id: string) => void;
@@ -121,6 +140,7 @@ export default function LayoutCard({
     depth?: number;
     insertSlotId: string | null;
     slotInsertIndex: number | null;
+    onUpdateSlotWidths?: (layoutId: string, widths: number[]) => void;
 }) {
     const {
         attributes,
@@ -136,6 +156,32 @@ export default function LayoutCard({
         transition,
         opacity: isDragging ? 0.4 : 1,
     };
+
+    // flex layout resize ────────────────────────
+    const flexContainerRef = useRef<HTMLDivElement>(null);
+
+    const handleResizeDrag = useCallback(
+        (slotIndex: number, dx: number) => {
+            if (!flexContainerRef.current || !onUpdateSlotWidths) return;
+            const totalWidth = flexContainerRef.current.offsetWidth;
+            if (totalWidth === 0) return;
+            const deltaPercent = (dx / totalWidth) * 100;
+            const equal = 100 / layout.slots.length;
+            const currentWidths = layout.slots.map(s => s.flexBasis ?? equal);
+            const next = [...currentWidths];
+            next[slotIndex] = Math.max(5, next[slotIndex] + deltaPercent);
+            next[slotIndex + 1] = Math.max(
+                5,
+                next[slotIndex + 1] - deltaPercent,
+            );
+            // 正規化，確保總和 = 100
+            const total = next.reduce((a, b) => a + b, 0);
+            const normalized = next.map(w => (w / total) * 100);
+            onUpdateSlotWidths(layout.id, normalized);
+        },
+        [layout, onUpdateSlotWidths],
+    );
+    // ────────────────────────────────────────────
 
     const isBlock = layout.type === 'block';
     const isFlex = layout.type === 'flex';
@@ -290,26 +336,64 @@ export default function LayoutCard({
 
                     {layout.slots.length > 0 && (
                         <div
+                            ref={isFlex ? flexContainerRef : undefined}
                             className={
                                 isBlock
                                     ? 'flex flex-col gap-2'
                                     : isFlex
-                                      ? 'flex flex-row gap-2'
+                                      ? 'flex flex-row'
                                       : 'grid grid-cols-2 gap-2'
                             }
                         >
-                            {layout.slots.map(slot => (
-                                <SlotZone
-                                    key={slot.id}
-                                    slot={slot}
-                                    ownerId={layout.id}
-                                    onRemove={onRemove}
-                                    onSelect={onSelect}
-                                    selectedLayoutId={selectedLayoutId}
-                                    insertSlotId={insertSlotId}
-                                    slotInsertIndex={slotInsertIndex}
-                                />
-                            ))}
+                            {isFlex
+                                ? layout.slots.map((slot, i) => (
+                                      <div
+                                          key={slot.id}
+                                          className='flex min-w-0'
+                                          style={{
+                                              flexBasis: `${slot.flexBasis ?? 100 / layout.slots.length}%`,
+                                              flexShrink: 0,
+                                              flexGrow: 0,
+                                          }}
+                                      >
+                                          <SlotZone
+                                              slot={slot}
+                                              ownerId={layout.id}
+                                              onRemove={onRemove}
+                                              onSelect={onSelect}
+                                              selectedLayoutId={
+                                                  selectedLayoutId
+                                              }
+                                              insertSlotId={insertSlotId}
+                                              slotInsertIndex={slotInsertIndex}
+                                              onUpdateSlotWidths={
+                                                  onUpdateSlotWidths
+                                              }
+                                          />
+                                          {i < layout.slots.length - 1 && (
+                                              <ResizeHandle
+                                                  onDrag={dx =>
+                                                      handleResizeDrag(i, dx)
+                                                  }
+                                              />
+                                          )}
+                                      </div>
+                                  ))
+                                : layout.slots.map(slot => (
+                                      <SlotZone
+                                          key={slot.id}
+                                          slot={slot}
+                                          ownerId={layout.id}
+                                          onRemove={onRemove}
+                                          onSelect={onSelect}
+                                          selectedLayoutId={selectedLayoutId}
+                                          insertSlotId={insertSlotId}
+                                          slotInsertIndex={slotInsertIndex}
+                                          onUpdateSlotWidths={
+                                              onUpdateSlotWidths
+                                          }
+                                      />
+                                  ))}
                         </div>
                     )}
                 </div>

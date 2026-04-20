@@ -37,6 +37,9 @@ export function flattenToGraph(
                 id: slot.id,
                 childIds: slot.children.map(c => c.id),
                 parentLayoutId: layout.id,
+                ...(slot.flexBasis !== undefined
+                    ? { flexBasis: slot.flexBasis }
+                    : {}),
             };
             for (const child of slot.children) {
                 visitLayout(child, slot.id);
@@ -244,6 +247,21 @@ export function applyOperation(graph: PageGraph, op: PageOperation): PageGraph {
                 },
                 slots: restSlots,
             };
+        }
+
+        case 'UPDATE_SLOT_WIDTHS': {
+            const layout = graph.layouts[op.layoutId];
+            if (!layout) return graph;
+            const updatedSlots = { ...graph.slots };
+            layout.slotIds.forEach((slotId, i) => {
+                if (op.widths[i] !== undefined && updatedSlots[slotId]) {
+                    updatedSlots[slotId] = {
+                        ...updatedSlots[slotId],
+                        flexBasis: op.widths[i],
+                    };
+                }
+            });
+            return { ...graph, slots: updatedSlots };
         }
 
         default:

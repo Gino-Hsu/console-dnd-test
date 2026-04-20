@@ -11,9 +11,11 @@ export function genId(): string {
  */
 export function createLayout(type: LayoutType, label: string): NestedLayout {
     const { slotCount } = LAYOUT_CONFIG[type];
+    const equalBasis = type === 'flex' ? 100 / slotCount : undefined;
     const slots: Slot[] = Array.from({ length: slotCount }, () => ({
         id: genId(),
         children: [],
+        ...(equalBasis !== undefined ? { flexBasis: equalBasis } : {}),
     }));
     return {
         id: genId(),

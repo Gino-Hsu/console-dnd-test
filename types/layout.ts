@@ -11,6 +11,8 @@ export interface LayoutItem {
 export interface Slot {
     id: string;
     children: NestedLayout[];
+    /** flex 佔比百分比（僅 flex layout 使用），e.g. 50 = 50% */
+    flexBasis?: number;
 }
 
 export const LAYOUT_CONFIG: Record<LayoutType, { slotCount: number }> = {
@@ -82,6 +84,8 @@ export interface FlatSlot {
     id: string;
     childIds: string[];
     parentLayoutId: string;
+    /** flex 佔比百分比（僅 flex layout 使用），e.g. 50 = 50% */
+    flexBasis?: number;
 }
 
 /**
@@ -149,6 +153,14 @@ export type PageOperation =
           type: 'REMOVE_SLOT';
           layoutId: string;
           slotId: string;
+          seq: number;
+          clientId: string;
+      }
+    | {
+          type: 'UPDATE_SLOT_WIDTHS';
+          layoutId: string;
+          /** 與 FlatLayout.slotIds 順序相同的 flexBasis 百分比陣列 */
+          widths: number[];
           seq: number;
           clientId: string;
       };

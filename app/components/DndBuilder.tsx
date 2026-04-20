@@ -275,13 +275,19 @@ export default function DndBuilder() {
         const addToLayout = (items: NestedLayout[]): NestedLayout[] =>
             items.map(l => {
                 if (l.id === layoutId) {
-                    return {
-                        ...l,
-                        slots: [
-                            ...l.slots,
-                            { id: crypto.randomUUID(), children: [] },
-                        ],
-                    };
+                    const newSlots = [
+                        ...l.slots,
+                        { id: crypto.randomUUID(), children: [] },
+                    ];
+                    // flex layout：重新均分所有 slot 的 flexBasis
+                    const normalized =
+                        l.type === 'flex'
+                            ? newSlots.map(s => ({
+                                  ...s,
+                                  flexBasis: 100 / newSlots.length,
+                              }))
+                            : newSlots;
+                    return { ...l, slots: normalized };
                 }
                 return {
                     ...l,
@@ -299,10 +305,16 @@ export default function DndBuilder() {
         const removeFromLayout = (items: NestedLayout[]): NestedLayout[] =>
             items.map(l => {
                 if (l.id === layoutId) {
-                    return {
-                        ...l,
-                        slots: l.slots.filter(s => s.id !== slotId),
-                    };
+                    const remaining = l.slots.filter(s => s.id !== slotId);
+                    // flex layout：重新均分剩餘 slot 的 flexBasis
+                    const normalized =
+                        l.type === 'flex' && remaining.length > 0
+                            ? remaining.map(s => ({
+                                  ...s,
+                                  flexBasis: 100 / remaining.length,
+                              }))
+                            : remaining;
+                    return { ...l, slots: normalized };
                 }
                 return {
                     ...l,
@@ -320,6 +332,32 @@ export default function DndBuilder() {
             const update = (items: NestedLayout[]): NestedLayout[] =>
                 items.map(l => {
                     if (l.id === layoutId) return { ...l, spacing };
+                    return {
+                        ...l,
+                        slots: l.slots.map(s => ({
+                            ...s,
+                            children: update(s.children),
+                        })),
+                    };
+                });
+            setLayouts(prev => update(prev));
+        },
+        [],
+    );
+
+    const handleUpdateSlotWidths = useCallback(
+        (layoutId: string, widths: number[]) => {
+            const update = (items: NestedLayout[]): NestedLayout[] =>
+                items.map(l => {
+                    if (l.id === layoutId) {
+                        return {
+                            ...l,
+                            slots: l.slots.map((s, i) => ({
+                                ...s,
+                                flexBasis: widths[i] ?? s.flexBasis,
+                            })),
+                        };
+                    }
                     return {
                         ...l,
                         slots: l.slots.map(s => ({
@@ -385,6 +423,7 @@ export default function DndBuilder() {
                     insertIndex={insertSlotId === null ? insertIndex : null}
                     insertSlotId={insertSlotId}
                     slotInsertIndex={insertSlotId !== null ? insertIndex : null}
+                    onUpdateSlotWidths={handleUpdateSlotWidths}
                 />
             </div>
 
