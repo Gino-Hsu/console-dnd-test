@@ -57,6 +57,8 @@ export interface NestedLayout {
     gridColGap?: number;
     /** grid layout 列間距（row-gap），像素 */
     gridRowGap?: number;
+    /** flex layout slot 間距（gap），像素 */
+    flexGap?: number;
 }
 
 // ─── 版本快照 ─────────────────────────────────────────────────
@@ -91,6 +93,8 @@ export interface FlatLayout {
     gridColGap?: number;
     /** grid layout 列間距（row-gap），像素 */
     gridRowGap?: number;
+    /** flex layout slot 間距（gap），像素 */
+    flexGap?: number;
 }
 
 /**

@@ -51,13 +51,16 @@ export default function LayoutCard({
             if (!flexRef.current || !shared.onUpdateSlotWidths) return;
             const tw = flexRef.current.offsetWidth;
             if (!tw) return;
+            const gap = layout.flexGap ?? 8;
+            const contentWidth = tw - (layout.slots.length - 1) * gap;
+            if (!contentWidth) return;
             const eq = 100 / layout.slots.length;
             shared.onUpdateSlotWidths(
                 layout.id,
                 resizeFlexSlots(
                     layout.slots.map(s => s.flexBasis ?? eq),
                     i,
-                    (dx / tw) * 100,
+                    (dx / contentWidth) * 100,
                 ),
             );
         },

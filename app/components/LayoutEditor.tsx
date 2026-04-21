@@ -109,6 +109,7 @@ export default function LayoutEditor({
     onRemoveSlot,
     onUpdateSpacing,
     onUpdateGridDimensions,
+    onUpdateFlexGap,
     onDeselect,
 }: {
     layout: NestedLayout;
@@ -122,10 +123,12 @@ export default function LayoutEditor({
         colGap?: number,
         rowGap?: number,
     ) => void;
+    onUpdateFlexGap?: (layoutId: string, flexGap: number) => void;
     onDeselect: () => void;
 }) {
     const [slotsOpen, setSlotsOpen] = useState(true);
     const [gridOpen, setGridOpen] = useState(true);
+    const [flexOpen, setFlexOpen] = useState(true);
     const [spacingOpen, setSpacingOpen] = useState(true);
 
     const spacing = layout.spacing ?? DEFAULT_SPACING;
@@ -465,6 +468,44 @@ export default function LayoutEditor({
                             </div>
                         );
                     })()}
+
+                {/* 分隔線 */}
+                <div className='border-t border-zinc-100' />
+
+                {/* ── Flex 設定 手風琴（僅 flex layout 顯示） ── */}
+                {layout.type === 'flex' && onUpdateFlexGap && (
+                    <div className='flex flex-col gap-2'>
+                        <AccordionHeader
+                            label='Flex 設定'
+                            open={flexOpen}
+                            onToggle={() => setFlexOpen(o => !o)}
+                        />
+                        {flexOpen && (
+                            <div className='mt-1'>
+                                <p className='text-[10px] font-semibold text-zinc-400 uppercase tracking-wide mb-1.5'>
+                                    Slot 間距 px
+                                </p>
+                                <input
+                                    type='number'
+                                    min={0}
+                                    max={200}
+                                    value={layout.flexGap ?? 8}
+                                    onChange={e =>
+                                        onUpdateFlexGap(
+                                            layout.id,
+                                            Math.max(
+                                                0,
+                                                parseInt(e.target.value, 10) ||
+                                                    0,
+                                            ),
+                                        )
+                                    }
+                                    className='w-full text-center text-xs border border-zinc-200 rounded px-1 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-sky-400 focus:border-sky-400 transition'
+                                />
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {/* 分隔線 */}
                 <div className='border-t border-zinc-100' />

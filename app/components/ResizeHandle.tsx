@@ -12,6 +12,8 @@ interface ResizeHandleProps {
     direction?: 'col' | 'row';
     /** 每次 pointermove 觸發，delta 為像素位移（col = dx, row = dy） */
     onDrag: (delta: number) => void;
+    /** 覆寫預設尺寸（col 方向為寬度，row 方向為高度），單位 px。預設 8px。 */
+    size?: number;
 }
 
 /**
@@ -21,6 +23,7 @@ interface ResizeHandleProps {
 export default function ResizeHandle({
     direction = 'col',
     onDrag,
+    size,
 }: ResizeHandleProps) {
     const dragging = useRef(false);
     const lastPos = useRef(0);
@@ -62,6 +65,13 @@ export default function ResizeHandle({
                 isCol
                     ? 'shrink-0 w-2 cursor-col-resize flex items-stretch justify-center group select-none'
                     : 'shrink-0 h-2 cursor-row-resize flex items-center justify-stretch group select-none'
+            }
+            style={
+                size !== undefined
+                    ? isCol
+                        ? { width: size }
+                        : { height: size }
+                    : undefined
             }
             role='separator'
             aria-orientation={isCol ? 'vertical' : 'horizontal'}

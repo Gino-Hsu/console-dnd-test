@@ -444,6 +444,24 @@ export default function DndBuilder() {
         [],
     );
 
+    const handleUpdateFlexGap = useCallback(
+        (layoutId: string, flexGap: number) => {
+            const update = (items: NestedLayout[]): NestedLayout[] =>
+                items.map(l => {
+                    if (l.id === layoutId) return { ...l, flexGap };
+                    return {
+                        ...l,
+                        slots: l.slots.map(s => ({
+                            ...s,
+                            children: update(s.children),
+                        })),
+                    };
+                });
+            setLayouts(prev => update(prev));
+        },
+        [],
+    );
+
     const overlayLabel =
         activeSidebarType === 'block'
             ? '塊級 Layout'
@@ -487,6 +505,7 @@ export default function DndBuilder() {
                     onRemoveSlot={handleRemoveSlot}
                     onUpdateSpacing={handleUpdateSpacing}
                     onUpdateGridDimensions={handleUpdateGridDimensions}
+                    onUpdateFlexGap={handleUpdateFlexGap}
                     onDeselect={() => setSelectedLayoutId(null)}
                 />
                 <CanvasArea
