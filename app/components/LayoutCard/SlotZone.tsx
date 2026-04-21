@@ -5,6 +5,7 @@ import {
     SortableContext,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import { cn } from '@/lib/cn';
 import { InsertLine } from '../CanvasArea';
 import type { NestedLayout } from '@/types/layout';
 import type { SlotProps } from './types';
@@ -31,10 +32,10 @@ export default function SlotZone({
 
     return (
         <div
-            className={[
+            className={cn(
                 flexBasis !== undefined ? 'min-w-0' : 'flex-1 min-w-0',
-                isGridItem ? 'h-full' : '',
-            ].join(' ')}
+                isGridItem ? 'h-full' : undefined,
+            )}
             style={
                 flexBasis !== undefined
                     ? { flexBasis: `${flexBasis}%`, flexShrink: 0, flexGrow: 0 }

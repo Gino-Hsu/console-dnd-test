@@ -32,8 +32,6 @@ export default function LayoutContent({
     onColDrag: (i: number, dx: number) => void;
     onRowDrag: (i: number, dy: number) => void;
 }) {
-    if (!layout.slots.length) return null;
-
     if (layout.type === 'block') {
         return <BlockLayout slots={layout.slots} sp={sp} />;
     }
@@ -47,17 +45,20 @@ export default function LayoutContent({
             />
         );
     }
-    return (
-        <GridLayout
-            layout={layout}
-            containerRef={gridRef}
-            cols={cols}
-            rows={rows}
-            defColW={defColW}
-            defRowH={defRowH}
-            sp={sp}
-            onColDrag={onColDrag}
-            onRowDrag={onRowDrag}
-        />
-    );
+    if (layout.type === 'grid') {
+        return (
+            <GridLayout
+                layout={layout}
+                containerRef={gridRef}
+                cols={cols}
+                rows={rows}
+                defColW={defColW}
+                defRowH={defRowH}
+                sp={sp}
+                onColDrag={onColDrag}
+                onRowDrag={onRowDrag}
+            />
+        );
+    }
+    return null;
 }

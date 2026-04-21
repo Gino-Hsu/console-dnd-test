@@ -6,7 +6,7 @@ import {
     gridContainerStyle,
     gridRowHandleTop,
 } from '@/lib/layout/resizeUtils';
-import ResizeHandle from './ResizeHandle';
+import ResizeHandle from '../ResizeHandle';
 import SlotZone from './SlotZone';
 import type { NestedLayout } from '@/types/layout';
 import type { SlotProps } from './types';

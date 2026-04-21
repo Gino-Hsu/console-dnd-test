@@ -1,7 +1,7 @@
 'use client';
 
 import type { RefObject } from 'react';
-import ResizeHandle from './ResizeHandle';
+import ResizeHandle from '../ResizeHandle';
 import SlotZone from './SlotZone';
 import type { NestedLayout } from '@/types/layout';
 import type { SlotProps } from './types';
