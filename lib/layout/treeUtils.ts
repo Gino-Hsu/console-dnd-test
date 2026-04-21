@@ -37,6 +37,30 @@ export function findLayoutById(
     return null;
 }
 
+/**
+ * 判斷 slotId 是否屬於 layoutId 本身或其任意後代 layout 的 slot。
+ * 用來防止 layout 被拖進自己（或子孫）的 slot。
+ */
+export function isSlotInsideLayout(
+    slotId: string,
+    layoutId: string,
+    items: NestedLayout[],
+): boolean {
+    const layout = findLayoutById(layoutId, items);
+    if (!layout) return false;
+    // 遞迴檢查：只要找到此 slot 就回傳 true
+    function check(node: NestedLayout): boolean {
+        for (const slot of node.slots) {
+            if (slot.id === slotId) return true;
+            for (const child of slot.children) {
+                if (check(child)) return true;
+            }
+        }
+        return false;
+    }
+    return check(layout);
+}
+
 // ─── 變換（純函式，不 mutate） ───────────────────────────────
 
 /** 遞迴在指定 slot 內插入一個 layout（可指定位置） */

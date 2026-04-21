@@ -19,6 +19,7 @@ import {
     findContainer,
     findLayoutById,
     insertIntoSlot,
+    isSlotInsideLayout,
     moveItem,
     removeItem,
     sortInContainer,
@@ -41,6 +42,8 @@ export default function DndBuilder() {
     layoutsRef.current = layouts;
     // 記錄拖曳開始時的來源容器，用來判斷是否跨容器
     const activeContainerRef = useRef<string | null>(null);
+    // 記錄目前正在拖曳的 canvas item id（handleDragOver 是 stale closure，無法讀 state）
+    const activeCanvasIdRef = useRef<string | null>(null);
 
     const dndId = useId();
 
@@ -65,6 +68,7 @@ export default function DndBuilder() {
             setActiveSidebarType(data.type as LayoutType);
         } else {
             setActiveCanvasId(event.active.id as string);
+            activeCanvasIdRef.current = event.active.id as string;
             activeContainerRef.current = findContainer(
                 event.active.id as string,
                 layoutsRef.current,
@@ -90,6 +94,21 @@ export default function DndBuilder() {
 
             // canvas item 在同一個 slot 內移動：不顯示 InsertLine，讓 useSortable 處理
             if (!isSidebar && activeContainerRef.current === slotId) {
+                setInsertSlotId(null);
+                setInsertIndex(null);
+                return;
+            }
+
+            // 不允許拖進自己（或後代）的 slot
+            if (
+                !isSidebar &&
+                activeCanvasIdRef.current &&
+                isSlotInsideLayout(
+                    slotId,
+                    activeCanvasIdRef.current,
+                    layoutsRef.current,
+                )
+            ) {
                 setInsertSlotId(null);
                 setInsertIndex(null);
                 return;
@@ -154,7 +173,9 @@ export default function DndBuilder() {
             setActiveCanvasId(null);
             setInsertIndex(null);
             setInsertSlotId(null);
+
             activeContainerRef.current = null;
+            activeCanvasIdRef.current = null;
             if (!over) return;
 
             // Sidebar → Canvas
@@ -224,6 +245,14 @@ export default function DndBuilder() {
                 }
 
                 // 跨容器搬移
+                // 防止拖進自己（或後代）的 slot
+                if (
+                    targetContainer !== 'root' &&
+                    isSlotInsideLayout(targetContainer, activeId, prev)
+                ) {
+                    return prev;
+                }
+
                 return moveItem(
                     prev,
                     activeId,
@@ -242,6 +271,7 @@ export default function DndBuilder() {
         setInsertIndex(null);
         setInsertSlotId(null);
         activeContainerRef.current = null;
+        activeCanvasIdRef.current = null;
     }, []);
 
     const handleRemove = useCallback((id: string) => {
