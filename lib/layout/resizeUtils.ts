@@ -89,6 +89,8 @@ export function gridRowHandleTop(
 /**
  * 產生 grid 容器的 CSS style（gridTemplateColumns/Rows + gap）
  */
+const DEFAULT_GAP = 8;
+
 export function gridContainerStyle(
     layout: Pick<
         NestedLayout,
@@ -108,8 +110,8 @@ export function gridContainerStyle(
         display: 'grid',
         gridTemplateColumns: colWidths.map(w => `${w}fr`).join(' '),
         gridTemplateRows: rowHeights.map(h => `${h}px`).join(' '),
-        columnGap: `${layout.gridColGap ?? 8}px`,
-        rowGap: `${layout.gridRowGap ?? 8}px`,
+        columnGap: `${layout.gridColGap ?? DEFAULT_GAP}px`,
+        rowGap: `${layout.gridRowGap ?? DEFAULT_GAP}px`,
     };
 }
 
