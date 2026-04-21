@@ -58,16 +58,16 @@ export function gridColHandleLeft(
 /**
  * 計算拖曳後的 grid 列高（px），最小 40px
  */
-export function resizeGridRows(
-    rowHeights: number[],
-    rowIndex: number,
-    dy: number,
-): number[] {
-    const next = [...rowHeights];
-    next[rowIndex] = Math.max(40, next[rowIndex] + dy);
-    next[rowIndex + 1] = Math.max(40, next[rowIndex + 1] - dy);
-    return next;
-}
+// export function resizeGridRows(
+//     rowHeights: number[],
+//     rowIndex: number,
+//     dy: number,
+// ): number[] {
+//     const next = [...rowHeights];
+//     next[rowIndex] = Math.max(40, next[rowIndex] + dy);
+//     next[rowIndex + 1] = Math.max(40, next[rowIndex + 1] - dy);
+//     return next;
+// }
 
 /**
  * 計算列分隔拖曳條距離容器頂部的 px 值（置於間距正中央）
@@ -97,19 +97,15 @@ export function gridContainerStyle(
         'gridColWidths' | 'gridRowHeights' | 'gridColGap' | 'gridRowGap'
     >,
     cols: number,
-    rows: number,
     defaultColW: number,
-    defaultRowH: number,
 ): React.CSSProperties {
     const colWidths =
         layout.gridColWidths ?? Array.from({ length: cols }, () => defaultColW);
-    const rowHeights =
-        layout.gridRowHeights ??
-        Array.from({ length: rows }, () => defaultRowH);
+
     return {
         display: 'grid',
         gridTemplateColumns: colWidths.map(w => `${w}fr`).join(' '),
-        gridTemplateRows: rowHeights.map(h => `${h}px`).join(' '),
+        gridTemplateRows: 'auto',
         columnGap: `${layout.gridColGap ?? DEFAULT_GAP}px`,
         rowGap: `${layout.gridRowGap ?? DEFAULT_GAP}px`,
     };

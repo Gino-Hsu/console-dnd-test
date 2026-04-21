@@ -1,8 +1,9 @@
+import { v4 as uuidv4 } from 'uuid';
 import type { LayoutType, NestedLayout, Slot } from '@/types/layout';
 import { DEFAULT_SPACING, LAYOUT_CONFIG } from '@/types/layout';
 
 export function genId(): string {
-    return crypto.randomUUID();
+    return uuidv4();
 }
 
 /**

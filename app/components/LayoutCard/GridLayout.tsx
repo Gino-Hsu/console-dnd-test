@@ -15,28 +15,28 @@ export default function GridLayout({
     layout,
     containerRef,
     cols,
-    rows,
+    // rows,
     defColW,
-    defRowH,
+    // defRowH,
     sp,
     onColDrag,
-    onRowDrag,
+    // onRowDrag,
 }: {
     layout: NestedLayout;
     containerRef: RefObject<HTMLDivElement | null>;
     cols: number;
-    rows: number;
+    // rows: number;
     defColW: number;
-    defRowH: number;
+    // defRowH: number;
     sp: SlotProps;
     onColDrag: (i: number, dx: number) => void;
-    onRowDrag: (i: number, dy: number) => void;
+    // onRowDrag: (i: number, dy: number) => void;
 }) {
     return (
         <div
             ref={containerRef}
             className='relative'
-            style={gridContainerStyle(layout, cols, rows, defColW, defRowH)}
+            style={gridContainerStyle(layout, cols, defColW)}
         >
             {layout.slots.map(slot => (
                 <SlotZone key={slot.id} slot={slot} isGridItem {...sp} />
@@ -69,7 +69,7 @@ export default function GridLayout({
             })}
 
             {/* 列分隔拖曳條 */}
-            {Array.from({ length: rows - 1 }, (_, i) => {
+            {/* {Array.from({ length: rows - 1 }, (_, i) => {
                 const rh =
                     layout.gridRowHeights ??
                     Array.from({ length: rows }, () => defRowH);
@@ -88,7 +88,7 @@ export default function GridLayout({
                         />
                     </div>
                 );
-            })}
+            })} */}
         </div>
     );
 }

@@ -11,6 +11,7 @@ import {
     useSensor,
     useSensors,
 } from '@dnd-kit/core';
+import { v4 as uuidv4 } from 'uuid';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import CanvasArea from './CanvasArea';
 import {
@@ -277,7 +278,7 @@ export default function DndBuilder() {
                 if (l.id === layoutId) {
                     const newSlots = [
                         ...l.slots,
-                        { id: crypto.randomUUID(), children: [] },
+                        { id: uuidv4(), children: [] },
                     ];
                     if (l.type === 'flex') {
                         // flex：重新均分所有 slot 的 flexBasis

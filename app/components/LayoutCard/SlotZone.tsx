@@ -55,13 +55,13 @@ export default function SlotZone({
             >
                 <div
                     ref={setNodeRef}
-                    className={[
+                    className={cn(
                         'rounded-lg border-2 border-dashed h-full p-4 flex flex-col gap-2 transition-colors',
                         isGridItem ? 'h-full' : 'min-h-16',
                         isOver
                             ? 'border-blue-400 bg-blue-50'
                             : 'border-zinc-200 bg-white/60',
-                    ].join(' ')}
+                    )}
                 >
                     {slot.children.length === 0 ? (
                         <>

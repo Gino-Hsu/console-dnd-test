@@ -12,25 +12,25 @@ export default function LayoutContent({
     flexRef,
     gridRef,
     cols,
-    rows,
+    // rows,
     defColW,
-    defRowH,
+    // defRowH,
     sp,
     onFlexDrag,
     onColDrag,
-    onRowDrag,
+    // onRowDrag,
 }: {
     layout: NestedLayout;
     flexRef: RefObject<HTMLDivElement | null>;
     gridRef: RefObject<HTMLDivElement | null>;
     cols: number;
-    rows: number;
+    // rows: number;
     defColW: number;
-    defRowH: number;
+    // defRowH: number;
     sp: SlotProps;
     onFlexDrag: (i: number, dx: number) => void;
     onColDrag: (i: number, dx: number) => void;
-    onRowDrag: (i: number, dy: number) => void;
+    // onRowDrag: (i: number, dy: number) => void;
 }) {
     if (layout.type === 'block') {
         return <BlockLayout slots={layout.slots} sp={sp} />;
@@ -51,12 +51,12 @@ export default function LayoutContent({
                 layout={layout}
                 containerRef={gridRef}
                 cols={cols}
-                rows={rows}
+                // rows={rows}
                 defColW={defColW}
-                defRowH={defRowH}
+                // defRowH={defRowH}
                 sp={sp}
                 onColDrag={onColDrag}
-                onRowDrag={onRowDrag}
+                // onRowDrag={onRowDrag}
             />
         );
     }

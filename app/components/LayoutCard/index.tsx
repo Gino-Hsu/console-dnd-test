@@ -7,7 +7,7 @@ import {
     layoutTheme,
     resizeFlexSlots,
     resizeGridCols,
-    resizeGridRows,
+    // resizeGridRows,
 } from '@/lib/layout/resizeUtils';
 import LayoutContent from './LayoutContent';
 import LayoutFrame from './LayoutFrame';
@@ -84,23 +84,23 @@ export default function LayoutCard({
         [layout, cols, rows, defColW, defRowH, shared.onUpdateGridDimensions],
     );
 
-    const handleRowDrag = useCallback(
-        (i: number, dy: number) => {
-            if (!shared.onUpdateGridDimensions) return;
-            const rh =
-                layout.gridRowHeights ??
-                Array.from({ length: rows }, () => defRowH);
-            shared.onUpdateGridDimensions(
-                layout.id,
-                layout.gridColWidths ??
-                    Array.from({ length: cols }, () => defColW),
-                resizeGridRows(rh, i, dy),
-                layout.gridColGap,
-                layout.gridRowGap,
-            );
-        },
-        [layout, cols, rows, defColW, defRowH, shared.onUpdateGridDimensions],
-    );
+    // const handleRowDrag = useCallback(
+    //     (i: number, dy: number) => {
+    //         if (!shared.onUpdateGridDimensions) return;
+    //         const rh =
+    //             layout.gridRowHeights ??
+    //             Array.from({ length: rows }, () => defRowH);
+    //         shared.onUpdateGridDimensions(
+    //             layout.id,
+    //             layout.gridColWidths ??
+    //                 Array.from({ length: cols }, () => defColW),
+    //             resizeGridRows(rh, i, dy),
+    //             layout.gridColGap,
+    //             layout.gridRowGap,
+    //         );
+    //     },
+    //     [layout, cols, rows, defColW, defRowH, shared.onUpdateGridDimensions],
+    // );
 
     // ── 外觀 ──────────────────────────────────────────────────────────────────
     const { borderColor, bgColor } = layoutTheme(layout.type, depth);
@@ -128,13 +128,13 @@ export default function LayoutCard({
                 flexRef={flexRef}
                 gridRef={gridRef}
                 cols={cols}
-                rows={rows}
+                // rows={rows}
                 defColW={defColW}
-                defRowH={defRowH}
+                // defRowH={defRowH}
                 sp={sp}
                 onFlexDrag={handleFlexDrag}
                 onColDrag={handleColDrag}
-                onRowDrag={handleRowDrag}
+                // onRowDrag={handleRowDrag}
             />
         </LayoutFrame>
     );
