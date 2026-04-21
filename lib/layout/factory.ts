@@ -24,5 +24,14 @@ export function createLayout(type: LayoutType, label: string): NestedLayout {
         props: {},
         slots,
         spacing: structuredClone(DEFAULT_SPACING),
+        // grid layout：預設 2 欄等寬、2 列等高、gap 8px
+        ...(type === 'grid'
+            ? {
+                  gridColWidths: [50, 50],
+                  gridRowHeights: [120, 120],
+                  gridColGap: 8,
+                  gridRowGap: 8,
+              }
+            : {}),
     };
 }

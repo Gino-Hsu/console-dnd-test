@@ -32,6 +32,7 @@ export default function CanvasArea({
     insertSlotId,
     slotInsertIndex,
     onUpdateSlotWidths,
+    onUpdateGridDimensions,
 }: {
     layouts: NestedLayout[];
     onRemove: (id: string) => void;
@@ -41,6 +42,13 @@ export default function CanvasArea({
     insertSlotId: string | null;
     slotInsertIndex: number | null;
     onUpdateSlotWidths?: (layoutId: string, widths: number[]) => void;
+    onUpdateGridDimensions?: (
+        layoutId: string,
+        colWidths: number[],
+        rowHeights: number[],
+        colGap?: number,
+        rowGap?: number,
+    ) => void;
 }) {
     const { setNodeRef, isOver } = useDroppable({
         id: 'canvas-root',
@@ -143,6 +151,9 @@ export default function CanvasArea({
                                             slotInsertIndex={slotInsertIndex}
                                             onUpdateSlotWidths={
                                                 onUpdateSlotWidths
+                                            }
+                                            onUpdateGridDimensions={
+                                                onUpdateGridDimensions
                                             }
                                         />
                                         {insertIndex === index + 1 && (

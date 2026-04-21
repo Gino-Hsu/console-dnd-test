@@ -108,15 +108,24 @@ export default function LayoutEditor({
     onAddSlot,
     onRemoveSlot,
     onUpdateSpacing,
+    onUpdateGridDimensions,
     onDeselect,
 }: {
     layout: NestedLayout;
     onAddSlot: (layoutId: string) => void;
     onRemoveSlot: (layoutId: string, slotId: string) => void;
     onUpdateSpacing: (layoutId: string, spacing: LayoutSpacing) => void;
+    onUpdateGridDimensions?: (
+        layoutId: string,
+        colWidths: number[],
+        rowHeights: number[],
+        colGap?: number,
+        rowGap?: number,
+    ) => void;
     onDeselect: () => void;
 }) {
     const [slotsOpen, setSlotsOpen] = useState(true);
+    const [gridOpen, setGridOpen] = useState(true);
     const [spacingOpen, setSpacingOpen] = useState(true);
 
     const spacing = layout.spacing ?? DEFAULT_SPACING;
@@ -277,6 +286,185 @@ export default function LayoutEditor({
                         </div>
                     )}
                 </div>
+
+                {/* 分隔線 */}
+                <div className='border-t border-zinc-100' />
+
+                {/* ── Grid 設定 手風琴（僅 grid layout 顯示） ── */}
+                {layout.type === 'grid' &&
+                    onUpdateGridDimensions &&
+                    (() => {
+                        const currentCols = layout.gridColWidths?.length ?? 2;
+                        const currentRows = layout.gridRowHeights?.length ?? 2;
+
+                        const applyNewCols = (newCols: number) => {
+                            if (newCols < 1 || newCols > 12) return;
+                            const newColWidths = Array.from(
+                                { length: newCols },
+                                () => 100 / newCols,
+                            );
+                            const newRows = Math.max(
+                                1,
+                                Math.ceil(layout.slots.length / newCols),
+                            );
+                            const existingRowHeights =
+                                layout.gridRowHeights ??
+                                Array.from({ length: currentRows }, () => 120);
+                            const newRowHeights = Array.from(
+                                { length: newRows },
+                                (_, i) => existingRowHeights[i] ?? 120,
+                            );
+                            onUpdateGridDimensions(
+                                layout.id,
+                                newColWidths,
+                                newRowHeights,
+                                layout.gridColGap,
+                                layout.gridRowGap,
+                            );
+                        };
+
+                        const applyGap = (colGap: number, rowGap: number) => {
+                            onUpdateGridDimensions(
+                                layout.id,
+                                layout.gridColWidths ??
+                                    Array.from(
+                                        { length: currentCols },
+                                        () => 100 / currentCols,
+                                    ),
+                                layout.gridRowHeights ??
+                                    Array.from(
+                                        { length: currentRows },
+                                        () => 120,
+                                    ),
+                                colGap,
+                                rowGap,
+                            );
+                        };
+
+                        return (
+                            <div className='flex flex-col gap-2'>
+                                <AccordionHeader
+                                    label='Grid 設定'
+                                    open={gridOpen}
+                                    onToggle={() => setGridOpen(o => !o)}
+                                />
+                                {gridOpen && (
+                                    <div className='flex flex-col gap-3 mt-1'>
+                                        {/* 每列欄數 */}
+                                        <div>
+                                            <p className='text-[10px] font-semibold text-zinc-400 uppercase tracking-wide mb-2'>
+                                                每列欄數
+                                            </p>
+                                            <div className='flex items-center gap-2'>
+                                                <button
+                                                    onClick={() =>
+                                                        applyNewCols(
+                                                            currentCols - 1,
+                                                        )
+                                                    }
+                                                    disabled={currentCols <= 1}
+                                                    className='w-7 h-7 flex items-center justify-center rounded border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm font-bold'
+                                                >
+                                                    −
+                                                </button>
+                                                <input
+                                                    type='number'
+                                                    min={1}
+                                                    max={12}
+                                                    value={currentCols}
+                                                    onChange={e =>
+                                                        applyNewCols(
+                                                            parseInt(
+                                                                e.target.value,
+                                                                10,
+                                                            ) || 1,
+                                                        )
+                                                    }
+                                                    className='flex-1 text-center text-sm font-semibold border border-zinc-200 rounded px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400 transition'
+                                                />
+                                                <button
+                                                    onClick={() =>
+                                                        applyNewCols(
+                                                            currentCols + 1,
+                                                        )
+                                                    }
+                                                    disabled={currentCols >= 12}
+                                                    className='w-7 h-7 flex items-center justify-center rounded border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm font-bold'
+                                                >
+                                                    ＋
+                                                </button>
+                                            </div>
+                                            <p className='text-[10px] text-zinc-400 mt-1.5'>
+                                                目前 {currentCols} 欄 ×{' '}
+                                                {currentRows} 列，共{' '}
+                                                {layout.slots.length} 個 Slot
+                                            </p>
+                                        </div>
+
+                                        {/* 欄間距 / 列間距 */}
+                                        <div className='grid grid-cols-2 gap-2'>
+                                            <div>
+                                                <p className='text-[10px] font-semibold text-zinc-400 uppercase tracking-wide mb-1.5'>
+                                                    欄間距 px
+                                                </p>
+                                                <input
+                                                    type='number'
+                                                    min={0}
+                                                    max={200}
+                                                    value={
+                                                        layout.gridColGap ?? 8
+                                                    }
+                                                    onChange={e =>
+                                                        applyGap(
+                                                            Math.max(
+                                                                0,
+                                                                parseInt(
+                                                                    e.target
+                                                                        .value,
+                                                                    10,
+                                                                ) || 0,
+                                                            ),
+                                                            layout.gridRowGap ??
+                                                                8,
+                                                        )
+                                                    }
+                                                    className='w-full text-center text-xs border border-zinc-200 rounded px-1 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400 transition'
+                                                />
+                                            </div>
+                                            <div>
+                                                <p className='text-[10px] font-semibold text-zinc-400 uppercase tracking-wide mb-1.5'>
+                                                    列間距 px
+                                                </p>
+                                                <input
+                                                    type='number'
+                                                    min={0}
+                                                    max={200}
+                                                    value={
+                                                        layout.gridRowGap ?? 8
+                                                    }
+                                                    onChange={e =>
+                                                        applyGap(
+                                                            layout.gridColGap ??
+                                                                8,
+                                                            Math.max(
+                                                                0,
+                                                                parseInt(
+                                                                    e.target
+                                                                        .value,
+                                                                    10,
+                                                                ) || 0,
+                                                            ),
+                                                        )
+                                                    }
+                                                    className='w-full text-center text-xs border border-zinc-200 rounded px-1 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400 transition'
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })()}
 
                 {/* 分隔線 */}
                 <div className='border-t border-zinc-100' />

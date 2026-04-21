@@ -279,15 +279,32 @@ export default function DndBuilder() {
                         ...l.slots,
                         { id: crypto.randomUUID(), children: [] },
                     ];
-                    // flex layout：重新均分所有 slot 的 flexBasis
-                    const normalized =
-                        l.type === 'flex'
-                            ? newSlots.map(s => ({
-                                  ...s,
-                                  flexBasis: 100 / newSlots.length,
-                              }))
-                            : newSlots;
-                    return { ...l, slots: normalized };
+                    if (l.type === 'flex') {
+                        // flex：重新均分所有 slot 的 flexBasis
+                        return {
+                            ...l,
+                            slots: newSlots.map(s => ({
+                                ...s,
+                                flexBasis: 100 / newSlots.length,
+                            })),
+                        };
+                    }
+                    if (l.type === 'grid') {
+                        // grid：重新計算需要幾列，同步擴充 gridRowHeights
+                        const cols = l.gridColWidths?.length ?? 2;
+                        const newRowCount = Math.ceil(newSlots.length / cols);
+                        const existingRowHeights = l.gridRowHeights ?? [];
+                        const newRowHeights = Array.from(
+                            { length: newRowCount },
+                            (_, i) => existingRowHeights[i] ?? 120,
+                        );
+                        return {
+                            ...l,
+                            slots: newSlots,
+                            gridRowHeights: newRowHeights,
+                        };
+                    }
+                    return { ...l, slots: newSlots };
                 }
                 return {
                     ...l,
@@ -306,15 +323,35 @@ export default function DndBuilder() {
             items.map(l => {
                 if (l.id === layoutId) {
                     const remaining = l.slots.filter(s => s.id !== slotId);
-                    // flex layout：重新均分剩餘 slot 的 flexBasis
-                    const normalized =
-                        l.type === 'flex' && remaining.length > 0
-                            ? remaining.map(s => ({
-                                  ...s,
-                                  flexBasis: 100 / remaining.length,
-                              }))
-                            : remaining;
-                    return { ...l, slots: normalized };
+                    if (l.type === 'flex' && remaining.length > 0) {
+                        // flex：重新均分剩餘 slot 的 flexBasis
+                        return {
+                            ...l,
+                            slots: remaining.map(s => ({
+                                ...s,
+                                flexBasis: 100 / remaining.length,
+                            })),
+                        };
+                    }
+                    if (l.type === 'grid') {
+                        // grid：重新計算需要幾列，裁切或保留 gridRowHeights
+                        const cols = l.gridColWidths?.length ?? 2;
+                        const newRowCount = Math.max(
+                            1,
+                            Math.ceil(remaining.length / cols),
+                        );
+                        const existingRowHeights = l.gridRowHeights ?? [];
+                        const newRowHeights = Array.from(
+                            { length: newRowCount },
+                            (_, i) => existingRowHeights[i] ?? 120,
+                        );
+                        return {
+                            ...l,
+                            slots: remaining,
+                            gridRowHeights: newRowHeights,
+                        };
+                    }
+                    return { ...l, slots: remaining };
                 }
                 return {
                     ...l,
@@ -371,6 +408,41 @@ export default function DndBuilder() {
         [],
     );
 
+    const handleUpdateGridDimensions = useCallback(
+        (
+            layoutId: string,
+            colWidths: number[],
+            rowHeights: number[],
+            colGap?: number,
+            rowGap?: number,
+        ) => {
+            const update = (items: NestedLayout[]): NestedLayout[] =>
+                items.map(l => {
+                    if (l.id === layoutId)
+                        return {
+                            ...l,
+                            gridColWidths: colWidths,
+                            gridRowHeights: rowHeights,
+                            ...(colGap !== undefined
+                                ? { gridColGap: colGap }
+                                : {}),
+                            ...(rowGap !== undefined
+                                ? { gridRowGap: rowGap }
+                                : {}),
+                        };
+                    return {
+                        ...l,
+                        slots: l.slots.map(s => ({
+                            ...s,
+                            children: update(s.children),
+                        })),
+                    };
+                });
+            setLayouts(prev => update(prev));
+        },
+        [],
+    );
+
     const overlayLabel =
         activeSidebarType === 'block'
             ? '塊級 Layout'
@@ -413,6 +485,7 @@ export default function DndBuilder() {
                     onAddSlot={handleAddSlot}
                     onRemoveSlot={handleRemoveSlot}
                     onUpdateSpacing={handleUpdateSpacing}
+                    onUpdateGridDimensions={handleUpdateGridDimensions}
                     onDeselect={() => setSelectedLayoutId(null)}
                 />
                 <CanvasArea
@@ -424,6 +497,7 @@ export default function DndBuilder() {
                     insertSlotId={insertSlotId}
                     slotInsertIndex={insertSlotId !== null ? insertIndex : null}
                     onUpdateSlotWidths={handleUpdateSlotWidths}
+                    onUpdateGridDimensions={handleUpdateGridDimensions}
                 />
             </div>
 

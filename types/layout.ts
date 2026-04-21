@@ -49,6 +49,14 @@ export interface NestedLayout {
     props: Record<string, unknown>;
     slots: Slot[];
     spacing: LayoutSpacing;
+    /** grid layout 欄寬百分比陣列，長度 = 欄數，e.g. [50, 50] */
+    gridColWidths?: number[];
+    /** grid layout 列高像素陣列，長度 = 列數，e.g. [120, 120] */
+    gridRowHeights?: number[];
+    /** grid layout 欄間距（column-gap），像素 */
+    gridColGap?: number;
+    /** grid layout 列間距（row-gap），像素 */
+    gridRowGap?: number;
 }
 
 // ─── 版本快照 ─────────────────────────────────────────────────
@@ -75,6 +83,14 @@ export interface FlatLayout {
     spacing: LayoutSpacing;
     slotIds: string[];
     parentSlotId: string | null;
+    /** grid layout 欄寬百分比陣列（僅 grid 使用） */
+    gridColWidths?: number[];
+    /** grid layout 列高像素陣列（僅 grid 使用） */
+    gridRowHeights?: number[];
+    /** grid layout 欄間距（column-gap），像素 */
+    gridColGap?: number;
+    /** grid layout 列間距（row-gap），像素 */
+    gridRowGap?: number;
 }
 
 /**
@@ -161,6 +177,20 @@ export type PageOperation =
           layoutId: string;
           /** 與 FlatLayout.slotIds 順序相同的 flexBasis 百分比陣列 */
           widths: number[];
+          seq: number;
+          clientId: string;
+      }
+    | {
+          type: 'UPDATE_GRID_DIMENSIONS';
+          layoutId: string;
+          /** 欄寬百分比陣列，長度 = 欄數 */
+          colWidths: number[];
+          /** 列高像素陣列，長度 = 列數 */
+          rowHeights: number[];
+          /** 欄間距 px（可選） */
+          colGap?: number;
+          /** 列間距 px（可選） */
+          rowGap?: number;
           seq: number;
           clientId: string;
       };

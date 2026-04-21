@@ -54,12 +54,20 @@ export default function LayoutSidebar({
     onAddSlot,
     onRemoveSlot,
     onUpdateSpacing,
+    onUpdateGridDimensions,
     onDeselect,
 }: {
     selectedLayout: NestedLayout | null;
     onAddSlot: (layoutId: string) => void;
     onRemoveSlot: (layoutId: string, slotId: string) => void;
     onUpdateSpacing: (layoutId: string, spacing: LayoutSpacing) => void;
+    onUpdateGridDimensions?: (
+        layoutId: string,
+        colWidths: number[],
+        rowHeights: number[],
+        colGap?: number,
+        rowGap?: number,
+    ) => void;
     onDeselect: () => void;
 }) {
     return (
@@ -70,6 +78,7 @@ export default function LayoutSidebar({
                     onAddSlot={onAddSlot}
                     onRemoveSlot={onRemoveSlot}
                     onUpdateSpacing={onUpdateSpacing}
+                    onUpdateGridDimensions={onUpdateGridDimensions}
                     onDeselect={onDeselect}
                 />
             ) : (

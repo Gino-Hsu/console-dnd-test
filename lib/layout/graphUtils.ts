@@ -31,6 +31,18 @@ export function flattenToGraph(
             spacing: layout.spacing,
             slotIds: layout.slots.map(s => s.id),
             parentSlotId,
+            ...(layout.gridColWidths !== undefined
+                ? { gridColWidths: layout.gridColWidths }
+                : {}),
+            ...(layout.gridRowHeights !== undefined
+                ? { gridRowHeights: layout.gridRowHeights }
+                : {}),
+            ...(layout.gridColGap !== undefined
+                ? { gridColGap: layout.gridColGap }
+                : {}),
+            ...(layout.gridRowGap !== undefined
+                ? { gridRowGap: layout.gridRowGap }
+                : {}),
         };
         for (const slot of layout.slots) {
             slots[slot.id] = {
@@ -54,8 +66,22 @@ export function flattenToGraph(
     return { ...meta, rootOrder: rootLayouts.map(l => l.id), layouts, slots };
 }
 
-// ─── applyOperation（純函式，不 mutate） ─────────────────────
+// ─────────────────────────────────────────────────────────────
+// 以下為「協同編輯」預留基礎建設，目前尚未接入。
+//
+// 設計用途：
+//   - applyOperation：將單一 PageOperation 純函式地套用到 PageGraph，
+//     不 mutate 原物件，適合搭配 WebSocket / CRDT 使用。
+//   - removeLayoutDeep：applyOperation 的內部輔助，遞迴刪除 layout 及
+//     其所有子 slots / layouts。
+//
+// 預計接入時機：
+//   1. 多人協同編輯（伺服器廣播 op → client applyOperation）
+//   2. Undo / Redo（本地 opLog replay）
+//
+// ─────────────────────────────────────────────────────────────
 
+/** @internal 遞迴刪除 layout 及其所有子 slot / layout */
 function removeLayoutDeep(
     graph: PageGraph,
     layoutId: string,
@@ -80,7 +106,22 @@ function removeLayoutDeep(
 }
 
 /**
- * 將 operation 套用到 graph，回傳新 graph（不 mutate 原物件）
+ * 將 PageOperation 套用到 PageGraph，回傳新 graph（pure，不 mutate 原物件）。
+ *
+ * @remarks
+ * **尚未接入** — 保留供未來協同編輯 / undo-redo 使用。
+ * 呼叫端負責維護 opLog 與 seq 順序；此函式本身不處理衝突解決。
+ *
+ * @example
+ * ```ts
+ * const nextGraph = applyOperation(currentGraph, {
+ *   type: 'UPDATE_SLOT_WIDTHS',
+ *   layoutId: 'abc',
+ *   widths: [30, 70],
+ *   seq: 42,
+ *   clientId: 'user-1',
+ * });
+ * ```
  */
 export function applyOperation(graph: PageGraph, op: PageOperation): PageGraph {
     switch (op.type) {
@@ -262,6 +303,28 @@ export function applyOperation(graph: PageGraph, op: PageOperation): PageGraph {
                 }
             });
             return { ...graph, slots: updatedSlots };
+        }
+
+        case 'UPDATE_GRID_DIMENSIONS': {
+            const layout = graph.layouts[op.layoutId];
+            if (!layout) return graph;
+            return {
+                ...graph,
+                layouts: {
+                    ...graph.layouts,
+                    [op.layoutId]: {
+                        ...layout,
+                        gridColWidths: op.colWidths,
+                        gridRowHeights: op.rowHeights,
+                        ...(op.colGap !== undefined
+                            ? { gridColGap: op.colGap }
+                            : {}),
+                        ...(op.rowGap !== undefined
+                            ? { gridRowGap: op.rowGap }
+                            : {}),
+                    },
+                },
+            };
         }
 
         default:
