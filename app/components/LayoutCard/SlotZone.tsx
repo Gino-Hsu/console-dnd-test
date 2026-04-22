@@ -87,6 +87,7 @@ export default function SlotZone({
                                         <LayoutCard
                                             layout={child}
                                             depth={1}
+                                            isDraggingFromParent={isDragging}
                                             {...sp}
                                         />
                                     </div>

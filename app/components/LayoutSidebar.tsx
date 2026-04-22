@@ -56,6 +56,8 @@ export default function LayoutSidebar({
     onUpdateSpacing,
     onUpdateGridDimensions,
     onUpdateFlexGap,
+    onUpdateFlexRowGap,
+    onUpdateFlexWrap,
     onDeselect,
 }: {
     selectedLayout: NestedLayout | null;
@@ -70,6 +72,8 @@ export default function LayoutSidebar({
         rowGap?: number,
     ) => void;
     onUpdateFlexGap?: (layoutId: string, flexGap: number) => void;
+    onUpdateFlexRowGap?: (layoutId: string, flexRowGap: number) => void;
+    onUpdateFlexWrap?: (layoutId: string, flexWrap: boolean) => void;
     onDeselect: () => void;
 }) {
     return (
@@ -82,6 +86,8 @@ export default function LayoutSidebar({
                     onUpdateSpacing={onUpdateSpacing}
                     onUpdateGridDimensions={onUpdateGridDimensions}
                     onUpdateFlexGap={onUpdateFlexGap}
+                    onUpdateFlexRowGap={onUpdateFlexRowGap}
+                    onUpdateFlexWrap={onUpdateFlexWrap}
                     onDeselect={onDeselect}
                 />
             ) : (

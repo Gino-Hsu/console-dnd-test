@@ -110,6 +110,8 @@ export default function LayoutEditor({
     onUpdateSpacing,
     onUpdateGridDimensions,
     onUpdateFlexGap,
+    onUpdateFlexRowGap,
+    onUpdateFlexWrap,
     onDeselect,
 }: {
     layout: NestedLayout;
@@ -124,6 +126,8 @@ export default function LayoutEditor({
         rowGap?: number,
     ) => void;
     onUpdateFlexGap?: (layoutId: string, flexGap: number) => void;
+    onUpdateFlexRowGap?: (layoutId: string, flexRowGap: number) => void;
+    onUpdateFlexWrap?: (layoutId: string, flexWrap: boolean) => void;
     onDeselect: () => void;
 }) {
     const [slotsOpen, setSlotsOpen] = useState(true);
@@ -473,39 +477,109 @@ export default function LayoutEditor({
                 <div className='border-t border-zinc-100' />
 
                 {/* ── Flex 設定 手風琴（僅 flex layout 顯示） ── */}
-                {layout.type === 'flex' && onUpdateFlexGap && (
-                    <div className='flex flex-col gap-2'>
-                        <AccordionHeader
-                            label='Flex 設定'
-                            open={flexOpen}
-                            onToggle={() => setFlexOpen(o => !o)}
-                        />
-                        {flexOpen && (
-                            <div className='mt-1'>
-                                <p className='text-[10px] font-semibold text-zinc-400 uppercase tracking-wide mb-1.5'>
-                                    Slot 間距 px
-                                </p>
-                                <input
-                                    type='number'
-                                    min={0}
-                                    max={200}
-                                    value={layout.flexGap ?? 8}
-                                    onChange={e =>
-                                        onUpdateFlexGap(
-                                            layout.id,
-                                            Math.max(
-                                                0,
-                                                parseInt(e.target.value, 10) ||
-                                                    0,
-                                            ),
-                                        )
-                                    }
-                                    className='w-full text-center text-xs border border-zinc-200 rounded px-1 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-sky-400 focus:border-sky-400 transition'
-                                />
-                            </div>
-                        )}
-                    </div>
-                )}
+                {layout.type === 'flex' &&
+                    (onUpdateFlexGap || onUpdateFlexWrap) && (
+                        <div className='flex flex-col gap-2'>
+                            <AccordionHeader
+                                label='Flex 設定'
+                                open={flexOpen}
+                                onToggle={() => setFlexOpen(o => !o)}
+                            />
+                            {flexOpen && (
+                                <div className='flex flex-col gap-3 mt-1'>
+                                    {onUpdateFlexGap && (
+                                        <div>
+                                            <p className='text-[10px] font-semibold text-zinc-400 uppercase tracking-wide mb-1.5'>
+                                                欄間距 px
+                                            </p>
+                                            <input
+                                                type='number'
+                                                min={0}
+                                                max={200}
+                                                value={layout.flexGap ?? 8}
+                                                onChange={e =>
+                                                    onUpdateFlexGap(
+                                                        layout.id,
+                                                        Math.max(
+                                                            0,
+                                                            parseInt(
+                                                                e.target.value,
+                                                                10,
+                                                            ) || 0,
+                                                        ),
+                                                    )
+                                                }
+                                                className='w-full text-center text-xs border border-zinc-200 rounded px-1 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-sky-400 focus:border-sky-400 transition'
+                                            />
+                                        </div>
+                                    )}
+                                    {/* 列間距：只有換行開啟時才顯示 */}
+                                    {onUpdateFlexRowGap &&
+                                        (layout.flexWrap ?? false) && (
+                                            <div>
+                                                <p className='text-[10px] font-semibold text-zinc-400 uppercase tracking-wide mb-1.5'>
+                                                    列間距 px
+                                                </p>
+                                                <input
+                                                    type='number'
+                                                    min={0}
+                                                    max={200}
+                                                    value={
+                                                        layout.flexRowGap ?? 8
+                                                    }
+                                                    onChange={e =>
+                                                        onUpdateFlexRowGap(
+                                                            layout.id,
+                                                            Math.max(
+                                                                0,
+                                                                parseInt(
+                                                                    e.target
+                                                                        .value,
+                                                                    10,
+                                                                ) || 0,
+                                                            ),
+                                                        )
+                                                    }
+                                                    className='w-full text-center text-xs border border-zinc-200 rounded px-1 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-sky-400 focus:border-sky-400 transition'
+                                                />
+                                            </div>
+                                        )}
+                                    {onUpdateFlexWrap && (
+                                        <div className='flex items-center justify-between'>
+                                            <p className='text-[10px] font-semibold text-zinc-400 uppercase tracking-wide'>
+                                                換行
+                                            </p>
+                                            <button
+                                                onClick={() =>
+                                                    onUpdateFlexWrap(
+                                                        layout.id,
+                                                        !(
+                                                            layout.flexWrap ??
+                                                            false
+                                                        ),
+                                                    )
+                                                }
+                                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${
+                                                    (layout.flexWrap ?? false)
+                                                        ? 'bg-sky-500'
+                                                        : 'bg-zinc-200'
+                                                }`}
+                                            >
+                                                <span
+                                                    className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
+                                                        (layout.flexWrap ??
+                                                        false)
+                                                            ? 'translate-x-4'
+                                                            : 'translate-x-1'
+                                                    }`}
+                                                />
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                 {/* 分隔線 */}
                 <div className='border-t border-zinc-100' />

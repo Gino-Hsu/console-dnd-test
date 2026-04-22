@@ -18,8 +18,13 @@ import type { NestedLayout } from '@/types/layout';
 export default function LayoutCard({
     layout,
     depth = 0,
+    isDraggingFromParent = false,
     ...shared
-}: SharedProps & { layout: NestedLayout; depth?: number }) {
+}: SharedProps & {
+    layout: NestedLayout;
+    depth?: number;
+    isDraggingFromParent?: boolean;
+}) {
     const {
         attributes,
         listeners,
@@ -143,7 +148,7 @@ export default function LayoutCard({
                 onFlexDrag={handleFlexDrag}
                 onColDrag={handleColDrag}
                 // onRowDrag={handleRowDrag}
-                isDragging={isDragging}
+                isDragging={isDragging || isDraggingFromParent}
             />
         </LayoutFrame>
     );

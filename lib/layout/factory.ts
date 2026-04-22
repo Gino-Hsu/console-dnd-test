@@ -34,6 +34,8 @@ export function createLayout(type: LayoutType, label: string): NestedLayout {
                   gridRowGap: 8,
               }
             : {}),
-        ...(type === 'flex' ? { flexGap: 8 } : {}),
+        ...(type === 'flex'
+            ? { flexGap: 8, flexRowGap: 8, flexWrap: false }
+            : {}),
     };
 }

@@ -479,6 +479,42 @@ export default function DndBuilder() {
         [],
     );
 
+    const handleUpdateFlexWrap = useCallback(
+        (layoutId: string, flexWrap: boolean) => {
+            const update = (items: NestedLayout[]): NestedLayout[] =>
+                items.map(l => {
+                    if (l.id === layoutId) return { ...l, flexWrap };
+                    return {
+                        ...l,
+                        slots: l.slots.map(s => ({
+                            ...s,
+                            children: update(s.children),
+                        })),
+                    };
+                });
+            setLayouts(prev => update(prev));
+        },
+        [],
+    );
+
+    const handleUpdateFlexRowGap = useCallback(
+        (layoutId: string, flexRowGap: number) => {
+            const update = (items: NestedLayout[]): NestedLayout[] =>
+                items.map(l => {
+                    if (l.id === layoutId) return { ...l, flexRowGap };
+                    return {
+                        ...l,
+                        slots: l.slots.map(s => ({
+                            ...s,
+                            children: update(s.children),
+                        })),
+                    };
+                });
+            setLayouts(prev => update(prev));
+        },
+        [],
+    );
+
     const overlayLabel =
         activeSidebarType === 'block'
             ? '塊級 Layout'
@@ -523,6 +559,8 @@ export default function DndBuilder() {
                     onUpdateSpacing={handleUpdateSpacing}
                     onUpdateGridDimensions={handleUpdateGridDimensions}
                     onUpdateFlexGap={handleUpdateFlexGap}
+                    onUpdateFlexRowGap={handleUpdateFlexRowGap}
+                    onUpdateFlexWrap={handleUpdateFlexWrap}
                     onDeselect={() => setSelectedLayoutId(null)}
                 />
                 <CanvasArea
