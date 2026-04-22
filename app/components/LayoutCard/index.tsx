@@ -29,9 +29,14 @@ export default function LayoutCard({
         isDragging,
     } = useSortable({ id: layout.id });
 
+    // canvas 拖曳進行中時，凍結所有非被拖物件的 sortable dodge transform。
+    // 排序仍由 handleDragEnd 的 pointer/over 判斷，不依賴視覺位移。
+    // 被拖物件本身（isDragging=true）已用 opacity 表示，不需 transform。
     const sortStyle: React.CSSProperties = {
-        transform: CSS.Transform.toString(transform),
-        transition,
+        transform: shared.isSomethingDragging
+            ? undefined
+            : CSS.Transform.toString(transform),
+        transition: shared.isSomethingDragging ? undefined : transition,
         opacity: isDragging ? 0.4 : 1,
     };
 
@@ -138,6 +143,7 @@ export default function LayoutCard({
                 onFlexDrag={handleFlexDrag}
                 onColDrag={handleColDrag}
                 // onRowDrag={handleRowDrag}
+                isDragging={isDragging}
             />
         </LayoutFrame>
     );

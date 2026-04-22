@@ -1,6 +1,6 @@
 'use client';
 
-import type { RefObject } from 'react';
+import { Fragment, type RefObject } from 'react';
 import ResizeHandle from '../ResizeHandle';
 import SlotZone from './SlotZone';
 import type { NestedLayout } from '@/types/layout';
@@ -11,11 +11,13 @@ export default function FlexLayout({
     containerRef,
     sp,
     onDrag,
+    isDragging,
 }: {
     layout: NestedLayout;
     containerRef: RefObject<HTMLDivElement | null>;
     sp: SlotProps;
     onDrag: (i: number, dx: number) => void;
+    isDragging: boolean;
 }) {
     const gap = layout.flexGap ?? 8;
     const n = layout.slots.length;
@@ -28,9 +30,8 @@ export default function FlexLayout({
                 // totalHandleWidth = (n-1)*gap，slot 佔 basis/100 的比例
                 const offsetPx = (basis / 100) * (n - 1) * gap;
                 return (
-                    <>
+                    <Fragment key={slot.id}>
                         <div
-                            key={slot.id}
                             className='min-w-0'
                             style={{
                                 flexBasis: `calc(${basis}% - ${offsetPx.toFixed(3)}px)`,
@@ -38,16 +39,19 @@ export default function FlexLayout({
                                 flexGrow: 0,
                             }}
                         >
-                            <SlotZone slot={slot} {...sp} />
+                            <SlotZone
+                                slot={slot}
+                                {...sp}
+                                isDragging={isDragging}
+                            />
                         </div>
                         {i < n - 1 && (
                             <ResizeHandle
-                                key={`h-${i}`}
                                 size={gap}
                                 onDrag={dx => onDrag(i, dx)}
                             />
                         )}
-                    </>
+                    </Fragment>
                 );
             })}
         </div>

@@ -31,6 +31,7 @@ export default function CanvasArea({
     insertIndex,
     insertSlotId,
     slotInsertIndex,
+    isSomethingDragging,
     onUpdateSlotWidths,
     onUpdateGridDimensions,
 }: {
@@ -41,6 +42,7 @@ export default function CanvasArea({
     insertIndex: number | null;
     insertSlotId: string | null;
     slotInsertIndex: number | null;
+    isSomethingDragging?: boolean;
     onUpdateSlotWidths?: (layoutId: string, widths: number[]) => void;
     onUpdateGridDimensions?: (
         layoutId: string,
@@ -149,6 +151,9 @@ export default function CanvasArea({
                                             depth={0}
                                             insertSlotId={insertSlotId}
                                             slotInsertIndex={slotInsertIndex}
+                                            isSomethingDragging={
+                                                isSomethingDragging
+                                            }
                                             onUpdateSlotWidths={
                                                 onUpdateSlotWidths
                                             }

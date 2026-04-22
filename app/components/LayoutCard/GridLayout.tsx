@@ -21,6 +21,7 @@ export default function GridLayout({
     sp,
     onColDrag,
     // onRowDrag,
+    isDragging,
 }: {
     layout: NestedLayout;
     containerRef: RefObject<HTMLDivElement | null>;
@@ -31,6 +32,7 @@ export default function GridLayout({
     sp: SlotProps;
     onColDrag: (i: number, dx: number) => void;
     // onRowDrag: (i: number, dy: number) => void;
+    isDragging: boolean;
 }) {
     return (
         <div
@@ -39,7 +41,13 @@ export default function GridLayout({
             style={gridContainerStyle(layout, cols, defColW)}
         >
             {layout.slots.map(slot => (
-                <SlotZone key={slot.id} slot={slot} isGridItem {...sp} />
+                <SlotZone
+                    key={slot.id}
+                    slot={slot}
+                    isGridItem
+                    {...sp}
+                    isDragging={isDragging}
+                />
             ))}
 
             {/* 欄分隔拖曳條 */}

@@ -22,7 +22,6 @@ import {
     isSlotInsideLayout,
     moveItem,
     removeItem,
-    sortInContainer,
 } from '@/lib/layout';
 import LayoutSidebar from './LayoutSidebar';
 import type { LayoutSpacing, LayoutType, NestedLayout } from '@/types/layout';
@@ -92,13 +91,6 @@ export default function DndBuilder() {
         if (overData?.type === 'slot') {
             const slotId = event.over!.id as string;
 
-            // canvas item 在同一個 slot 內移動：不顯示 InsertLine，讓 useSortable 處理
-            if (!isSidebar && activeContainerRef.current === slotId) {
-                setInsertSlotId(null);
-                setInsertIndex(null);
-                return;
-            }
-
             // 不允許拖進自己（或後代）的 slot
             if (
                 !isSidebar &&
@@ -132,13 +124,6 @@ export default function DndBuilder() {
             setInsertSlotId(slotId);
             setInsertIndex(newIndex);
         } else if (overData?.type === 'canvas') {
-            // canvas item 在 root 排序：不顯示 InsertLine
-            if (!isSidebar && activeContainerRef.current === 'root') {
-                setInsertSlotId(null);
-                setInsertIndex(null);
-                return;
-            }
-
             const elements = Array.from(
                 document.querySelectorAll(
                     '[data-root-canvas] > [data-canvas-item]',
@@ -234,13 +219,15 @@ export default function DndBuilder() {
                         findContainer(overId, prev) ?? activeContainer;
                 }
 
-                // 同容器排序
+                // 同容器排序：transform 凍結後 overId 是 canvas/slot droppable，
+                // 改用 currentInsertIndex 直接定位
                 if (activeContainer === targetContainer) {
-                    return sortInContainer(
+                    if (currentInsertIndex === null) return prev;
+                    return moveItem(
                         prev,
-                        activeContainer,
                         activeId,
-                        overId,
+                        targetContainer,
+                        currentInsertIndex,
                     );
                 }
 
@@ -546,6 +533,7 @@ export default function DndBuilder() {
                     insertIndex={insertSlotId === null ? insertIndex : null}
                     insertSlotId={insertSlotId}
                     slotInsertIndex={insertSlotId !== null ? insertIndex : null}
+                    isSomethingDragging={activeCanvasId !== null}
                     onUpdateSlotWidths={handleUpdateSlotWidths}
                     onUpdateGridDimensions={handleUpdateGridDimensions}
                 />

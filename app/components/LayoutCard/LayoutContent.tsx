@@ -19,6 +19,7 @@ export default function LayoutContent({
     onFlexDrag,
     onColDrag,
     // onRowDrag,
+    isDragging,
 }: {
     layout: NestedLayout;
     flexRef: RefObject<HTMLDivElement | null>;
@@ -31,9 +32,12 @@ export default function LayoutContent({
     onFlexDrag: (i: number, dx: number) => void;
     onColDrag: (i: number, dx: number) => void;
     // onRowDrag: (i: number, dy: number) => void;
+    isDragging: boolean;
 }) {
     if (layout.type === 'block') {
-        return <BlockLayout slots={layout.slots} sp={sp} />;
+        return (
+            <BlockLayout slots={layout.slots} isDragging={isDragging} sp={sp} />
+        );
     }
     if (layout.type === 'flex') {
         return (
@@ -42,6 +46,7 @@ export default function LayoutContent({
                 containerRef={flexRef}
                 sp={sp}
                 onDrag={onFlexDrag}
+                isDragging={isDragging}
             />
         );
     }
@@ -57,6 +62,7 @@ export default function LayoutContent({
                 sp={sp}
                 onColDrag={onColDrag}
                 // onRowDrag={onRowDrag}
+                isDragging={isDragging}
             />
         );
     }

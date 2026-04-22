@@ -18,11 +18,13 @@ export default function SlotZone({
     slot,
     flexBasis,
     isGridItem,
+    isDragging,
     ...sp
 }: SlotProps & {
     slot: { id: string; label?: string; children: NestedLayout[] };
     flexBasis?: number;
     isGridItem?: boolean;
+    isDragging?: boolean;
 }) {
     const { setNodeRef, isOver } = useDroppable({
         id: slot.id,
@@ -58,7 +60,7 @@ export default function SlotZone({
                     className={cn(
                         'rounded-lg border-2 border-dashed h-full p-4 flex flex-col gap-2 transition-colors',
                         isGridItem ? 'h-full' : 'min-h-16',
-                        isOver
+                        isOver && !isDragging
                             ? 'border-blue-400 bg-blue-50'
                             : 'border-zinc-200 bg-white/60',
                     )}
