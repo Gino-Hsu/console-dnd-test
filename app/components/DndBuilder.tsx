@@ -25,9 +25,13 @@ import {
 } from '@/lib/layout';
 import LayoutSidebar from './LayoutSidebar';
 import type { LayoutSpacing, LayoutType, NestedLayout } from '@/types/layout';
+import { graphToTree } from '@/lib/layout';
+import { MOCK_PAGE_GRAPH } from '@/app/mockData';
 
 export default function DndBuilder() {
-    const [layouts, setLayouts] = useState<NestedLayout[]>([]);
+    const [layouts, setLayouts] = useState<NestedLayout[]>(() =>
+        graphToTree(MOCK_PAGE_GRAPH),
+    );
     const [activeSidebarType, setActiveSidebarType] =
         useState<LayoutType | null>(null);
     const [activeCanvasId, setActiveCanvasId] = useState<string | null>(null);

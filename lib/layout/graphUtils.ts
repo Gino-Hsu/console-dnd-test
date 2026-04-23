@@ -66,6 +66,60 @@ export function flattenToGraph(
     return { ...meta, rootOrder: rootLayouts.map(l => l.id), layouts, slots };
 }
 
+/**
+ * 將 PageGraph 還原成 NestedLayout[]（樹狀結構）
+ * 用於從 API 讀取扁平資料後，轉回 editor 的工作格式
+ */
+export function graphToTree(graph: PageGraph): NestedLayout[] {
+    function buildLayout(id: string): NestedLayout {
+        const flat = graph.layouts[id];
+        if (!flat) throw new Error(`graphToTree: layout "${id}" not found`);
+
+        const slots = flat.slotIds.map(slotId => {
+            const flatSlot = graph.slots[slotId];
+            if (!flatSlot)
+                throw new Error(`graphToTree: slot "${slotId}" not found`);
+            return {
+                id: flatSlot.id,
+                children: flatSlot.childIds.map(childId =>
+                    buildLayout(childId),
+                ),
+                ...(flatSlot.flexBasis !== undefined
+                    ? { flexBasis: flatSlot.flexBasis }
+                    : {}),
+            };
+        });
+
+        return {
+            id: flat.id,
+            type: flat.type,
+            label: flat.label,
+            props: flat.props,
+            spacing: flat.spacing,
+            slots,
+            ...(flat.gridColWidths !== undefined
+                ? { gridColWidths: flat.gridColWidths }
+                : {}),
+            ...(flat.gridRowHeights !== undefined
+                ? { gridRowHeights: flat.gridRowHeights }
+                : {}),
+            ...(flat.gridColGap !== undefined
+                ? { gridColGap: flat.gridColGap }
+                : {}),
+            ...(flat.gridRowGap !== undefined
+                ? { gridRowGap: flat.gridRowGap }
+                : {}),
+            ...(flat.flexGap !== undefined ? { flexGap: flat.flexGap } : {}),
+            ...(flat.flexRowGap !== undefined
+                ? { flexRowGap: flat.flexRowGap }
+                : {}),
+            ...(flat.flexWrap !== undefined ? { flexWrap: flat.flexWrap } : {}),
+        };
+    }
+
+    return graph.rootOrder.map(id => buildLayout(id));
+}
+
 // ─────────────────────────────────────────────────────────────
 // 以下為「協同編輯」預留基礎建設，目前尚未接入。
 //
