@@ -100,53 +100,6 @@ export function insertIntoSlot(
     });
 }
 
-/** 遞迴在指定容器內對兩個 item 做排序 */
-export function sortInContainer(
-    items: NestedLayout[],
-    containerId: string,
-    activeId: string,
-    overId: string,
-): NestedLayout[] {
-    if (containerId === 'root') {
-        const oldIndex = items.findIndex(i => i.id === activeId);
-        const newIndex = items.findIndex(i => i.id === overId);
-        if (oldIndex === -1 || newIndex === -1) return items;
-        return arrayMove(items, oldIndex, newIndex);
-    }
-    return items.map(layout => {
-        const slotIdx = layout.slots.findIndex(s => s.id === containerId);
-        if (slotIdx !== -1) {
-            return {
-                ...layout,
-                slots: layout.slots.map((s, i) => {
-                    if (i !== slotIdx) return s;
-                    const oldIndex = s.children.findIndex(
-                        c => c.id === activeId,
-                    );
-                    const newIndex = s.children.findIndex(c => c.id === overId);
-                    if (oldIndex === -1 || newIndex === -1) return s;
-                    return {
-                        ...s,
-                        children: arrayMove(s.children, oldIndex, newIndex),
-                    };
-                }),
-            };
-        }
-        return {
-            ...layout,
-            slots: layout.slots.map(s => ({
-                ...s,
-                children: sortInContainer(
-                    s.children,
-                    containerId,
-                    activeId,
-                    overId,
-                ),
-            })),
-        };
-    });
-}
-
 /** 遞迴移除某個 layout */
 export function removeItem(items: NestedLayout[], id: string): NestedLayout[] {
     return items

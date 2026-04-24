@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import type { LayoutSpacing, NestedLayout, SpacingValue } from './types';
-import { DEFAULT_SPACING } from './types';
+import type { LayoutSpacing, NestedLayout, SpacingValue } from '../types';
+import { DEFAULT_SPACING } from '@/types/layout';
 
 /* ── 小工具：手風琴 header ─────────────────────────── */
 function AccordionHeader({

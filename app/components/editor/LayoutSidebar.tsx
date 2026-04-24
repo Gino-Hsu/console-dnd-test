@@ -1,7 +1,7 @@
 'use client';
 
 import { useDraggable } from '@dnd-kit/core';
-import type { LayoutSpacing, NestedLayout, SidebarItem } from './types';
+import type { LayoutSpacing, NestedLayout, SidebarItem } from '../types';
 import { SIDEBAR_ITEMS } from './types';
 import LayoutEditor from './LayoutEditor';
 

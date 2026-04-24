@@ -4,7 +4,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
     pageId: 'page-1',
     version: 1,
     status: 'published',
-    createdAt: '2026-04-23T01:23:51.378Z',
+    createdAt: '2026-04-24T06:44:00.503Z',
     rootOrder: [
         'd0a762a3-faaf-41f2-a181-575025ad01f4',
         'dac899bc-26ef-4e9a-9e78-3ab2a77154e7',
@@ -17,8 +17,18 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
             label: '塊級 Layout',
             props: {},
             spacing: {
-                padding: { top: 0, right: 0, bottom: 0, left: 0 },
-                margin: { top: 0, right: 0, bottom: 0, left: 0 },
+                padding: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0,
+                },
+                margin: {
+                    top: 20,
+                    right: 10,
+                    bottom: 20,
+                    left: 10,
+                },
             },
             slotIds: ['d02f41d5-eaa2-472f-9d29-b4f2c583535b'],
             parentSlotId: null,
@@ -29,8 +39,18 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
             label: 'Flex Layout',
             props: {},
             spacing: {
-                padding: { top: 0, right: 0, bottom: 0, left: 0 },
-                margin: { top: 0, right: 0, bottom: 0, left: 0 },
+                padding: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0,
+                },
+                margin: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0,
+                },
             },
             slotIds: [
                 'd39603a4-677d-49c7-8c3b-ae7007f150ae',
@@ -44,8 +64,18 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
             label: 'Flex Layout',
             props: {},
             spacing: {
-                padding: { top: 0, right: 0, bottom: 0, left: 0 },
-                margin: { top: 0, right: 0, bottom: 0, left: 0 },
+                padding: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0,
+                },
+                margin: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0,
+                },
             },
             slotIds: [
                 '7e1e3dd0-83cc-412b-8c9f-f9294b31bc4c',
@@ -59,8 +89,18 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
             label: 'Grid Layout',
             props: {},
             spacing: {
-                padding: { top: 0, right: 0, bottom: 0, left: 0 },
-                margin: { top: 0, right: 0, bottom: 0, left: 0 },
+                padding: {
+                    top: 20,
+                    right: 20,
+                    bottom: 20,
+                    left: 20,
+                },
+                margin: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0,
+                },
             },
             slotIds: [
                 'f4f216b1-d68e-4cb2-a0fa-891530a6710d',
@@ -80,8 +120,18 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
             label: 'Grid Layout',
             props: {},
             spacing: {
-                padding: { top: 0, right: 0, bottom: 0, left: 0 },
-                margin: { top: 0, right: 0, bottom: 0, left: 0 },
+                padding: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0,
+                },
+                margin: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0,
+                },
             },
             slotIds: [
                 '4d5a3e3e-84bb-4c02-b85a-062714761d59',
@@ -101,8 +151,18 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
             label: '塊級 Layout',
             props: {},
             spacing: {
-                padding: { top: 0, right: 0, bottom: 0, left: 0 },
-                margin: { top: 0, right: 0, bottom: 0, left: 0 },
+                padding: {
+                    top: 20,
+                    right: 20,
+                    bottom: 20,
+                    left: 20,
+                },
+                margin: {
+                    top: 10,
+                    right: 10,
+                    bottom: 10,
+                    left: 10,
+                },
             },
             slotIds: ['73e12c90-af80-4954-8b83-9221fb2f1550'],
             parentSlotId: '4d5a3e3e-84bb-4c02-b85a-062714761d59',
@@ -113,8 +173,18 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
             label: 'Flex Layout',
             props: {},
             spacing: {
-                padding: { top: 0, right: 0, bottom: 0, left: 0 },
-                margin: { top: 0, right: 0, bottom: 0, left: 0 },
+                padding: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0,
+                },
+                margin: {
+                    top: 30,
+                    right: 0,
+                    bottom: 30,
+                    left: 0,
+                },
             },
             slotIds: [
                 'c7a0d3d4-2573-4074-a19b-3337653492df',

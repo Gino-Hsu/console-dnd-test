@@ -12,7 +12,7 @@ import type { SlotProps } from './types';
 
 // 延遲 import 避免循環依賴在模組初始化時出問題
 // （實際執行時是安全的，因為 LayoutCard 在 render 時才被呼叫）
-import LayoutCard from './index';
+import LayoutCard from '../index';
 
 export default function SlotZone({
     slot,

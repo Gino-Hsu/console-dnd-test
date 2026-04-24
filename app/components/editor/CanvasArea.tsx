@@ -6,8 +6,8 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useCallback } from 'react';
-import LayoutCard from './LayoutCard';
-import type { NestedLayout, PageVersion } from './types';
+import LayoutCard from './layout';
+import type { NestedLayout, PageVersion } from '../types';
 import { flattenToGraph } from './types';
 
 /*  插入線  */
