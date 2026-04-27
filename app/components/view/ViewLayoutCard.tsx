@@ -3,6 +3,8 @@ import type { NestedLayout } from '@/types/layout';
 import { Fragment } from 'react';
 import ViewSlotZone from './ViewSlotZone';
 
+const MAX_LAYOUT_DEPTH = 2; // 允許 depth 0, 1, 2 (共3層)
+
 export default function ViewLayoutCard({
     layout,
     depth = 0,
@@ -10,6 +12,11 @@ export default function ViewLayoutCard({
     layout: NestedLayout;
     depth?: number;
 }) {
+    // 超過最大層數，不渲染
+    if (depth > MAX_LAYOUT_DEPTH) {
+        return null;
+    }
+
     const { borderColor, bgColor } = layoutTheme(layout.type, depth);
     const sp = layout.spacing;
     const mt = sp?.margin.top ?? 0,
@@ -58,7 +65,7 @@ function ViewLayoutContent({
         return (
             <div className='flex flex-col'>
                 {layout.slots.map(slot => (
-                    <ViewSlotZone key={slot.id} slot={slot} />
+                    <ViewSlotZone key={slot.id} slot={slot} depth={depth} />
                 ))}
             </div>
         );
@@ -92,7 +99,7 @@ function ViewLayoutContent({
                                     flexGrow: 0,
                                 }}
                             >
-                                <ViewSlotZone slot={slot} />
+                                <ViewSlotZone slot={slot} depth={depth} />
                             </div>
                             {/* nowrap 模式補間距用純 div，不需 ResizeHandle */}
                             {!isWrap && i < n - 1 && (
@@ -114,7 +121,7 @@ function ViewLayoutContent({
                 style={gridContainerStyle(layout, cols, defColW)}
             >
                 {layout.slots.map(slot => (
-                    <ViewSlotZone key={slot.id} slot={slot} />
+                    <ViewSlotZone key={slot.id} slot={slot} depth={depth} />
                 ))}
             </div>
         );

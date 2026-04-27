@@ -4,9 +4,11 @@ import ViewLayoutCard from './ViewLayoutCard';
 export default function ViewSlotZone({
     slot,
     flexBasis,
+    depth = 0,
 }: {
     slot: NestedLayout['slots'][number];
     flexBasis?: number;
+    depth?: number;
 }) {
     return (
         <div
@@ -25,7 +27,7 @@ export default function ViewSlotZone({
                     .join(' ')}
             >
                 {slot.children.map(child => (
-                    <ViewLayoutCard key={child.id} layout={child} depth={1} />
+                    <ViewLayoutCard key={child.id} layout={child} depth={depth + 1} />
                 ))}
             </div>
         </div>
