@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { LayoutSpacing, NestedLayout, SpacingValue } from '../types';
+import type { LayoutSpacing, NestedLayout, SpacingValue } from '@/types/layout';
 import { DEFAULT_SPACING } from '@/types/layout';
 
 /* ── 小工具：手風琴 header ─────────────────────────── */
@@ -122,8 +122,8 @@ export default function LayoutEditor({
         layoutId: string,
         colWidths: number[],
         rowHeights: number[],
-        colGap?: number,
-        rowGap?: number,
+        colGap: number | null,
+        rowGap: number | null,
     ) => void;
     onUpdateFlexGap?: (layoutId: string, flexGap: number) => void;
     onUpdateFlexRowGap?: (layoutId: string, flexRowGap: number) => void;

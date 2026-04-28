@@ -1,6 +1,6 @@
 'use client';
 
-import SlotZone from './SlotZone';
+import SharedBlockLayout from '@/app/components/shared/SharedBlockLayout';
 import type { NestedLayout } from '@/types/layout';
 import type { SlotProps } from './types';
 
@@ -14,15 +14,11 @@ export default function BlockLayout({
     isDragging: boolean;
 }) {
     return (
-        <div className='flex flex-col gap-2'>
-            {slots.map(slot => (
-                <SlotZone
-                    key={slot.id}
-                    slot={slot}
-                    {...sp}
-                    isDragging={isDragging}
-                />
-            ))}
-        </div>
+        <SharedBlockLayout
+            mode='edit'
+            slots={slots}
+            sp={sp}
+            isDragging={isDragging}
+        />
     );
 }

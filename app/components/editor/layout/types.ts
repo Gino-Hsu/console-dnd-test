@@ -14,8 +14,8 @@ export interface SharedProps {
         layoutId: string,
         colWidths: number[],
         rowHeights: number[],
-        colGap?: number,
-        rowGap?: number,
+        colGap: number | null,
+        rowGap: number | null,
     ) => void;
 }
 

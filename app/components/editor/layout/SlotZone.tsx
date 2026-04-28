@@ -12,7 +12,7 @@ import type { SlotProps } from './types';
 
 // 延遲 import 避免循環依賴在模組初始化時出問題
 // （實際執行時是安全的，因為 LayoutCard 在 render 時才被呼叫）
-import LayoutCard from '../index';
+import LayoutCard from './index';
 
 export default function SlotZone({
     slot,
@@ -38,11 +38,6 @@ export default function SlotZone({
                 flexBasis !== undefined ? 'min-w-0' : 'flex-1 min-w-0',
                 isGridItem ? 'h-full' : undefined,
             )}
-            style={
-                flexBasis !== undefined
-                    ? { flexBasis: `${flexBasis}%`, flexShrink: 0, flexGrow: 0 }
-                    : undefined
-            }
             data-slot-id={slot.id}
         >
             {slot.label && (

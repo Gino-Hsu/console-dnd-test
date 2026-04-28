@@ -41,8 +41,6 @@ export default function DndBuilder() {
         null,
     );
 
-    const layoutsRef = useRef(layouts);
-    layoutsRef.current = layouts;
     // 記錄拖曳開始時的來源容器，用來判斷是否跨容器
     const activeContainerRef = useRef<string | null>(null);
     // 記錄目前正在拖曳的 canvas item id（handleDragOver 是 stale closure，無法讀 state）
@@ -74,7 +72,7 @@ export default function DndBuilder() {
             activeCanvasIdRef.current = event.active.id as string;
             activeContainerRef.current = findContainer(
                 event.active.id as string,
-                layoutsRef.current,
+                layouts,
             );
         }
         setInsertIndex(null);
@@ -99,11 +97,7 @@ export default function DndBuilder() {
             if (
                 !isSidebar &&
                 activeCanvasIdRef.current &&
-                isSlotInsideLayout(
-                    slotId,
-                    activeCanvasIdRef.current,
-                    layoutsRef.current,
-                )
+                isSlotInsideLayout(slotId, activeCanvasIdRef.current, layouts)
             ) {
                 setInsertSlotId(null);
                 setInsertIndex(null);
@@ -267,7 +261,7 @@ export default function DndBuilder() {
 
     const handleRemove = useCallback((id: string) => {
         setLayouts(prev => removeItem(prev, id));
-        setSelectedLayoutId(prev => (prev === id ? null : prev));
+        setSelectedLayoutId(null);
     }, []);
 
     const handleSelect = useCallback((id: string) => {
@@ -299,7 +293,11 @@ export default function DndBuilder() {
                 if (l.id === layoutId) {
                     const newSlots = [
                         ...l.slots,
-                        { id: uuidv4(), children: [] },
+                        {
+                            id: uuidv4(),
+                            children: [],
+                            flexBasis: undefined,
+                        } satisfies import('@/types/layout').Slot,
                     ];
                     if (l.type === 'flex') {
                         // flex：重新均分所有 slot 的 flexBasis
@@ -435,8 +433,8 @@ export default function DndBuilder() {
             layoutId: string,
             colWidths: number[],
             rowHeights: number[],
-            colGap?: number,
-            rowGap?: number,
+            colGap: number | null,
+            rowGap: number | null,
         ) => {
             const update = (items: NestedLayout[]): NestedLayout[] =>
                 items.map(l => {

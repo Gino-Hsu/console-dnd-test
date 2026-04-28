@@ -90,30 +90,12 @@ export default function LayoutCard({
                 resizeGridCols(cw, i, (dx / tw) * 100),
                 layout.gridRowHeights ??
                     Array.from({ length: rows }, () => defRowH),
-                layout.gridColGap,
-                layout.gridRowGap,
+                layout.gridColGap ?? null,
+                layout.gridRowGap ?? null,
             );
         },
         [layout, cols, rows, defColW, defRowH, shared.onUpdateGridDimensions],
     );
-
-    // const handleRowDrag = useCallback(
-    //     (i: number, dy: number) => {
-    //         if (!shared.onUpdateGridDimensions) return;
-    //         const rh =
-    //             layout.gridRowHeights ??
-    //             Array.from({ length: rows }, () => defRowH);
-    //         shared.onUpdateGridDimensions(
-    //             layout.id,
-    //             layout.gridColWidths ??
-    //                 Array.from({ length: cols }, () => defColW),
-    //             resizeGridRows(rh, i, dy),
-    //             layout.gridColGap,
-    //             layout.gridRowGap,
-    //         );
-    //     },
-    //     [layout, cols, rows, defColW, defRowH, shared.onUpdateGridDimensions],
-    // );
 
     // ── 外觀 ──────────────────────────────────────────────────────────────────
     const { borderColor, bgColor } = layoutTheme(layout.type, depth);

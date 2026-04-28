@@ -31,18 +31,15 @@ export function flattenToGraph(
             spacing: layout.spacing,
             slotIds: layout.slots.map(s => s.id),
             parentSlotId,
-            ...(layout.gridColWidths !== undefined
-                ? { gridColWidths: layout.gridColWidths }
-                : {}),
-            ...(layout.gridRowHeights !== undefined
-                ? { gridRowHeights: layout.gridRowHeights }
-                : {}),
-            ...(layout.gridColGap !== undefined
-                ? { gridColGap: layout.gridColGap }
-                : {}),
-            ...(layout.gridRowGap !== undefined
-                ? { gridRowGap: layout.gridRowGap }
-                : {}),
+            //  grid layout 專用屬性
+            gridColWidths: layout.gridColWidths || null,
+            gridRowHeights: layout.gridRowHeights || null,
+            gridColGap: layout.gridColGap || null,
+            gridRowGap: layout.gridRowGap || null,
+            //  flex layout 專用屬性
+            flexGap: layout.flexGap || null,
+            flexRowGap: layout.flexRowGap || null,
+            flexWrap: layout.flexWrap || null,
         };
         for (const slot of layout.slots) {
             slots[slot.id] = {
@@ -97,23 +94,13 @@ export function graphToTree(graph: PageGraph): NestedLayout[] {
             props: flat.props,
             spacing: flat.spacing,
             slots,
-            ...(flat.gridColWidths !== undefined
-                ? { gridColWidths: flat.gridColWidths }
-                : {}),
-            ...(flat.gridRowHeights !== undefined
-                ? { gridRowHeights: flat.gridRowHeights }
-                : {}),
-            ...(flat.gridColGap !== undefined
-                ? { gridColGap: flat.gridColGap }
-                : {}),
-            ...(flat.gridRowGap !== undefined
-                ? { gridRowGap: flat.gridRowGap }
-                : {}),
-            ...(flat.flexGap !== undefined ? { flexGap: flat.flexGap } : {}),
-            ...(flat.flexRowGap !== undefined
-                ? { flexRowGap: flat.flexRowGap }
-                : {}),
-            ...(flat.flexWrap !== undefined ? { flexWrap: flat.flexWrap } : {}),
+            gridColWidths: flat.gridColWidths ?? null,
+            gridRowHeights: flat.gridRowHeights ?? null,
+            gridColGap: flat.gridColGap ?? null,
+            gridRowGap: flat.gridRowGap ?? null,
+            flexGap: flat.flexGap ?? null,
+            flexRowGap: flat.flexRowGap ?? null,
+            flexWrap: flat.flexWrap ?? null,
         };
     }
 

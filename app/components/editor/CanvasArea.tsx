@@ -7,7 +7,7 @@ import {
 } from '@dnd-kit/sortable';
 import { useCallback } from 'react';
 import LayoutCard from './layout';
-import type { NestedLayout, PageVersion } from '../types';
+import type { NestedLayout, PageVersion } from './types';
 import { flattenToGraph } from './types';
 
 /*  插入線  */
@@ -42,14 +42,14 @@ export default function CanvasArea({
     insertIndex: number | null;
     insertSlotId: string | null;
     slotInsertIndex: number | null;
-    isSomethingDragging?: boolean;
-    onUpdateSlotWidths?: (layoutId: string, widths: number[]) => void;
-    onUpdateGridDimensions?: (
+    isSomethingDragging: boolean;
+    onUpdateSlotWidths: (layoutId: string, widths: number[]) => void;
+    onUpdateGridDimensions: (
         layoutId: string,
         colWidths: number[],
         rowHeights: number[],
-        colGap?: number,
-        rowGap?: number,
+        colGap: number | null,
+        rowGap: number | null,
     ) => void;
 }) {
     const { setNodeRef, isOver } = useDroppable({

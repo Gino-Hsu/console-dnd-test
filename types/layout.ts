@@ -50,19 +50,19 @@ export interface NestedLayout {
     slots: Slot[];
     spacing: LayoutSpacing;
     /** grid layout 欄寬百分比陣列，長度 = 欄數，e.g. [50, 50] */
-    gridColWidths?: number[];
+    gridColWidths: number[] | null;
     /** grid layout 列高像素陣列，長度 = 列數，e.g. [120, 120] */
-    gridRowHeights?: number[];
+    gridRowHeights: number[] | null;
     /** grid layout 欄間距（column-gap），像素 */
-    gridColGap?: number;
+    gridColGap: number | null;
     /** grid layout 列間距（row-gap），像素 */
-    gridRowGap?: number;
+    gridRowGap: number | null;
     /** flex layout slot 欄間距（column-gap），像素 */
-    flexGap?: number;
+    flexGap: number | null;
     /** flex layout 列間距（row-gap），換行時使用，像素 */
-    flexRowGap?: number;
+    flexRowGap: number | null;
     /** flex layout 是否換行，預設 false */
-    flexWrap?: boolean;
+    flexWrap: boolean | null;
 }
 
 // ─── 版本快照 ─────────────────────────────────────────────────
@@ -90,19 +90,19 @@ export interface FlatLayout {
     slotIds: string[];
     parentSlotId: string | null;
     /** grid layout 欄寬百分比陣列（僅 grid 使用） */
-    gridColWidths?: number[];
+    gridColWidths?: number[] | null;
     /** grid layout 列高像素陣列（僅 grid 使用） */
-    gridRowHeights?: number[];
+    gridRowHeights?: number[] | null;
     /** grid layout 欄間距（column-gap），像素 */
-    gridColGap?: number;
+    gridColGap?: number | null;
     /** grid layout 列間距（row-gap），像素 */
-    gridRowGap?: number;
+    gridRowGap?: number | null;
     /** flex layout slot 欄間距（column-gap），像素 */
-    flexGap?: number;
+    flexGap?: number | null;
     /** flex layout 列間距（row-gap），換行時使用，像素 */
-    flexRowGap?: number;
+    flexRowGap?: number | null;
     /** flex layout 是否換行，預設 false */
-    flexWrap?: boolean;
+    flexWrap?: boolean | null;
 }
 
 /**
