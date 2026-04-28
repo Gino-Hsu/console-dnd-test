@@ -41,38 +41,38 @@ export default function LayoutFrame({
                 paddingBottom: mb,
                 paddingLeft: ml,
             }}
-            className={`rounded-xl transition-colors ${hasMargin ? 'bg-amber-100/60 outline-dashed outline-1 outline-amber-300' : ''}`}
+            className={`group rounded-xl transition-colors ${hasMargin ? 'group-hover:bg-amber-100/60 group-hover:outline-dashed group-hover:outline-1 group-hover:outline-amber-300' : ''}`}
         >
             {/* 卡片主體 */}
             <div
                 ref={setNodeRef}
                 style={sortStyle}
-                className={`relative rounded-lg border-2 group transition-colors ${borderColor} ${bgColor} ${isSelected ? 'ring-2 ring-blue-500 ring-offset-1' : ''}`}
+                className={`group relative rounded-lg border-2 transition-colors ${borderColor} ${bgColor} ${isSelected ? 'ring-2 ring-blue-500 ring-offset-1' : ''}`}
             >
                 {/* padding 視覺色塊 */}
                 {hasPadding && (
                     <>
                         {pt > 0 && (
                             <div
-                                className='absolute inset-x-0 top-0 bg-green-200/60 pointer-events-none z-10 rounded-t-lg'
+                                className='absolute inset-x-0 top-0 bg-green-200/60 pointer-events-none z-10 rounded-t-lg opacity-0 group-hover:opacity-100'
                                 style={{ height: pt }}
                             />
                         )}
                         {pb > 0 && (
                             <div
-                                className='absolute inset-x-0 bottom-0 bg-green-200/60 pointer-events-none z-10 rounded-b-lg'
+                                className='absolute inset-x-0 bottom-0 bg-green-200/60 pointer-events-none z-10 rounded-b-lg opacity-0 group-hover:opacity-100'
                                 style={{ height: pb }}
                             />
                         )}
                         {pl > 0 && (
                             <div
-                                className='absolute inset-y-0 left-0 bg-green-200/60 pointer-events-none z-10'
+                                className='absolute inset-y-0 left-0 bg-green-200/60 pointer-events-none z-10 opacity-0 group-hover:opacity-100'
                                 style={{ width: pl }}
                             />
                         )}
                         {pr > 0 && (
                             <div
-                                className='absolute inset-y-0 right-0 bg-green-200/60 pointer-events-none z-10'
+                                className='absolute inset-y-0 right-0 bg-green-200/60 pointer-events-none z-10 opacity-0 group-hover:opacity-100'
                                 style={{ width: pr }}
                             />
                         )}

@@ -78,7 +78,7 @@ export default function SlotZone({
                                 <InsertLine />
                             )}
                             <div
-                                className={`flex items-center justify-center h-full text-xs select-none transition-colors ${
+                                className={`flex items-center justify-center h-full text-xs transition-colors ${
                                     atMaxDepth
                                         ? 'text-zinc-300'
                                         : isOver
