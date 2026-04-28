@@ -4,8 +4,6 @@ import SharedBlockLayout from '@/app/components/shared/SharedBlockLayout';
 import SharedFlexLayout from '@/app/components/shared/SharedFlexLayout';
 import SharedGridLayout from '@/app/components/shared/SharedGridLayout';
 
-const MAX_LAYOUT_DEPTH = 2; // 允許 depth 0, 1, 2 (共3層)
-
 export default function ViewLayoutCard({
     layout,
 }: {
@@ -49,12 +47,7 @@ export default function ViewLayoutCard({
     );
 }
 
-function ViewLayoutContent({
-    layout,
-}: {
-    layout: NestedLayout;
-    depth: number;
-}) {
+function ViewLayoutContent({ layout }: { layout: NestedLayout }) {
     if (layout.type === 'block') {
         return <SharedBlockLayout mode='view' slots={layout.slots} />;
     }
