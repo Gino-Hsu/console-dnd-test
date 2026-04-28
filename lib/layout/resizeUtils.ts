@@ -130,7 +130,7 @@ const BG: Record<LayoutType, [string, string]> = {
 /** 依 layout 類型與巢狀深度回傳 border / bg Tailwind class */
 export function layoutTheme(
     type: LayoutType,
-    depth: number,
+    depth = 0,
 ): { borderColor: string; bgColor: string } {
     const d = depth === 0 ? 0 : 1;
     return { borderColor: BORDER[type][d], bgColor: BG[type][d] };

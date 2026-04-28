@@ -4,7 +4,6 @@ import ViewLayoutCard from './ViewLayoutCard';
 export default function ViewSlotZone({
     slot,
     flexBasis,
-    depth = 0,
     isGridItem,
 }: {
     slot: NestedLayout['slots'][number];
@@ -27,11 +26,7 @@ export default function ViewSlotZone({
                     .join(' ')}
             >
                 {slot.children.map(child => (
-                    <ViewLayoutCard
-                        key={child.id}
-                        layout={child}
-                        depth={depth + 1}
-                    />
+                    <ViewLayoutCard key={child.id} layout={child} />
                 ))}
             </div>
         </div>

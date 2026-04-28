@@ -8,17 +8,11 @@ const MAX_LAYOUT_DEPTH = 2; // 允許 depth 0, 1, 2 (共3層)
 
 export default function ViewLayoutCard({
     layout,
-    depth = 0,
 }: {
     layout: NestedLayout;
     depth?: number;
 }) {
-    // 超過最大層數，不渲染
-    if (depth > MAX_LAYOUT_DEPTH) {
-        return null;
-    }
-
-    const { borderColor, bgColor } = layoutTheme(layout.type, depth);
+    const { borderColor, bgColor } = layoutTheme(layout.type);
     const sp = layout.spacing;
     const mt = sp?.margin.top ?? 0,
         mr = sp?.margin.right ?? 0;
@@ -49,7 +43,7 @@ export default function ViewLayoutCard({
                     paddingLeft: Math.max(pl, 0),
                 }}
             >
-                <ViewLayoutContent layout={layout} depth={depth} />
+                <ViewLayoutContent layout={layout} />
             </div>
         </div>
     );
