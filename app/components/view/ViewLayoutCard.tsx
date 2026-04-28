@@ -4,6 +4,8 @@ import SharedBlockLayout from '@/app/components/shared/SharedBlockLayout';
 import SharedFlexLayout from '@/app/components/shared/SharedFlexLayout';
 import SharedGridLayout from '@/app/components/shared/SharedGridLayout';
 
+const MAX_LAYOUT_DEPTH = 2; // 允許 depth 0, 1, 2 (共3層)
+
 export default function ViewLayoutCard({
     layout,
     depth = 0,
@@ -11,6 +13,11 @@ export default function ViewLayoutCard({
     layout: NestedLayout;
     depth?: number;
 }) {
+    // 超過最大層數，不渲染
+    if (depth > MAX_LAYOUT_DEPTH) {
+        return null;
+    }
+
     const { borderColor, bgColor } = layoutTheme(layout.type, depth);
     const sp = layout.spacing;
     const mt = sp?.margin.top ?? 0,
