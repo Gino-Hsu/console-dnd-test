@@ -23,6 +23,7 @@ type SharedGridLayoutProps = {
           sp: SlotProps;
           onColDrag: (i: number, dx: number) => void;
           isDragging: boolean;
+          depth: number;
       }
 );
 
@@ -43,6 +44,7 @@ export default function SharedGridLayout(props: SharedGridLayoutProps) {
                         isGridItem
                         {...props.sp}
                         isDragging={props.isDragging}
+                        depth={props.depth}
                     />
                 ) : (
                     <ViewSlotZone key={slot.id} slot={slot} isGridItem />

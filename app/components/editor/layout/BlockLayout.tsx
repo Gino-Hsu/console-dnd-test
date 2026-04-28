@@ -8,10 +8,12 @@ export default function BlockLayout({
     slots,
     sp,
     isDragging,
+    depth,
 }: {
     slots: NestedLayout['slots'];
     sp: SlotProps;
     isDragging: boolean;
+    depth: number;
 }) {
     return (
         <SharedBlockLayout
@@ -19,6 +21,7 @@ export default function BlockLayout({
             slots={slots}
             sp={sp}
             isDragging={isDragging}
+            depth={depth}
         />
     );
 }

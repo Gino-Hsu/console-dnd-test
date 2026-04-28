@@ -13,6 +13,7 @@ export default function GridLayout({
     sp,
     onColDrag,
     isDragging,
+    depth,
 }: {
     layout: NestedLayout;
     containerRef: RefObject<HTMLDivElement | null>;
@@ -21,6 +22,7 @@ export default function GridLayout({
     sp: SlotProps;
     onColDrag: (i: number, dx: number) => void;
     isDragging: boolean;
+    depth: number;
 }) {
     return (
         <SharedGridLayout
@@ -32,6 +34,7 @@ export default function GridLayout({
             sp={sp}
             onColDrag={onColDrag}
             isDragging={isDragging}
+            depth={depth}
         />
     );
 }

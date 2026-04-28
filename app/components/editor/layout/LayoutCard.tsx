@@ -7,7 +7,6 @@ import {
     layoutTheme,
     resizeFlexSlots,
     resizeGridCols,
-    // resizeGridRows,
 } from '@/lib/layout/resizeUtils';
 import LayoutContent from './LayoutContent';
 import LayoutFrame from './LayoutFrame';

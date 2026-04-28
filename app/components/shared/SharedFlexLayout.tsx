@@ -15,6 +15,7 @@ type SharedFlexLayoutProps = { layout: NestedLayout } & (
           sp: SlotProps;
           onDrag: (i: number, dx: number) => void;
           isDragging: boolean;
+          depth: number;
       }
 );
 
@@ -54,6 +55,7 @@ export default function SharedFlexLayout(props: SharedFlexLayoutProps) {
                                     slot={slot}
                                     {...props.sp}
                                     isDragging={props.isDragging}
+                                    depth={props.depth}
                                 />
                             ) : (
                                 <ViewSlotZone slot={slot} />

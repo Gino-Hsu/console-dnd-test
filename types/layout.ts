@@ -90,19 +90,19 @@ export interface FlatLayout {
     slotIds: string[];
     parentSlotId: string | null;
     /** grid layout 欄寬百分比陣列（僅 grid 使用） */
-    gridColWidths?: number[] | null;
+    gridColWidths: number[] | null;
     /** grid layout 列高像素陣列（僅 grid 使用） */
-    gridRowHeights?: number[] | null;
+    gridRowHeights: number[] | null;
     /** grid layout 欄間距（column-gap），像素 */
-    gridColGap?: number | null;
+    gridColGap: number | null;
     /** grid layout 列間距（row-gap），像素 */
-    gridRowGap?: number | null;
+    gridRowGap: number | null;
     /** flex layout slot 欄間距（column-gap），像素 */
-    flexGap?: number | null;
+    flexGap: number | null;
     /** flex layout 列間距（row-gap），換行時使用，像素 */
-    flexRowGap?: number | null;
+    flexRowGap: number | null;
     /** flex layout 是否換行，預設 false */
-    flexWrap?: boolean | null;
+    flexWrap: boolean | null;
 }
 
 /**

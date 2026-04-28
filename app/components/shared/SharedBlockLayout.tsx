@@ -7,7 +7,7 @@ import type { NestedLayout } from '@/types/layout';
 
 type SharedBlockLayoutProps = { slots: NestedLayout['slots'] } & (
     | { mode: 'view' }
-    | { mode: 'edit'; sp: SlotProps; isDragging: boolean }
+    | { mode: 'edit'; sp: SlotProps; isDragging: boolean; depth: number }
 );
 
 export default function SharedBlockLayout(props: SharedBlockLayoutProps) {
@@ -20,6 +20,7 @@ export default function SharedBlockLayout(props: SharedBlockLayoutProps) {
                         slot={slot}
                         {...props.sp}
                         isDragging={props.isDragging}
+                        depth={props.depth}
                     />
                 ) : (
                     <ViewSlotZone key={slot.id} slot={slot} />

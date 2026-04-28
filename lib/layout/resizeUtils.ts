@@ -115,23 +115,22 @@ export function gridContainerStyle(
 
 type LayoutType = NestedLayout['type'];
 
-const BORDER: Record<LayoutType, [string, string]> = {
-    block: ['border-violet-300', 'border-violet-200'],
-    flex: ['border-sky-300', 'border-sky-200'],
-    grid: ['border-emerald-300', 'border-emerald-200'],
+const BORDER: Record<LayoutType, [string]> = {
+    block: ['border-violet-200'],
+    flex: ['border-sky-200'],
+    grid: ['border-emerald-200'],
 };
 
-const BG: Record<LayoutType, [string, string]> = {
-    block: ['bg-violet-50', 'bg-violet-50/70'],
-    flex: ['bg-sky-50', 'bg-sky-50/70'],
-    grid: ['bg-emerald-50', 'bg-emerald-50/70'],
+const BG: Record<LayoutType, [string]> = {
+    block: ['bg-violet-50'],
+    flex: ['bg-sky-50'],
+    grid: ['bg-emerald-50'],
 };
 
 /** 依 layout 類型與巢狀深度回傳 border / bg Tailwind class */
-export function layoutTheme(
-    type: LayoutType,
-    depth = 0,
-): { borderColor: string; bgColor: string } {
-    const d = depth === 0 ? 0 : 1;
-    return { borderColor: BORDER[type][d], bgColor: BG[type][d] };
+export function layoutTheme(type: LayoutType): {
+    borderColor: string;
+    bgColor: string;
+} {
+    return { borderColor: BORDER[type][0], bgColor: BG[type][0] };
 }

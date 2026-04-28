@@ -6,7 +6,7 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useCallback } from 'react';
-import LayoutCard from './layout';
+import LayoutCard from './layout/LayoutCard';
 import type { NestedLayout, PageVersion } from './types';
 import { flattenToGraph } from './types';
 
@@ -54,7 +54,7 @@ export default function CanvasArea({
 }) {
     const { setNodeRef, isOver } = useDroppable({
         id: 'canvas-root',
-        data: { type: 'canvas' },
+        data: { type: 'canvas', depth: 0 },
     });
 
     const handlePublish = useCallback(() => {
@@ -148,7 +148,6 @@ export default function CanvasArea({
                                             onRemove={onRemove}
                                             onSelect={onSelect}
                                             selectedLayoutId={selectedLayoutId}
-                                            depth={0}
                                             insertSlotId={insertSlotId}
                                             slotInsertIndex={slotInsertIndex}
                                             isSomethingDragging={

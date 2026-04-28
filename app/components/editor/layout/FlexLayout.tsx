@@ -11,12 +11,14 @@ export default function FlexLayout({
     sp,
     onDrag,
     isDragging,
+    depth,
 }: {
     layout: NestedLayout;
     containerRef: RefObject<HTMLDivElement | null>;
     sp: SlotProps;
     onDrag: (i: number, dx: number) => void;
     isDragging: boolean;
+    depth: number;
 }) {
     return (
         <SharedFlexLayout
@@ -26,6 +28,7 @@ export default function FlexLayout({
             sp={sp}
             onDrag={onDrag}
             isDragging={isDragging}
+            depth={depth}
         />
     );
 }

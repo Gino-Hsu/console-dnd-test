@@ -20,6 +20,7 @@ import {
     findLayoutById,
     insertIntoSlot,
     isSlotInsideLayout,
+    MAX_DEPTH,
     moveItem,
     removeItem,
 } from '@/lib/layout';
@@ -80,69 +81,83 @@ export default function DndBuilder() {
     }, []);
 
     // ── DragOver：計算插入線位置 ─────────────────
-    const handleDragOver = useCallback((event: DragOverEvent) => {
-        const activeData = event.active.data.current;
-        const isSidebar = activeData?.source === 'sidebar';
+    const handleDragOver = useCallback(
+        (event: DragOverEvent) => {
+            const activeData = event.active.data.current;
+            const isSidebar = activeData?.source === 'sidebar';
 
-        const overData = event.over?.data.current;
-        const translated = event.active.rect.current.translated;
-        if (!translated) return;
+            const overData = event.over?.data.current;
+            const translated = event.active.rect.current.translated;
+            if (!translated) return;
 
-        const activeMidY = translated.top + translated.height / 2;
+            const activeMidY = translated.top + translated.height / 2;
 
-        if (overData?.type === 'slot') {
-            const slotId = event.over!.id as string;
+            if (overData?.type === 'slot') {
+                const slotId = event.over!.id as string;
 
-            // 不允許拖進自己（或後代）的 slot
-            if (
-                !isSidebar &&
-                activeCanvasIdRef.current &&
-                isSlotInsideLayout(slotId, activeCanvasIdRef.current, layouts)
-            ) {
+                // 不允許拖進自己（或後代）的 slot
+                if (
+                    !isSidebar &&
+                    activeCanvasIdRef.current &&
+                    isSlotInsideLayout(
+                        slotId,
+                        activeCanvasIdRef.current,
+                        layouts,
+                    )
+                ) {
+                    setInsertSlotId(null);
+                    setInsertIndex(null);
+                    return;
+                }
+
+                // 不允許超過最大層數
+                if (overData?.depth >= MAX_DEPTH) {
+                    setInsertSlotId(null);
+                    setInsertIndex(null);
+                    return;
+                }
+
+                const elements = Array.from(
+                    document.querySelectorAll(
+                        `[data-slot-id="${slotId}"] [data-canvas-item]`,
+                    ),
+                ) as HTMLElement[];
+
+                let newIndex = elements.length;
+                for (let i = 0; i < elements.length; i++) {
+                    const rect = elements[i].getBoundingClientRect();
+                    if (activeMidY < rect.top + rect.height / 2) {
+                        newIndex = i;
+                        break;
+                    }
+                }
+
+                setInsertSlotId(slotId);
+                setInsertIndex(newIndex);
+            } else if (overData?.type === 'canvas') {
+                const elements = Array.from(
+                    document.querySelectorAll(
+                        '[data-root-canvas] > [data-canvas-item]',
+                    ),
+                ) as HTMLElement[];
+
+                let newIndex = elements.length;
+                for (let i = 0; i < elements.length; i++) {
+                    const rect = elements[i].getBoundingClientRect();
+                    if (activeMidY < rect.top + rect.height / 2) {
+                        newIndex = i;
+                        break;
+                    }
+                }
+                setInsertSlotId(null);
+                setInsertIndex(prev => (prev === newIndex ? prev : newIndex));
+            } else {
                 setInsertSlotId(null);
                 setInsertIndex(null);
-                return;
             }
-
-            const elements = Array.from(
-                document.querySelectorAll(
-                    `[data-slot-id="${slotId}"] [data-canvas-item]`,
-                ),
-            ) as HTMLElement[];
-
-            let newIndex = elements.length;
-            for (let i = 0; i < elements.length; i++) {
-                const rect = elements[i].getBoundingClientRect();
-                if (activeMidY < rect.top + rect.height / 2) {
-                    newIndex = i;
-                    break;
-                }
-            }
-
-            setInsertSlotId(slotId);
-            setInsertIndex(newIndex);
-        } else if (overData?.type === 'canvas') {
-            const elements = Array.from(
-                document.querySelectorAll(
-                    '[data-root-canvas] > [data-canvas-item]',
-                ),
-            ) as HTMLElement[];
-
-            let newIndex = elements.length;
-            for (let i = 0; i < elements.length; i++) {
-                const rect = elements[i].getBoundingClientRect();
-                if (activeMidY < rect.top + rect.height / 2) {
-                    newIndex = i;
-                    break;
-                }
-            }
-            setInsertSlotId(null);
-            setInsertIndex(prev => (prev === newIndex ? prev : newIndex));
-        } else {
-            setInsertSlotId(null);
-            setInsertIndex(null);
-        }
-    }, []);
+        },
+        [layouts],
+    );
 
     // ── DragEnd ─────────────────────────
     const handleDragEnd = useCallback(

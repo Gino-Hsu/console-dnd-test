@@ -9,26 +9,36 @@ import { cn } from '@/lib/cn';
 import { InsertLine } from '../CanvasArea';
 import type { NestedLayout } from '@/types/layout';
 import type { SlotProps } from './types';
+import { MAX_DEPTH } from '@/lib/layout';
 
 // 延遲 import 避免循環依賴在模組初始化時出問題
 // （實際執行時是安全的，因為 LayoutCard 在 render 時才被呼叫）
-import LayoutCard from './index';
+import LayoutCard from './LayoutCard';
 
 export default function SlotZone({
     slot,
     flexBasis,
     isGridItem,
     isDragging,
+    depth,
     ...sp
 }: SlotProps & {
     slot: { id: string; label?: string; children: NestedLayout[] };
     flexBasis?: number;
     isGridItem?: boolean;
     isDragging?: boolean;
+    depth: number;
 }) {
+    const atMaxDepth = depth + 1 >= MAX_DEPTH;
     const { setNodeRef, isOver } = useDroppable({
         id: slot.id,
-        data: { type: 'slot', ownerId: sp.ownerId, slotId: slot.id },
+        data: {
+            type: 'slot',
+            ownerId: sp.ownerId,
+            slotId: slot.id,
+            depth: depth + 1,
+        },
+        disabled: atMaxDepth,
     });
     const isActive = sp.insertSlotId === slot.id;
 
@@ -55,9 +65,11 @@ export default function SlotZone({
                     className={cn(
                         'rounded-lg border-2 border-dashed h-full p-4 flex flex-col gap-2 transition-colors',
                         isGridItem ? 'h-full' : 'min-h-16',
-                        isOver && !isDragging
-                            ? 'border-blue-400 bg-blue-50'
-                            : 'border-zinc-200 bg-white/60',
+                        atMaxDepth
+                            ? 'border-zinc-200 bg-zinc-50 opacity-60 cursor-not-allowed'
+                            : isOver && !isDragging
+                              ? 'border-blue-400 bg-blue-50'
+                              : 'border-zinc-200 bg-white/60',
                     )}
                 >
                     {slot.children.length === 0 ? (
@@ -66,9 +78,17 @@ export default function SlotZone({
                                 <InsertLine />
                             )}
                             <div
-                                className={`flex items-center justify-center h-full text-xs select-none transition-colors ${isOver ? 'text-blue-400' : 'text-zinc-300'}`}
+                                className={`flex items-center justify-center h-full text-xs select-none transition-colors ${
+                                    atMaxDepth
+                                        ? 'text-zinc-300'
+                                        : isOver
+                                          ? 'text-blue-400'
+                                          : 'text-zinc-300'
+                                }`}
                             >
-                                拖曳 Layout 到此 slot
+                                {atMaxDepth
+                                    ? `已達最大層數（${MAX_DEPTH} 層）`
+                                    : '拖曳 Layout 到此 slot'}
                             </div>
                         </>
                     ) : (
@@ -81,7 +101,7 @@ export default function SlotZone({
                                     <div className='py-1'>
                                         <LayoutCard
                                             layout={child}
-                                            depth={1}
+                                            depth={depth + 1}
                                             isDraggingFromParent={isDragging}
                                             {...sp}
                                         />
