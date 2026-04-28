@@ -66,7 +66,7 @@ export default function SlotZone({
                         'rounded-lg border-2 border-dashed h-full p-4 flex flex-col gap-2 transition-colors',
                         isGridItem ? 'h-full' : 'min-h-16',
                         atMaxDepth
-                            ? 'border-zinc-200 bg-zinc-50 opacity-60 cursor-not-allowed'
+                            ? 'border-zinc-200 bg-zinc-50 opacity-60'
                             : isOver && !isDragging
                               ? 'border-blue-400 bg-blue-50'
                               : 'border-zinc-200 bg-white/60',

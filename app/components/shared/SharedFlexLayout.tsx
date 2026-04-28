@@ -61,7 +61,6 @@ export default function SharedFlexLayout(props: SharedFlexLayoutProps) {
                                 <ViewSlotZone slot={slot} />
                             )}
                         </div>
-                        {/* edit mode：ResizeHandle 作為間距；view mode：純 div 補間距 */}
                         {!isWrap && i < n - 1 && props.mode === 'edit' && (
                             <ResizeHandle
                                 size={gap}
