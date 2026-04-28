@@ -49,25 +49,8 @@ export function gridColHandleLeft(
     const fraction = leftFr / totalFr;
     const subtractPx = (fraction * (cols - 1) * colGap).toFixed(2);
     const addPx = colIndex * colGap + colGap / 2;
-    // center = fraction*(containerW - (cols-1)*gap) + colIndex*gap + gap/2
     return `calc(${fraction * 100}% - ${subtractPx}px + ${addPx}px - 4px)`;
 }
-
-// ── Grid rows ─────────────────────────────────────────────────────────────────
-
-/**
- * 計算拖曳後的 grid 列高（px），最小 40px
- */
-// export function resizeGridRows(
-//     rowHeights: number[],
-//     rowIndex: number,
-//     dy: number,
-// ): number[] {
-//     const next = [...rowHeights];
-//     next[rowIndex] = Math.max(40, next[rowIndex] + dy);
-//     next[rowIndex + 1] = Math.max(40, next[rowIndex + 1] - dy);
-//     return next;
-// }
 
 /**
  * 計算列分隔拖曳條距離容器頂部的 px 值（置於間距正中央）
