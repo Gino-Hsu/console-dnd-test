@@ -11,8 +11,12 @@ export interface LayoutItem {
 export interface Slot {
     id: string;
     children: NestedLayout[];
-    /** flex 佔比百分比（僅 flex layout 使用），e.g. 50 = 50% */
-    flexBasis?: number;
+    flexWidthConfig: {
+        /** flex 佔比百分比（僅 flex layout 非換行模式使用），e.g. 50 = 50% */
+        flexBasis: number;
+        /** flex layout 換行模式下各 slot 的像素寬度，預設 200px */
+        widthPx: number;
+    };
 }
 
 export const LAYOUT_CONFIG: Record<LayoutType, { slotCount: number }> = {
@@ -42,6 +46,26 @@ export const DEFAULT_SPACING: LayoutSpacing = {
 
 // ─── 巢狀樹狀結構（編輯時使用） ─────────────────────────────
 
+export interface FlexConfig {
+    /** column-gap，像素 */
+    gap: number;
+    /** row-gap（換行時使用），像素 */
+    rowGap: number;
+    /** 是否換行 */
+    wrap: boolean;
+}
+
+export interface GridConfig {
+    /** 欄寬百分比陣列，長度 = 欄數，e.g. [50, 50] */
+    colWidths: number[];
+    /** 列高像素陣列，長度 = 列數，e.g. [120, 120] */
+    rowHeights: number[];
+    /** column-gap，像素 */
+    colGap: number;
+    /** row-gap，像素 */
+    rowGap: number;
+}
+
 export interface NestedLayout {
     id: string;
     type: LayoutType;
@@ -49,20 +73,10 @@ export interface NestedLayout {
     props: Record<string, unknown>;
     slots: Slot[];
     spacing: LayoutSpacing;
-    /** grid layout 欄寬百分比陣列，長度 = 欄數，e.g. [50, 50] */
-    gridColWidths?: number[];
-    /** grid layout 列高像素陣列，長度 = 列數，e.g. [120, 120] */
-    gridRowHeights?: number[];
-    /** grid layout 欄間距（column-gap），像素 */
-    gridColGap?: number;
-    /** grid layout 列間距（row-gap），像素 */
-    gridRowGap?: number;
-    /** flex layout slot 欄間距（column-gap），像素 */
-    flexGap?: number;
-    /** flex layout 列間距（row-gap），換行時使用，像素 */
-    flexRowGap?: number;
-    /** flex layout 是否換行，預設 false */
-    flexWrap?: boolean;
+    /** flex layout 專用設定（type !== 'flex' 時為 null） */
+    flexConfig: FlexConfig | null;
+    /** grid layout 專用設定（type !== 'grid' 時為 null） */
+    gridConfig: GridConfig | null;
 }
 
 // ─── 版本快照 ─────────────────────────────────────────────────
@@ -89,20 +103,10 @@ export interface FlatLayout {
     spacing: LayoutSpacing;
     slotIds: string[];
     parentSlotId: string | null;
-    /** grid layout 欄寬百分比陣列（僅 grid 使用） */
-    gridColWidths?: number[];
-    /** grid layout 列高像素陣列（僅 grid 使用） */
-    gridRowHeights?: number[];
-    /** grid layout 欄間距（column-gap），像素 */
-    gridColGap?: number;
-    /** grid layout 列間距（row-gap），像素 */
-    gridRowGap?: number;
-    /** flex layout slot 欄間距（column-gap），像素 */
-    flexGap?: number;
-    /** flex layout 列間距（row-gap），換行時使用，像素 */
-    flexRowGap?: number;
-    /** flex layout 是否換行，預設 false */
-    flexWrap?: boolean;
+    /** flex layout 專用設定（type !== 'flex' 時為 null） */
+    flexConfig: FlexConfig | null;
+    /** grid layout 專用設定（type !== 'grid' 時為 null） */
+    gridConfig: GridConfig | null;
 }
 
 /**
@@ -112,8 +116,11 @@ export interface FlatSlot {
     id: string;
     childIds: string[];
     parentLayoutId: string;
+    flexWidthConfig: {
+        flexBasis: number | null;
+        widthPx: number | null;
+    };
     /** flex 佔比百分比（僅 flex layout 使用），e.g. 50 = 50% */
-    flexBasis?: number;
 }
 
 /**

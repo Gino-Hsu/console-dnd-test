@@ -1,8 +1,12 @@
 import { arrayMove } from '@dnd-kit/sortable';
 import type { NestedLayout } from '@/types/layout';
 
-// ─── 查詢 ────────────────────────────────────────────────────
+// ─── 常數 ────────────────────────────────────────────────────
 
+/** 最大允許巢狀層數（root = 0，最深 = MAX_DEPTH） */
+export const MAX_DEPTH = 3;
+
+// ─── 查詢 ────────────────────────────────────────────────────
 /**
  * 遞迴找出某個 layout 所在的容器
  * 回傳 'root' 或 slotId；找不到回傳 null

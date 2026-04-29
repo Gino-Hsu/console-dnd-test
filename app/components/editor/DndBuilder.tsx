@@ -20,6 +20,7 @@ import {
     findLayoutById,
     insertIntoSlot,
     isSlotInsideLayout,
+    MAX_DEPTH,
     moveItem,
     removeItem,
 } from '@/lib/layout';
@@ -41,8 +42,6 @@ export default function DndBuilder() {
         null,
     );
 
-    const layoutsRef = useRef(layouts);
-    layoutsRef.current = layouts;
     // 記錄拖曳開始時的來源容器，用來判斷是否跨容器
     const activeContainerRef = useRef<string | null>(null);
     // 記錄目前正在拖曳的 canvas item id（handleDragOver 是 stale closure，無法讀 state）
@@ -74,7 +73,7 @@ export default function DndBuilder() {
             activeCanvasIdRef.current = event.active.id as string;
             activeContainerRef.current = findContainer(
                 event.active.id as string,
-                layoutsRef.current,
+                layouts,
             );
         }
         setInsertIndex(null);
@@ -82,73 +81,83 @@ export default function DndBuilder() {
     }, []);
 
     // ── DragOver：計算插入線位置 ─────────────────
-    const handleDragOver = useCallback((event: DragOverEvent) => {
-        const activeData = event.active.data.current;
-        const isSidebar = activeData?.source === 'sidebar';
+    const handleDragOver = useCallback(
+        (event: DragOverEvent) => {
+            const activeData = event.active.data.current;
+            const isSidebar = activeData?.source === 'sidebar';
 
-        const overData = event.over?.data.current;
-        const translated = event.active.rect.current.translated;
-        if (!translated) return;
+            const overData = event.over?.data.current;
+            const translated = event.active.rect.current.translated;
+            if (!translated) return;
 
-        const activeMidY = translated.top + translated.height / 2;
+            const activeMidY = translated.top + translated.height / 2;
 
-        if (overData?.type === 'slot') {
-            const slotId = event.over!.id as string;
+            if (overData?.type === 'slot') {
+                const slotId = event.over!.id as string;
 
-            // 不允許拖進自己（或後代）的 slot
-            if (
-                !isSidebar &&
-                activeCanvasIdRef.current &&
-                isSlotInsideLayout(
-                    slotId,
-                    activeCanvasIdRef.current,
-                    layoutsRef.current,
-                )
-            ) {
+                // 不允許拖進自己（或後代）的 slot
+                if (
+                    !isSidebar &&
+                    activeCanvasIdRef.current &&
+                    isSlotInsideLayout(
+                        slotId,
+                        activeCanvasIdRef.current,
+                        layouts,
+                    )
+                ) {
+                    setInsertSlotId(null);
+                    setInsertIndex(null);
+                    return;
+                }
+
+                // 不允許超過最大層數
+                if (overData?.depth >= MAX_DEPTH) {
+                    setInsertSlotId(null);
+                    setInsertIndex(null);
+                    return;
+                }
+
+                const elements = Array.from(
+                    document.querySelectorAll(
+                        `[data-slot-id="${slotId}"] [data-canvas-item]`,
+                    ),
+                ) as HTMLElement[];
+
+                let newIndex = elements.length;
+                for (let i = 0; i < elements.length; i++) {
+                    const rect = elements[i].getBoundingClientRect();
+                    if (activeMidY < rect.top + rect.height / 2) {
+                        newIndex = i;
+                        break;
+                    }
+                }
+
+                setInsertSlotId(slotId);
+                setInsertIndex(newIndex);
+            } else if (overData?.type === 'canvas') {
+                const elements = Array.from(
+                    document.querySelectorAll(
+                        '[data-root-canvas] > [data-canvas-item]',
+                    ),
+                ) as HTMLElement[];
+
+                let newIndex = elements.length;
+                for (let i = 0; i < elements.length; i++) {
+                    const rect = elements[i].getBoundingClientRect();
+                    if (activeMidY < rect.top + rect.height / 2) {
+                        newIndex = i;
+                        break;
+                    }
+                }
+                setInsertSlotId(null);
+                setInsertIndex(prev => (prev === newIndex ? prev : newIndex));
+            } else {
                 setInsertSlotId(null);
                 setInsertIndex(null);
-                return;
             }
-
-            const elements = Array.from(
-                document.querySelectorAll(
-                    `[data-slot-id="${slotId}"] [data-canvas-item]`,
-                ),
-            ) as HTMLElement[];
-
-            let newIndex = elements.length;
-            for (let i = 0; i < elements.length; i++) {
-                const rect = elements[i].getBoundingClientRect();
-                if (activeMidY < rect.top + rect.height / 2) {
-                    newIndex = i;
-                    break;
-                }
-            }
-
-            setInsertSlotId(slotId);
-            setInsertIndex(newIndex);
-        } else if (overData?.type === 'canvas') {
-            const elements = Array.from(
-                document.querySelectorAll(
-                    '[data-root-canvas] > [data-canvas-item]',
-                ),
-            ) as HTMLElement[];
-
-            let newIndex = elements.length;
-            for (let i = 0; i < elements.length; i++) {
-                const rect = elements[i].getBoundingClientRect();
-                if (activeMidY < rect.top + rect.height / 2) {
-                    newIndex = i;
-                    break;
-                }
-            }
-            setInsertSlotId(null);
-            setInsertIndex(prev => (prev === newIndex ? prev : newIndex));
-        } else {
-            setInsertSlotId(null);
-            setInsertIndex(null);
-        }
-    }, []);
+        },
+        [layouts],
+    );
 
     // ── DragEnd ─────────────────────────
     const handleDragEnd = useCallback(
@@ -267,7 +276,7 @@ export default function DndBuilder() {
 
     const handleRemove = useCallback((id: string) => {
         setLayouts(prev => removeItem(prev, id));
-        setSelectedLayoutId(prev => (prev === id ? null : prev));
+        setSelectedLayoutId(null);
     }, []);
 
     const handleSelect = useCallback((id: string) => {
@@ -297,25 +306,33 @@ export default function DndBuilder() {
         const addToLayout = (items: NestedLayout[]): NestedLayout[] =>
             items.map(l => {
                 if (l.id === layoutId) {
-                    const newSlots = [
+                    const newSlots: import('@/types/layout').Slot[] = [
                         ...l.slots,
-                        { id: uuidv4(), children: [] },
+                        {
+                            id: uuidv4(),
+                            children: [],
+                            flexWidthConfig: { flexBasis: 50, widthPx: 200 },
+                        },
                     ];
                     if (l.type === 'flex') {
-                        // flex：重新均分所有 slot 的 flexBasis
+                        const eq = 100 / newSlots.length;
                         return {
                             ...l,
                             slots: newSlots.map(s => ({
                                 ...s,
-                                flexBasis: 100 / newSlots.length,
+                                flexWidthConfig: {
+                                    ...s.flexWidthConfig,
+                                    flexBasis: eq,
+                                },
                             })),
                         };
                     }
                     if (l.type === 'grid') {
-                        // grid：重新計算需要幾列，同步擴充 gridRowHeights
-                        const cols = l.gridColWidths?.length ?? 2;
+                        // grid：重新計算需要幾列，同步擴充 rowHeights
+                        const cols = l.gridConfig?.colWidths?.length ?? 2;
                         const newRowCount = Math.ceil(newSlots.length / cols);
-                        const existingRowHeights = l.gridRowHeights ?? [];
+                        const existingRowHeights =
+                            l.gridConfig?.rowHeights ?? [];
                         const newRowHeights = Array.from(
                             { length: newRowCount },
                             (_, i) => existingRowHeights[i] ?? 120,
@@ -323,7 +340,10 @@ export default function DndBuilder() {
                         return {
                             ...l,
                             slots: newSlots,
-                            gridRowHeights: newRowHeights,
+                            gridConfig: {
+                                ...l.gridConfig!,
+                                rowHeights: newRowHeights,
+                            },
                         };
                     }
                     return { ...l, slots: newSlots };
@@ -346,23 +366,27 @@ export default function DndBuilder() {
                 if (l.id === layoutId) {
                     const remaining = l.slots.filter(s => s.id !== slotId);
                     if (l.type === 'flex' && remaining.length > 0) {
-                        // flex：重新均分剩餘 slot 的 flexBasis
+                        const eq = 100 / remaining.length;
                         return {
                             ...l,
                             slots: remaining.map(s => ({
                                 ...s,
-                                flexBasis: 100 / remaining.length,
+                                flexWidthConfig: {
+                                    ...s.flexWidthConfig,
+                                    flexBasis: eq,
+                                },
                             })),
                         };
                     }
                     if (l.type === 'grid') {
-                        // grid：重新計算需要幾列，裁切或保留 gridRowHeights
-                        const cols = l.gridColWidths?.length ?? 2;
+                        // grid：重新計算需要幾列，裁切或保留 rowHeights
+                        const cols = l.gridConfig?.colWidths?.length ?? 2;
                         const newRowCount = Math.max(
                             1,
                             Math.ceil(remaining.length / cols),
                         );
-                        const existingRowHeights = l.gridRowHeights ?? [];
+                        const existingRowHeights =
+                            l.gridConfig?.rowHeights ?? [];
                         const newRowHeights = Array.from(
                             { length: newRowCount },
                             (_, i) => existingRowHeights[i] ?? 120,
@@ -370,7 +394,10 @@ export default function DndBuilder() {
                         return {
                             ...l,
                             slots: remaining,
-                            gridRowHeights: newRowHeights,
+                            gridConfig: {
+                                ...l.gridConfig!,
+                                rowHeights: newRowHeights,
+                            },
                         };
                     }
                     return { ...l, slots: remaining };
@@ -413,7 +440,12 @@ export default function DndBuilder() {
                             ...l,
                             slots: l.slots.map((s, i) => ({
                                 ...s,
-                                flexBasis: widths[i] ?? s.flexBasis,
+                                flexWidthConfig: {
+                                    ...s.flexWidthConfig,
+                                    flexBasis:
+                                        widths[i] ??
+                                        s.flexWidthConfig.flexBasis,
+                                },
                             })),
                         };
                     }
@@ -435,22 +467,20 @@ export default function DndBuilder() {
             layoutId: string,
             colWidths: number[],
             rowHeights: number[],
-            colGap?: number,
-            rowGap?: number,
+            colGap: number | null,
+            rowGap: number | null,
         ) => {
             const update = (items: NestedLayout[]): NestedLayout[] =>
                 items.map(l => {
                     if (l.id === layoutId)
                         return {
                             ...l,
-                            gridColWidths: colWidths,
-                            gridRowHeights: rowHeights,
-                            ...(colGap !== undefined
-                                ? { gridColGap: colGap }
-                                : {}),
-                            ...(rowGap !== undefined
-                                ? { gridRowGap: rowGap }
-                                : {}),
+                            gridConfig: {
+                                colWidths,
+                                rowHeights,
+                                colGap: colGap ?? l.gridConfig?.colGap ?? 8,
+                                rowGap: rowGap ?? l.gridConfig?.rowGap ?? 8,
+                            },
                         };
                     return {
                         ...l,
@@ -465,29 +495,28 @@ export default function DndBuilder() {
         [],
     );
 
-    const handleUpdateFlexGap = useCallback(
-        (layoutId: string, flexGap: number) => {
-            const update = (items: NestedLayout[]): NestedLayout[] =>
-                items.map(l => {
-                    if (l.id === layoutId) return { ...l, flexGap };
-                    return {
-                        ...l,
-                        slots: l.slots.map(s => ({
-                            ...s,
-                            children: update(s.children),
-                        })),
-                    };
-                });
-            setLayouts(prev => update(prev));
-        },
-        [],
-    );
+    const handleUpdateFlexGap = useCallback((layoutId: string, gap: number) => {
+        const update = (items: NestedLayout[]): NestedLayout[] =>
+            items.map(l => {
+                if (l.id === layoutId)
+                    return { ...l, flexConfig: { ...l.flexConfig!, gap } };
+                return {
+                    ...l,
+                    slots: l.slots.map(s => ({
+                        ...s,
+                        children: update(s.children),
+                    })),
+                };
+            });
+        setLayouts(prev => update(prev));
+    }, []);
 
     const handleUpdateFlexWrap = useCallback(
-        (layoutId: string, flexWrap: boolean) => {
+        (layoutId: string, wrap: boolean) => {
             const update = (items: NestedLayout[]): NestedLayout[] =>
                 items.map(l => {
-                    if (l.id === layoutId) return { ...l, flexWrap };
+                    if (l.id === layoutId)
+                        return { ...l, flexConfig: { ...l.flexConfig!, wrap } };
                     return {
                         ...l,
                         slots: l.slots.map(s => ({
@@ -502,10 +531,14 @@ export default function DndBuilder() {
     );
 
     const handleUpdateFlexRowGap = useCallback(
-        (layoutId: string, flexRowGap: number) => {
+        (layoutId: string, rowGap: number) => {
             const update = (items: NestedLayout[]): NestedLayout[] =>
                 items.map(l => {
-                    if (l.id === layoutId) return { ...l, flexRowGap };
+                    if (l.id === layoutId)
+                        return {
+                            ...l,
+                            flexConfig: { ...l.flexConfig!, rowGap },
+                        };
                     return {
                         ...l,
                         slots: l.slots.map(s => ({
@@ -518,6 +551,42 @@ export default function DndBuilder() {
         },
         [],
     );
+
+    const handleUpdateWrapSlotWidth = useCallback(
+        // 只更新指定 slot 的 widthPx（flex layout 換行模式專用）
+        (layoutId: string, slotId: string, widthPx: number) => {
+            const update = (items: NestedLayout[]): NestedLayout[] =>
+                items.map(l => {
+                    if (l.id === layoutId) {
+                        return {
+                            ...l,
+                            slots: l.slots.map(s =>
+                                s.id === slotId
+                                    ? {
+                                          ...s,
+                                          flexWidthConfig: {
+                                              ...s.flexWidthConfig,
+                                              widthPx,
+                                          },
+                                      }
+                                    : s,
+                            ),
+                        };
+                    }
+                    return {
+                        ...l,
+                        slots: l.slots.map(s => ({
+                            ...s,
+                            children: update(s.children),
+                        })),
+                    };
+                });
+            setLayouts(prev => update(prev));
+        },
+        [],
+    );
+
+    console.log('layouts', layouts);
 
     const overlayLabel =
         activeSidebarType === 'block'
@@ -578,6 +647,7 @@ export default function DndBuilder() {
                     isSomethingDragging={activeCanvasId !== null}
                     onUpdateSlotWidths={handleUpdateSlotWidths}
                     onUpdateGridDimensions={handleUpdateGridDimensions}
+                    onUpdateWrapSlotWidth={handleUpdateWrapSlotWidth}
                 />
             </div>
 

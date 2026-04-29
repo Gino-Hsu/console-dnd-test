@@ -1,7 +1,7 @@
 'use client';
 
 import { useDraggable } from '@dnd-kit/core';
-import type { LayoutSpacing, NestedLayout, SidebarItem } from '../types';
+import type { LayoutSpacing, NestedLayout, SidebarItem } from './types';
 import { SIDEBAR_ITEMS } from './types';
 import LayoutEditor from './LayoutEditor';
 
@@ -68,8 +68,8 @@ export default function LayoutSidebar({
         layoutId: string,
         colWidths: number[],
         rowHeights: number[],
-        colGap?: number,
-        rowGap?: number,
+        colGap: number | null,
+        rowGap: number | null,
     ) => void;
     onUpdateFlexGap?: (layoutId: string, flexGap: number) => void;
     onUpdateFlexRowGap?: (layoutId: string, flexRowGap: number) => void;

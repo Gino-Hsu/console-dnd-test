@@ -1,4 +1,4 @@
-import type { NestedLayout } from '@/types/layout';
+import type { GridConfig, NestedLayout } from '@/types/layout';
 
 // ── Flex ─────────────────────────────────────────────────────────────────────
 
@@ -49,25 +49,8 @@ export function gridColHandleLeft(
     const fraction = leftFr / totalFr;
     const subtractPx = (fraction * (cols - 1) * colGap).toFixed(2);
     const addPx = colIndex * colGap + colGap / 2;
-    // center = fraction*(containerW - (cols-1)*gap) + colIndex*gap + gap/2
     return `calc(${fraction * 100}% - ${subtractPx}px + ${addPx}px - 4px)`;
 }
-
-// ── Grid rows ─────────────────────────────────────────────────────────────────
-
-/**
- * 計算拖曳後的 grid 列高（px），最小 40px
- */
-// export function resizeGridRows(
-//     rowHeights: number[],
-//     rowIndex: number,
-//     dy: number,
-// ): number[] {
-//     const next = [...rowHeights];
-//     next[rowIndex] = Math.max(40, next[rowIndex] + dy);
-//     next[rowIndex + 1] = Math.max(40, next[rowIndex + 1] - dy);
-//     return next;
-// }
 
 /**
  * 計算列分隔拖曳條距離容器頂部的 px 值（置於間距正中央）
@@ -92,22 +75,20 @@ export function gridRowHandleTop(
 const DEFAULT_GAP = 8;
 
 export function gridContainerStyle(
-    layout: Pick<
-        NestedLayout,
-        'gridColWidths' | 'gridRowHeights' | 'gridColGap' | 'gridRowGap'
-    >,
+    gridConfig: GridConfig | null,
     cols: number,
     defaultColW: number,
 ): React.CSSProperties {
     const colWidths =
-        layout.gridColWidths ?? Array.from({ length: cols }, () => defaultColW);
+        gridConfig?.colWidths ??
+        Array.from({ length: cols }, () => defaultColW);
 
     return {
         display: 'grid',
         gridTemplateColumns: colWidths.map(w => `${w}fr`).join(' '),
         gridTemplateRows: 'auto',
-        columnGap: `${layout.gridColGap ?? DEFAULT_GAP}px`,
-        rowGap: `${layout.gridRowGap ?? DEFAULT_GAP}px`,
+        columnGap: `${gridConfig?.colGap ?? DEFAULT_GAP}px`,
+        rowGap: `${gridConfig?.rowGap ?? DEFAULT_GAP}px`,
     };
 }
 
@@ -115,23 +96,22 @@ export function gridContainerStyle(
 
 type LayoutType = NestedLayout['type'];
 
-const BORDER: Record<LayoutType, [string, string]> = {
-    block: ['border-violet-300', 'border-violet-200'],
-    flex: ['border-sky-300', 'border-sky-200'],
-    grid: ['border-emerald-300', 'border-emerald-200'],
+const BORDER: Record<LayoutType, [string]> = {
+    block: ['border-violet-200'],
+    flex: ['border-sky-200'],
+    grid: ['border-emerald-200'],
 };
 
-const BG: Record<LayoutType, [string, string]> = {
-    block: ['bg-violet-50', 'bg-violet-50/70'],
-    flex: ['bg-sky-50', 'bg-sky-50/70'],
-    grid: ['bg-emerald-50', 'bg-emerald-50/70'],
+const BG: Record<LayoutType, [string]> = {
+    block: ['bg-violet-50'],
+    flex: ['bg-sky-50'],
+    grid: ['bg-emerald-50'],
 };
 
 /** 依 layout 類型與巢狀深度回傳 border / bg Tailwind class */
-export function layoutTheme(
-    type: LayoutType,
-    depth: number,
-): { borderColor: string; bgColor: string } {
-    const d = depth === 0 ? 0 : 1;
-    return { borderColor: BORDER[type][d], bgColor: BG[type][d] };
+export function layoutTheme(type: LayoutType): {
+    borderColor: string;
+    bgColor: string;
+} {
+    return { borderColor: BORDER[type][0], bgColor: BG[type][0] };
 }

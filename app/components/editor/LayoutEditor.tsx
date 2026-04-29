@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { LayoutSpacing, NestedLayout, SpacingValue } from '../types';
+import type { LayoutSpacing, NestedLayout, SpacingValue } from '@/types/layout';
 import { DEFAULT_SPACING } from '@/types/layout';
 
 /* ── 小工具：手風琴 header ─────────────────────────── */
@@ -122,8 +122,8 @@ export default function LayoutEditor({
         layoutId: string,
         colWidths: number[],
         rowHeights: number[],
-        colGap?: number,
-        rowGap?: number,
+        colGap: number | null,
+        rowGap: number | null,
     ) => void;
     onUpdateFlexGap?: (layoutId: string, flexGap: number) => void;
     onUpdateFlexRowGap?: (layoutId: string, flexRowGap: number) => void;
@@ -301,8 +301,10 @@ export default function LayoutEditor({
                 {layout.type === 'grid' &&
                     onUpdateGridDimensions &&
                     (() => {
-                        const currentCols = layout.gridColWidths?.length ?? 2;
-                        const currentRows = layout.gridRowHeights?.length ?? 2;
+                        const currentCols =
+                            layout.gridConfig?.colWidths?.length ?? 2;
+                        const currentRows =
+                            layout.gridConfig?.rowHeights?.length ?? 2;
 
                         const applyNewCols = (newCols: number) => {
                             if (newCols < 1 || newCols > 12) return;
@@ -315,7 +317,7 @@ export default function LayoutEditor({
                                 Math.ceil(layout.slots.length / newCols),
                             );
                             const existingRowHeights =
-                                layout.gridRowHeights ??
+                                layout.gridConfig?.rowHeights ??
                                 Array.from({ length: currentRows }, () => 120);
                             const newRowHeights = Array.from(
                                 { length: newRows },
@@ -325,20 +327,20 @@ export default function LayoutEditor({
                                 layout.id,
                                 newColWidths,
                                 newRowHeights,
-                                layout.gridColGap,
-                                layout.gridRowGap,
+                                layout.gridConfig?.colGap ?? null,
+                                layout.gridConfig?.rowGap ?? null,
                             );
                         };
 
                         const applyGap = (colGap: number, rowGap: number) => {
                             onUpdateGridDimensions(
                                 layout.id,
-                                layout.gridColWidths ??
+                                layout.gridConfig?.colWidths ??
                                     Array.from(
                                         { length: currentCols },
                                         () => 100 / currentCols,
                                     ),
-                                layout.gridRowHeights ??
+                                layout.gridConfig?.rowHeights ??
                                     Array.from(
                                         { length: currentRows },
                                         () => 120,
@@ -419,7 +421,8 @@ export default function LayoutEditor({
                                                     min={0}
                                                     max={200}
                                                     value={
-                                                        layout.gridColGap ?? 8
+                                                        layout.gridConfig
+                                                            ?.colGap ?? 8
                                                     }
                                                     onChange={e =>
                                                         applyGap(
@@ -431,8 +434,8 @@ export default function LayoutEditor({
                                                                     10,
                                                                 ) || 0,
                                                             ),
-                                                            layout.gridRowGap ??
-                                                                8,
+                                                            layout.gridConfig
+                                                                ?.rowGap ?? 8,
                                                         )
                                                     }
                                                     className='w-full text-center text-xs border border-zinc-200 rounded px-1 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-emerald-400 focus:border-emerald-400 transition'
@@ -447,12 +450,13 @@ export default function LayoutEditor({
                                                     min={0}
                                                     max={200}
                                                     value={
-                                                        layout.gridRowGap ?? 8
+                                                        layout.gridConfig
+                                                            ?.rowGap ?? 8
                                                     }
                                                     onChange={e =>
                                                         applyGap(
-                                                            layout.gridColGap ??
-                                                                8,
+                                                            layout.gridConfig
+                                                                ?.colGap ?? 8,
                                                             Math.max(
                                                                 0,
                                                                 parseInt(
@@ -496,7 +500,9 @@ export default function LayoutEditor({
                                                 type='number'
                                                 min={0}
                                                 max={200}
-                                                value={layout.flexGap ?? 8}
+                                                value={
+                                                    layout.flexConfig?.gap ?? 8
+                                                }
                                                 onChange={e =>
                                                     onUpdateFlexGap(
                                                         layout.id,
@@ -515,7 +521,7 @@ export default function LayoutEditor({
                                     )}
                                     {/* 列間距：只有換行開啟時才顯示 */}
                                     {onUpdateFlexRowGap &&
-                                        (layout.flexWrap ?? false) && (
+                                        (layout.flexConfig?.wrap ?? false) && (
                                             <div>
                                                 <p className='text-[10px] font-semibold text-zinc-400 uppercase tracking-wide mb-1.5'>
                                                     列間距 px
@@ -525,7 +531,8 @@ export default function LayoutEditor({
                                                     min={0}
                                                     max={200}
                                                     value={
-                                                        layout.flexRowGap ?? 8
+                                                        layout.flexConfig
+                                                            ?.rowGap ?? 8
                                                     }
                                                     onChange={e =>
                                                         onUpdateFlexRowGap(
@@ -554,21 +561,22 @@ export default function LayoutEditor({
                                                     onUpdateFlexWrap(
                                                         layout.id,
                                                         !(
-                                                            layout.flexWrap ??
-                                                            false
+                                                            layout.flexConfig
+                                                                ?.wrap ?? false
                                                         ),
                                                     )
                                                 }
                                                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${
-                                                    (layout.flexWrap ?? false)
+                                                    (layout.flexConfig?.wrap ??
+                                                    false)
                                                         ? 'bg-sky-500'
                                                         : 'bg-zinc-200'
                                                 }`}
                                             >
                                                 <span
                                                     className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
-                                                        (layout.flexWrap ??
-                                                        false)
+                                                        (layout.flexConfig
+                                                            ?.wrap ?? false)
                                                             ? 'translate-x-4'
                                                             : 'translate-x-1'
                                                     }`}

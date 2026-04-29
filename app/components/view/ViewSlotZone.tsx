@@ -4,22 +4,21 @@ import ViewLayoutCard from './ViewLayoutCard';
 export default function ViewSlotZone({
     slot,
     flexBasis,
-    depth = 0,
+    isGridItem,
 }: {
     slot: NestedLayout['slots'][number];
     flexBasis?: number;
     depth?: number;
+    isGridItem?: boolean;
 }) {
     return (
         <div
-            className={[flexBasis !== undefined ? 'min-w-0' : 'flex-1 min-w-0']
+            className={[
+                flexBasis !== undefined ? 'min-w-0' : 'flex-1 min-w-0',
+                isGridItem ? 'h-full' : undefined,
+            ]
                 .filter(Boolean)
                 .join(' ')}
-            style={
-                flexBasis !== undefined
-                    ? { flexBasis: `${flexBasis}%`, flexShrink: 0, flexGrow: 0 }
-                    : undefined
-            }
         >
             <div
                 className={['rounded-lg flex flex-col gap-2 min-h-16']
@@ -27,7 +26,7 @@ export default function ViewSlotZone({
                     .join(' ')}
             >
                 {slot.children.map(child => (
-                    <ViewLayoutCard key={child.id} layout={child} depth={depth + 1} />
+                    <ViewLayoutCard key={child.id} layout={child} />
                 ))}
             </div>
         </div>

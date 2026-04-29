@@ -6,8 +6,8 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useCallback } from 'react';
-import LayoutCard from './layout';
-import type { NestedLayout, PageVersion } from '../types';
+import LayoutCard from './layout/LayoutCard';
+import type { NestedLayout, PageVersion } from './types';
 import { flattenToGraph } from './types';
 
 /*  插入線  */
@@ -34,6 +34,7 @@ export default function CanvasArea({
     isSomethingDragging,
     onUpdateSlotWidths,
     onUpdateGridDimensions,
+    onUpdateWrapSlotWidth,
 }: {
     layouts: NestedLayout[];
     onRemove: (id: string) => void;
@@ -42,19 +43,24 @@ export default function CanvasArea({
     insertIndex: number | null;
     insertSlotId: string | null;
     slotInsertIndex: number | null;
-    isSomethingDragging?: boolean;
-    onUpdateSlotWidths?: (layoutId: string, widths: number[]) => void;
-    onUpdateGridDimensions?: (
+    isSomethingDragging: boolean;
+    onUpdateSlotWidths: (layoutId: string, widths: number[]) => void;
+    onUpdateGridDimensions: (
         layoutId: string,
         colWidths: number[],
         rowHeights: number[],
-        colGap?: number,
-        rowGap?: number,
+        colGap: number | null,
+        rowGap: number | null,
+    ) => void;
+    onUpdateWrapSlotWidth?: (
+        layoutId: string,
+        slotId: string,
+        widthPx: number,
     ) => void;
 }) {
     const { setNodeRef, isOver } = useDroppable({
         id: 'canvas-root',
-        data: { type: 'canvas' },
+        data: { type: 'canvas', depth: 0 },
     });
 
     const handlePublish = useCallback(() => {
@@ -148,7 +154,6 @@ export default function CanvasArea({
                                             onRemove={onRemove}
                                             onSelect={onSelect}
                                             selectedLayoutId={selectedLayoutId}
-                                            depth={0}
                                             insertSlotId={insertSlotId}
                                             slotInsertIndex={slotInsertIndex}
                                             isSomethingDragging={
@@ -159,6 +164,9 @@ export default function CanvasArea({
                                             }
                                             onUpdateGridDimensions={
                                                 onUpdateGridDimensions
+                                            }
+                                            onUpdateWrapSlotWidth={
+                                                onUpdateWrapSlotWidth
                                             }
                                         />
                                         {insertIndex === index + 1 && (

@@ -1,23 +1,16 @@
-import { gridContainerStyle, layoutTheme } from '@/lib/layout/resizeUtils';
+import { layoutTheme } from '@/lib/layout/resizeUtils';
 import type { NestedLayout } from '@/types/layout';
-import { Fragment } from 'react';
-import ViewSlotZone from './ViewSlotZone';
-
-const MAX_LAYOUT_DEPTH = 2; // 允許 depth 0, 1, 2 (共3層)
+import SharedBlockLayout from '@/app/components/shared/SharedBlockLayout';
+import SharedFlexLayout from '@/app/components/shared/SharedFlexLayout';
+import SharedGridLayout from '@/app/components/shared/SharedGridLayout';
 
 export default function ViewLayoutCard({
     layout,
-    depth = 0,
 }: {
     layout: NestedLayout;
     depth?: number;
 }) {
-    // 超過最大層數，不渲染
-    if (depth > MAX_LAYOUT_DEPTH) {
-        return null;
-    }
-
-    const { borderColor, bgColor } = layoutTheme(layout.type, depth);
+    const { borderColor, bgColor } = layoutTheme(layout.type);
     const sp = layout.spacing;
     const mt = sp?.margin.top ?? 0,
         mr = sp?.margin.right ?? 0;
@@ -48,82 +41,31 @@ export default function ViewLayoutCard({
                     paddingLeft: Math.max(pl, 0),
                 }}
             >
-                <ViewLayoutContent layout={layout} depth={depth} />
+                <ViewLayoutContent layout={layout} />
             </div>
         </div>
     );
 }
 
-function ViewLayoutContent({
-    layout,
-    depth,
-}: {
-    layout: NestedLayout;
-    depth: number;
-}) {
+function ViewLayoutContent({ layout }: { layout: NestedLayout }) {
     if (layout.type === 'block') {
-        return (
-            <div className='flex flex-col'>
-                {layout.slots.map(slot => (
-                    <ViewSlotZone key={slot.id} slot={slot} depth={depth} />
-                ))}
-            </div>
-        );
+        return <SharedBlockLayout mode='view' slots={layout.slots} />;
     }
 
     if (layout.type === 'flex') {
-        const gap = layout.flexGap ?? 0;
-        const rowGap = layout.flexRowGap ?? 0;
-        const n = layout.slots.length;
-        const isWrap = layout.flexWrap ?? false;
-        return (
-            <div
-                className='flex flex-row'
-                style={{
-                    flexWrap: isWrap ? 'wrap' : 'nowrap',
-                    ...(isWrap
-                        ? { columnGap: `${gap}px`, rowGap: `${rowGap}px` }
-                        : {}),
-                }}
-            >
-                {layout.slots.map((slot, i) => {
-                    const basis = slot.flexBasis ?? 100 / n;
-                    const offsetPx = isWrap ? 0 : (basis / 100) * (n - 1) * gap;
-                    return (
-                        <Fragment key={slot.id}>
-                            <div
-                                className='min-w-0'
-                                style={{
-                                    flexBasis: `calc(${basis}% - ${offsetPx.toFixed(3)}px)`,
-                                    flexShrink: 0,
-                                    flexGrow: 0,
-                                }}
-                            >
-                                <ViewSlotZone slot={slot} depth={depth} />
-                            </div>
-                            {/* nowrap 模式補間距用純 div，不需 ResizeHandle */}
-                            {!isWrap && i < n - 1 && (
-                                <div style={{ width: gap, flexShrink: 0 }} />
-                            )}
-                        </Fragment>
-                    );
-                })}
-            </div>
-        );
+        return <SharedFlexLayout mode='view' layout={layout} />;
     }
 
     if (layout.type === 'grid') {
-        const cols = layout.gridColWidths?.length ?? 2;
+        const cols = layout.gridConfig?.colWidths?.length ?? 2;
         const defColW = 100 / cols;
         return (
-            <div
-                className='relative'
-                style={gridContainerStyle(layout, cols, defColW)}
-            >
-                {layout.slots.map(slot => (
-                    <ViewSlotZone key={slot.id} slot={slot} depth={depth} />
-                ))}
-            </div>
+            <SharedGridLayout
+                mode='view'
+                layout={layout}
+                cols={cols}
+                defColW={defColW}
+            />
         );
     }
 

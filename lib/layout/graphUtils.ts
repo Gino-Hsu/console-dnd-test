@@ -31,27 +31,18 @@ export function flattenToGraph(
             spacing: layout.spacing,
             slotIds: layout.slots.map(s => s.id),
             parentSlotId,
-            ...(layout.gridColWidths !== undefined
-                ? { gridColWidths: layout.gridColWidths }
-                : {}),
-            ...(layout.gridRowHeights !== undefined
-                ? { gridRowHeights: layout.gridRowHeights }
-                : {}),
-            ...(layout.gridColGap !== undefined
-                ? { gridColGap: layout.gridColGap }
-                : {}),
-            ...(layout.gridRowGap !== undefined
-                ? { gridRowGap: layout.gridRowGap }
-                : {}),
+            flexConfig: layout.flexConfig,
+            gridConfig: layout.gridConfig,
         };
         for (const slot of layout.slots) {
             slots[slot.id] = {
                 id: slot.id,
                 childIds: slot.children.map(c => c.id),
                 parentLayoutId: layout.id,
-                ...(slot.flexBasis !== undefined
-                    ? { flexBasis: slot.flexBasis }
-                    : {}),
+                flexWidthConfig: {
+                    flexBasis: slot.flexWidthConfig.flexBasis || null,
+                    widthPx: slot.flexWidthConfig.widthPx || null,
+                },
             };
             for (const child of slot.children) {
                 visitLayout(child, slot.id);
@@ -84,9 +75,10 @@ export function graphToTree(graph: PageGraph): NestedLayout[] {
                 children: flatSlot.childIds.map(childId =>
                     buildLayout(childId),
                 ),
-                ...(flatSlot.flexBasis !== undefined
-                    ? { flexBasis: flatSlot.flexBasis }
-                    : {}),
+                flexWidthConfig: {
+                    flexBasis: flatSlot.flexWidthConfig.flexBasis ?? 50,
+                    widthPx: flatSlot.flexWidthConfig.widthPx ?? 200,
+                },
             };
         });
 
@@ -97,23 +89,8 @@ export function graphToTree(graph: PageGraph): NestedLayout[] {
             props: flat.props,
             spacing: flat.spacing,
             slots,
-            ...(flat.gridColWidths !== undefined
-                ? { gridColWidths: flat.gridColWidths }
-                : {}),
-            ...(flat.gridRowHeights !== undefined
-                ? { gridRowHeights: flat.gridRowHeights }
-                : {}),
-            ...(flat.gridColGap !== undefined
-                ? { gridColGap: flat.gridColGap }
-                : {}),
-            ...(flat.gridRowGap !== undefined
-                ? { gridRowGap: flat.gridRowGap }
-                : {}),
-            ...(flat.flexGap !== undefined ? { flexGap: flat.flexGap } : {}),
-            ...(flat.flexRowGap !== undefined
-                ? { flexRowGap: flat.flexRowGap }
-                : {}),
-            ...(flat.flexWrap !== undefined ? { flexWrap: flat.flexWrap } : {}),
+            flexConfig: flat.flexConfig ?? null,
+            gridConfig: flat.gridConfig ?? null,
         };
     }
 
@@ -352,7 +329,10 @@ export function applyOperation(graph: PageGraph, op: PageOperation): PageGraph {
                 if (op.widths[i] !== undefined && updatedSlots[slotId]) {
                     updatedSlots[slotId] = {
                         ...updatedSlots[slotId],
-                        flexBasis: op.widths[i],
+                        flexWidthConfig: {
+                            ...updatedSlots[slotId].flexWidthConfig,
+                            flexBasis: op.widths[i],
+                        },
                     };
                 }
             });
@@ -368,14 +348,12 @@ export function applyOperation(graph: PageGraph, op: PageOperation): PageGraph {
                     ...graph.layouts,
                     [op.layoutId]: {
                         ...layout,
-                        gridColWidths: op.colWidths,
-                        gridRowHeights: op.rowHeights,
-                        ...(op.colGap !== undefined
-                            ? { gridColGap: op.colGap }
-                            : {}),
-                        ...(op.rowGap !== undefined
-                            ? { gridRowGap: op.rowGap }
-                            : {}),
+                        gridConfig: {
+                            colWidths: op.colWidths,
+                            rowHeights: op.rowHeights,
+                            colGap: op.colGap ?? layout.gridConfig?.colGap ?? 8,
+                            rowGap: op.rowGap ?? layout.gridConfig?.rowGap ?? 8,
+                        },
                     },
                 },
             };
