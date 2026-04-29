@@ -1,4 +1,4 @@
-import type { NestedLayout } from '@/types/layout';
+import type { GridConfig, NestedLayout } from '@/types/layout';
 
 // ── Flex ─────────────────────────────────────────────────────────────────────
 
@@ -75,22 +75,20 @@ export function gridRowHandleTop(
 const DEFAULT_GAP = 8;
 
 export function gridContainerStyle(
-    layout: Pick<
-        NestedLayout,
-        'gridColWidths' | 'gridRowHeights' | 'gridColGap' | 'gridRowGap'
-    >,
+    gridConfig: GridConfig | null,
     cols: number,
     defaultColW: number,
 ): React.CSSProperties {
     const colWidths =
-        layout.gridColWidths ?? Array.from({ length: cols }, () => defaultColW);
+        gridConfig?.colWidths ??
+        Array.from({ length: cols }, () => defaultColW);
 
     return {
         display: 'grid',
         gridTemplateColumns: colWidths.map(w => `${w}fr`).join(' '),
         gridTemplateRows: 'auto',
-        columnGap: `${layout.gridColGap ?? DEFAULT_GAP}px`,
-        rowGap: `${layout.gridRowGap ?? DEFAULT_GAP}px`,
+        columnGap: `${gridConfig?.colGap ?? DEFAULT_GAP}px`,
+        rowGap: `${gridConfig?.rowGap ?? DEFAULT_GAP}px`,
     };
 }
 

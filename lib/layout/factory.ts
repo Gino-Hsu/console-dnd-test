@@ -12,11 +12,14 @@ export function genId(): string {
  */
 export function createLayout(type: LayoutType, label: string): NestedLayout {
     const { slotCount } = LAYOUT_CONFIG[type];
-    const equalBasis = type === 'flex' ? 100 / slotCount : undefined;
+    const equalBasis = 100 / slotCount;
     const slots: Slot[] = Array.from({ length: slotCount }, () => ({
         id: genId(),
         children: [],
-        ...(equalBasis !== undefined ? { flexBasis: equalBasis } : {}),
+        flexWidthConfig: {
+            flexBasis: equalBasis,
+            widthPx: 400,
+        },
     }));
     return {
         id: genId(),
@@ -25,17 +28,15 @@ export function createLayout(type: LayoutType, label: string): NestedLayout {
         props: {},
         slots,
         spacing: structuredClone(DEFAULT_SPACING),
-        // grid layout：預設 2 欄等寬、2 列等高、gap 8px
-        ...(type === 'grid'
-            ? {
-                  gridColWidths: [50, 50],
-                  gridRowHeights: [120, 120],
-                  gridColGap: 8,
-                  gridRowGap: 8,
-              }
-            : {}),
-        ...(type === 'flex'
-            ? { flexGap: 8, flexRowGap: 8, flexWrap: false }
-            : {}),
+        flexConfig: type === 'flex' ? { gap: 8, rowGap: 8, wrap: false } : null,
+        gridConfig:
+            type === 'grid'
+                ? {
+                      colWidths: [50, 50],
+                      rowHeights: [120, 120],
+                      colGap: 8,
+                      rowGap: 8,
+                  }
+                : null,
     };
 }

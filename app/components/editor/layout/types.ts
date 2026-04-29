@@ -17,6 +17,12 @@ export interface SharedProps {
         colGap: number | null,
         rowGap: number | null,
     ) => void;
+    /** flex wrap 模式：調整單個 slot 的像素寬度 */
+    onUpdateWrapSlotWidth?: (
+        layoutId: string,
+        slotId: string,
+        widthPx: number,
+    ) => void;
 }
 
 /** SharedProps + ownerId，傳給 SlotZone */

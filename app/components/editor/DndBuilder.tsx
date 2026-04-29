@@ -306,29 +306,33 @@ export default function DndBuilder() {
         const addToLayout = (items: NestedLayout[]): NestedLayout[] =>
             items.map(l => {
                 if (l.id === layoutId) {
-                    const newSlots = [
+                    const newSlots: import('@/types/layout').Slot[] = [
                         ...l.slots,
                         {
                             id: uuidv4(),
                             children: [],
-                            flexBasis: undefined,
-                        } satisfies import('@/types/layout').Slot,
+                            flexWidthConfig: { flexBasis: 50, widthPx: 200 },
+                        },
                     ];
                     if (l.type === 'flex') {
-                        // flex：重新均分所有 slot 的 flexBasis
+                        const eq = 100 / newSlots.length;
                         return {
                             ...l,
                             slots: newSlots.map(s => ({
                                 ...s,
-                                flexBasis: 100 / newSlots.length,
+                                flexWidthConfig: {
+                                    ...s.flexWidthConfig,
+                                    flexBasis: eq,
+                                },
                             })),
                         };
                     }
                     if (l.type === 'grid') {
-                        // grid：重新計算需要幾列，同步擴充 gridRowHeights
-                        const cols = l.gridColWidths?.length ?? 2;
+                        // grid：重新計算需要幾列，同步擴充 rowHeights
+                        const cols = l.gridConfig?.colWidths?.length ?? 2;
                         const newRowCount = Math.ceil(newSlots.length / cols);
-                        const existingRowHeights = l.gridRowHeights ?? [];
+                        const existingRowHeights =
+                            l.gridConfig?.rowHeights ?? [];
                         const newRowHeights = Array.from(
                             { length: newRowCount },
                             (_, i) => existingRowHeights[i] ?? 120,
@@ -336,7 +340,10 @@ export default function DndBuilder() {
                         return {
                             ...l,
                             slots: newSlots,
-                            gridRowHeights: newRowHeights,
+                            gridConfig: {
+                                ...l.gridConfig!,
+                                rowHeights: newRowHeights,
+                            },
                         };
                     }
                     return { ...l, slots: newSlots };
@@ -359,23 +366,27 @@ export default function DndBuilder() {
                 if (l.id === layoutId) {
                     const remaining = l.slots.filter(s => s.id !== slotId);
                     if (l.type === 'flex' && remaining.length > 0) {
-                        // flex：重新均分剩餘 slot 的 flexBasis
+                        const eq = 100 / remaining.length;
                         return {
                             ...l,
                             slots: remaining.map(s => ({
                                 ...s,
-                                flexBasis: 100 / remaining.length,
+                                flexWidthConfig: {
+                                    ...s.flexWidthConfig,
+                                    flexBasis: eq,
+                                },
                             })),
                         };
                     }
                     if (l.type === 'grid') {
-                        // grid：重新計算需要幾列，裁切或保留 gridRowHeights
-                        const cols = l.gridColWidths?.length ?? 2;
+                        // grid：重新計算需要幾列，裁切或保留 rowHeights
+                        const cols = l.gridConfig?.colWidths?.length ?? 2;
                         const newRowCount = Math.max(
                             1,
                             Math.ceil(remaining.length / cols),
                         );
-                        const existingRowHeights = l.gridRowHeights ?? [];
+                        const existingRowHeights =
+                            l.gridConfig?.rowHeights ?? [];
                         const newRowHeights = Array.from(
                             { length: newRowCount },
                             (_, i) => existingRowHeights[i] ?? 120,
@@ -383,7 +394,10 @@ export default function DndBuilder() {
                         return {
                             ...l,
                             slots: remaining,
-                            gridRowHeights: newRowHeights,
+                            gridConfig: {
+                                ...l.gridConfig!,
+                                rowHeights: newRowHeights,
+                            },
                         };
                     }
                     return { ...l, slots: remaining };
@@ -426,7 +440,12 @@ export default function DndBuilder() {
                             ...l,
                             slots: l.slots.map((s, i) => ({
                                 ...s,
-                                flexBasis: widths[i] ?? s.flexBasis,
+                                flexWidthConfig: {
+                                    ...s.flexWidthConfig,
+                                    flexBasis:
+                                        widths[i] ??
+                                        s.flexWidthConfig.flexBasis,
+                                },
                             })),
                         };
                     }
@@ -456,14 +475,12 @@ export default function DndBuilder() {
                     if (l.id === layoutId)
                         return {
                             ...l,
-                            gridColWidths: colWidths,
-                            gridRowHeights: rowHeights,
-                            ...(colGap !== undefined
-                                ? { gridColGap: colGap }
-                                : {}),
-                            ...(rowGap !== undefined
-                                ? { gridRowGap: rowGap }
-                                : {}),
+                            gridConfig: {
+                                colWidths,
+                                rowHeights,
+                                colGap: colGap ?? l.gridConfig?.colGap ?? 8,
+                                rowGap: rowGap ?? l.gridConfig?.rowGap ?? 8,
+                            },
                         };
                     return {
                         ...l,
@@ -478,29 +495,28 @@ export default function DndBuilder() {
         [],
     );
 
-    const handleUpdateFlexGap = useCallback(
-        (layoutId: string, flexGap: number) => {
-            const update = (items: NestedLayout[]): NestedLayout[] =>
-                items.map(l => {
-                    if (l.id === layoutId) return { ...l, flexGap };
-                    return {
-                        ...l,
-                        slots: l.slots.map(s => ({
-                            ...s,
-                            children: update(s.children),
-                        })),
-                    };
-                });
-            setLayouts(prev => update(prev));
-        },
-        [],
-    );
+    const handleUpdateFlexGap = useCallback((layoutId: string, gap: number) => {
+        const update = (items: NestedLayout[]): NestedLayout[] =>
+            items.map(l => {
+                if (l.id === layoutId)
+                    return { ...l, flexConfig: { ...l.flexConfig!, gap } };
+                return {
+                    ...l,
+                    slots: l.slots.map(s => ({
+                        ...s,
+                        children: update(s.children),
+                    })),
+                };
+            });
+        setLayouts(prev => update(prev));
+    }, []);
 
     const handleUpdateFlexWrap = useCallback(
-        (layoutId: string, flexWrap: boolean) => {
+        (layoutId: string, wrap: boolean) => {
             const update = (items: NestedLayout[]): NestedLayout[] =>
                 items.map(l => {
-                    if (l.id === layoutId) return { ...l, flexWrap };
+                    if (l.id === layoutId)
+                        return { ...l, flexConfig: { ...l.flexConfig!, wrap } };
                     return {
                         ...l,
                         slots: l.slots.map(s => ({
@@ -515,10 +531,14 @@ export default function DndBuilder() {
     );
 
     const handleUpdateFlexRowGap = useCallback(
-        (layoutId: string, flexRowGap: number) => {
+        (layoutId: string, rowGap: number) => {
             const update = (items: NestedLayout[]): NestedLayout[] =>
                 items.map(l => {
-                    if (l.id === layoutId) return { ...l, flexRowGap };
+                    if (l.id === layoutId)
+                        return {
+                            ...l,
+                            flexConfig: { ...l.flexConfig!, rowGap },
+                        };
                     return {
                         ...l,
                         slots: l.slots.map(s => ({
@@ -531,6 +551,42 @@ export default function DndBuilder() {
         },
         [],
     );
+
+    const handleUpdateWrapSlotWidth = useCallback(
+        // 只更新指定 slot 的 widthPx（flex layout 換行模式專用）
+        (layoutId: string, slotId: string, widthPx: number) => {
+            const update = (items: NestedLayout[]): NestedLayout[] =>
+                items.map(l => {
+                    if (l.id === layoutId) {
+                        return {
+                            ...l,
+                            slots: l.slots.map(s =>
+                                s.id === slotId
+                                    ? {
+                                          ...s,
+                                          flexWidthConfig: {
+                                              ...s.flexWidthConfig,
+                                              widthPx,
+                                          },
+                                      }
+                                    : s,
+                            ),
+                        };
+                    }
+                    return {
+                        ...l,
+                        slots: l.slots.map(s => ({
+                            ...s,
+                            children: update(s.children),
+                        })),
+                    };
+                });
+            setLayouts(prev => update(prev));
+        },
+        [],
+    );
+
+    console.log('layouts', layouts);
 
     const overlayLabel =
         activeSidebarType === 'block'
@@ -591,6 +647,7 @@ export default function DndBuilder() {
                     isSomethingDragging={activeCanvasId !== null}
                     onUpdateSlotWidths={handleUpdateSlotWidths}
                     onUpdateGridDimensions={handleUpdateGridDimensions}
+                    onUpdateWrapSlotWidth={handleUpdateWrapSlotWidth}
                 />
             </div>
 

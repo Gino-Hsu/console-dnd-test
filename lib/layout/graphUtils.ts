@@ -31,24 +31,18 @@ export function flattenToGraph(
             spacing: layout.spacing,
             slotIds: layout.slots.map(s => s.id),
             parentSlotId,
-            //  grid layout 專用屬性
-            gridColWidths: layout.gridColWidths || null,
-            gridRowHeights: layout.gridRowHeights || null,
-            gridColGap: layout.gridColGap || null,
-            gridRowGap: layout.gridRowGap || null,
-            //  flex layout 專用屬性
-            flexGap: layout.flexGap || null,
-            flexRowGap: layout.flexRowGap || null,
-            flexWrap: layout.flexWrap || null,
+            flexConfig: layout.flexConfig,
+            gridConfig: layout.gridConfig,
         };
         for (const slot of layout.slots) {
             slots[slot.id] = {
                 id: slot.id,
                 childIds: slot.children.map(c => c.id),
                 parentLayoutId: layout.id,
-                ...(slot.flexBasis !== undefined
-                    ? { flexBasis: slot.flexBasis }
-                    : {}),
+                flexWidthConfig: {
+                    flexBasis: slot.flexWidthConfig.flexBasis || null,
+                    widthPx: slot.flexWidthConfig.widthPx || null,
+                },
             };
             for (const child of slot.children) {
                 visitLayout(child, slot.id);
@@ -81,9 +75,10 @@ export function graphToTree(graph: PageGraph): NestedLayout[] {
                 children: flatSlot.childIds.map(childId =>
                     buildLayout(childId),
                 ),
-                ...(flatSlot.flexBasis !== undefined
-                    ? { flexBasis: flatSlot.flexBasis }
-                    : {}),
+                flexWidthConfig: {
+                    flexBasis: flatSlot.flexWidthConfig.flexBasis ?? 50,
+                    widthPx: flatSlot.flexWidthConfig.widthPx ?? 200,
+                },
             };
         });
 
@@ -94,13 +89,8 @@ export function graphToTree(graph: PageGraph): NestedLayout[] {
             props: flat.props,
             spacing: flat.spacing,
             slots,
-            gridColWidths: flat.gridColWidths ?? null,
-            gridRowHeights: flat.gridRowHeights ?? null,
-            gridColGap: flat.gridColGap ?? null,
-            gridRowGap: flat.gridRowGap ?? null,
-            flexGap: flat.flexGap ?? null,
-            flexRowGap: flat.flexRowGap ?? null,
-            flexWrap: flat.flexWrap ?? null,
+            flexConfig: flat.flexConfig ?? null,
+            gridConfig: flat.gridConfig ?? null,
         };
     }
 
@@ -339,7 +329,10 @@ export function applyOperation(graph: PageGraph, op: PageOperation): PageGraph {
                 if (op.widths[i] !== undefined && updatedSlots[slotId]) {
                     updatedSlots[slotId] = {
                         ...updatedSlots[slotId],
-                        flexBasis: op.widths[i],
+                        flexWidthConfig: {
+                            ...updatedSlots[slotId].flexWidthConfig,
+                            flexBasis: op.widths[i],
+                        },
                     };
                 }
             });
@@ -355,14 +348,12 @@ export function applyOperation(graph: PageGraph, op: PageOperation): PageGraph {
                     ...graph.layouts,
                     [op.layoutId]: {
                         ...layout,
-                        gridColWidths: op.colWidths,
-                        gridRowHeights: op.rowHeights,
-                        ...(op.colGap !== undefined
-                            ? { gridColGap: op.colGap }
-                            : {}),
-                        ...(op.rowGap !== undefined
-                            ? { gridRowGap: op.rowGap }
-                            : {}),
+                        gridConfig: {
+                            colWidths: op.colWidths,
+                            rowHeights: op.rowHeights,
+                            colGap: op.colGap ?? layout.gridConfig?.colGap ?? 8,
+                            rowGap: op.rowGap ?? layout.gridConfig?.rowGap ?? 8,
+                        },
                     },
                 },
             };

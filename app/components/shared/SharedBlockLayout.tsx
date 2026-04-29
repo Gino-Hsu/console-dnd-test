@@ -12,7 +12,7 @@ type SharedBlockLayoutProps = { slots: NestedLayout['slots'] } & (
 
 export default function SharedBlockLayout(props: SharedBlockLayoutProps) {
     return (
-        <div className='flex flex-col gap-2'>
+        <div className='flex flex-col gap-2 h-fit'>
             {props.slots.map(slot =>
                 props.mode === 'edit' ? (
                     <SlotZone

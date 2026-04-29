@@ -57,7 +57,7 @@ function ViewLayoutContent({ layout }: { layout: NestedLayout }) {
     }
 
     if (layout.type === 'grid') {
-        const cols = layout.gridColWidths?.length ?? 2;
+        const cols = layout.gridConfig?.colWidths?.length ?? 2;
         const defColW = 100 / cols;
         return (
             <SharedGridLayout

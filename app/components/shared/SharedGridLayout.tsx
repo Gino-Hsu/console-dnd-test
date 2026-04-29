@@ -33,8 +33,8 @@ export default function SharedGridLayout(props: SharedGridLayoutProps) {
     return (
         <div
             ref={props.mode === 'edit' ? props.containerRef : undefined}
-            className='relative'
-            style={gridContainerStyle(layout, cols, defColW)}
+            className='relative h-fit'
+            style={gridContainerStyle(layout.gridConfig, cols, defColW)}
         >
             {layout.slots.map(slot =>
                 props.mode === 'edit' ? (
@@ -55,7 +55,7 @@ export default function SharedGridLayout(props: SharedGridLayoutProps) {
             {props.mode === 'edit' &&
                 Array.from({ length: cols - 1 }, (_, i) => {
                     const cw =
-                        layout.gridColWidths ??
+                        layout.gridConfig?.colWidths ??
                         Array.from({ length: cols }, () => defColW);
                     return (
                         <div
@@ -65,7 +65,7 @@ export default function SharedGridLayout(props: SharedGridLayoutProps) {
                                 left: gridColHandleLeft(
                                     cw,
                                     i,
-                                    layout.gridColGap ?? 8,
+                                    layout.gridConfig?.colGap ?? 8,
                                 ),
                                 width: '8px',
                             }}

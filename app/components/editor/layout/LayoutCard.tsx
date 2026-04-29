@@ -49,7 +49,7 @@ export default function LayoutCard({
     const gridRef = useRef<HTMLDivElement>(null);
 
     // ── grid 尺寸 ─────────────────────────────────────────────────────────────
-    const cols = layout.gridColWidths?.length ?? 2;
+    const cols = layout.gridConfig?.colWidths?.length ?? 2;
     const rows = Math.max(1, Math.ceil(layout.slots.length / cols));
     const defColW = 100 / cols;
     const defRowH = 120;
@@ -60,14 +60,14 @@ export default function LayoutCard({
             if (!flexRef.current || !shared.onUpdateSlotWidths) return;
             const tw = flexRef.current.offsetWidth;
             if (!tw) return;
-            const gap = layout.flexGap ?? 8;
+            const gap = layout.flexConfig?.gap ?? 8;
             const contentWidth = tw - (layout.slots.length - 1) * gap;
             if (!contentWidth) return;
             const eq = 100 / layout.slots.length;
             shared.onUpdateSlotWidths(
                 layout.id,
                 resizeFlexSlots(
-                    layout.slots.map(s => s.flexBasis ?? eq),
+                    layout.slots.map(s => s.flexWidthConfig.flexBasis ?? eq),
                     i,
                     (dx / contentWidth) * 100,
                 ),
@@ -82,15 +82,15 @@ export default function LayoutCard({
             const tw = gridRef.current.offsetWidth;
             if (!tw) return;
             const cw =
-                layout.gridColWidths ??
+                layout.gridConfig?.colWidths ??
                 Array.from({ length: cols }, () => defColW);
             shared.onUpdateGridDimensions(
                 layout.id,
                 resizeGridCols(cw, i, (dx / tw) * 100),
-                layout.gridRowHeights ??
+                layout.gridConfig?.rowHeights ??
                     Array.from({ length: rows }, () => defRowH),
-                layout.gridColGap ?? null,
-                layout.gridRowGap ?? null,
+                layout.gridConfig?.colGap ?? null,
+                layout.gridConfig?.rowGap ?? null,
             );
         },
         [layout, cols, rows, defColW, defRowH, shared.onUpdateGridDimensions],
