@@ -11,8 +11,8 @@ import {
     useSensor,
     useSensors,
 } from '@dnd-kit/core';
-import { v4 as uuidv4 } from 'uuid';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useLayoutEditor } from '@/hooks/useLayoutEditor';
 import CanvasArea from './CanvasArea';
 import {
     createLayout,
@@ -25,22 +25,33 @@ import {
     removeItem,
 } from '@/lib/layout';
 import LayoutSidebar from './LayoutSidebar';
-import type { LayoutSpacing, LayoutType, NestedLayout } from '@/types/layout';
-import { graphToTree } from '@/lib/layout';
-import { MOCK_PAGE_GRAPH } from '@/app/mockData';
+import type { LayoutType } from '@/types/layout';
 
 export default function DndBuilder() {
-    const [layouts, setLayouts] = useState<NestedLayout[]>(() =>
-        graphToTree(MOCK_PAGE_GRAPH),
-    );
+    const {
+        layouts,
+        setLayouts,
+        selectedLayoutId,
+        selectedLayout,
+        handleRemove,
+        handleSelect,
+        handleAddSlot,
+        handleRemoveSlot,
+        handleUpdateSpacing,
+        handleUpdateSlotWidths,
+        handleUpdateWrapSlotWidth,
+        handleUpdateGridDimensions,
+        handleUpdateFlexGap,
+        handleUpdateFlexWrap,
+        handleUpdateFlexRowGap,
+        deselectLayout,
+    } = useLayoutEditor();
+
     const [activeSidebarType, setActiveSidebarType] =
         useState<LayoutType | null>(null);
     const [activeCanvasId, setActiveCanvasId] = useState<string | null>(null);
     const [insertIndex, setInsertIndex] = useState<number | null>(null);
     const [insertSlotId, setInsertSlotId] = useState<string | null>(null);
-    const [selectedLayoutId, setSelectedLayoutId] = useState<string | null>(
-        null,
-    );
 
     // 記錄拖曳開始時的來源容器，用來判斷是否跨容器
     const activeContainerRef = useRef<string | null>(null);
@@ -274,318 +285,6 @@ export default function DndBuilder() {
         activeCanvasIdRef.current = null;
     }, []);
 
-    const handleRemove = useCallback((id: string) => {
-        setLayouts(prev => removeItem(prev, id));
-        setSelectedLayoutId(null);
-    }, []);
-
-    const handleSelect = useCallback((id: string) => {
-        setSelectedLayoutId(prev => (prev === id ? null : id));
-    }, []);
-
-    // 遞迴找到目前選取的 layout
-    const findLayout = (
-        id: string,
-        items: NestedLayout[],
-    ): NestedLayout | null => {
-        for (const l of items) {
-            if (l.id === id) return l;
-            for (const s of l.slots) {
-                const found = findLayout(id, s.children);
-                if (found) return found;
-            }
-        }
-        return null;
-    };
-    const selectedLayout = selectedLayoutId
-        ? findLayout(selectedLayoutId, layouts)
-        : null;
-
-    // 在指定 layout 新增一個空 slot
-    const handleAddSlot = useCallback((layoutId: string) => {
-        const addToLayout = (items: NestedLayout[]): NestedLayout[] =>
-            items.map(l => {
-                if (l.id === layoutId) {
-                    const newSlots: import('@/types/layout').Slot[] = [
-                        ...l.slots,
-                        {
-                            id: uuidv4(),
-                            children: [],
-                            flexWidthConfig: { flexBasis: 50, widthPx: 200 },
-                        },
-                    ];
-                    if (l.type === 'flex') {
-                        const eq = 100 / newSlots.length;
-                        return {
-                            ...l,
-                            slots: newSlots.map(s => ({
-                                ...s,
-                                flexWidthConfig: {
-                                    ...s.flexWidthConfig,
-                                    flexBasis: eq,
-                                },
-                            })),
-                        };
-                    }
-                    if (l.type === 'grid') {
-                        // grid：重新計算需要幾列，同步擴充 rowHeights
-                        const cols = l.gridConfig?.colWidths?.length ?? 2;
-                        const newRowCount = Math.ceil(newSlots.length / cols);
-                        const existingRowHeights =
-                            l.gridConfig?.rowHeights ?? [];
-                        const newRowHeights = Array.from(
-                            { length: newRowCount },
-                            (_, i) => existingRowHeights[i] ?? 120,
-                        );
-                        return {
-                            ...l,
-                            slots: newSlots,
-                            gridConfig: {
-                                ...l.gridConfig!,
-                                rowHeights: newRowHeights,
-                            },
-                        };
-                    }
-                    return { ...l, slots: newSlots };
-                }
-                return {
-                    ...l,
-                    slots: l.slots.map(s => ({
-                        ...s,
-                        children: addToLayout(s.children),
-                    })),
-                };
-            });
-        setLayouts(prev => addToLayout(prev));
-    }, []);
-
-    // 在指定 layout 移除指定 slot（有子項目時不允許）
-    const handleRemoveSlot = useCallback((layoutId: string, slotId: string) => {
-        const removeFromLayout = (items: NestedLayout[]): NestedLayout[] =>
-            items.map(l => {
-                if (l.id === layoutId) {
-                    const remaining = l.slots.filter(s => s.id !== slotId);
-                    if (l.type === 'flex' && remaining.length > 0) {
-                        const eq = 100 / remaining.length;
-                        return {
-                            ...l,
-                            slots: remaining.map(s => ({
-                                ...s,
-                                flexWidthConfig: {
-                                    ...s.flexWidthConfig,
-                                    flexBasis: eq,
-                                },
-                            })),
-                        };
-                    }
-                    if (l.type === 'grid') {
-                        // grid：重新計算需要幾列，裁切或保留 rowHeights
-                        const cols = l.gridConfig?.colWidths?.length ?? 2;
-                        const newRowCount = Math.max(
-                            1,
-                            Math.ceil(remaining.length / cols),
-                        );
-                        const existingRowHeights =
-                            l.gridConfig?.rowHeights ?? [];
-                        const newRowHeights = Array.from(
-                            { length: newRowCount },
-                            (_, i) => existingRowHeights[i] ?? 120,
-                        );
-                        return {
-                            ...l,
-                            slots: remaining,
-                            gridConfig: {
-                                ...l.gridConfig!,
-                                rowHeights: newRowHeights,
-                            },
-                        };
-                    }
-                    return { ...l, slots: remaining };
-                }
-                return {
-                    ...l,
-                    slots: l.slots.map(s => ({
-                        ...s,
-                        children: removeFromLayout(s.children),
-                    })),
-                };
-            });
-        setLayouts(prev => removeFromLayout(prev));
-    }, []);
-
-    const handleUpdateSpacing = useCallback(
-        (layoutId: string, spacing: LayoutSpacing) => {
-            const update = (items: NestedLayout[]): NestedLayout[] =>
-                items.map(l => {
-                    if (l.id === layoutId) return { ...l, spacing };
-                    return {
-                        ...l,
-                        slots: l.slots.map(s => ({
-                            ...s,
-                            children: update(s.children),
-                        })),
-                    };
-                });
-            setLayouts(prev => update(prev));
-        },
-        [],
-    );
-
-    const handleUpdateSlotWidths = useCallback(
-        (layoutId: string, widths: number[]) => {
-            const update = (items: NestedLayout[]): NestedLayout[] =>
-                items.map(l => {
-                    if (l.id === layoutId) {
-                        return {
-                            ...l,
-                            slots: l.slots.map((s, i) => ({
-                                ...s,
-                                flexWidthConfig: {
-                                    ...s.flexWidthConfig,
-                                    flexBasis:
-                                        widths[i] ??
-                                        s.flexWidthConfig.flexBasis,
-                                },
-                            })),
-                        };
-                    }
-                    return {
-                        ...l,
-                        slots: l.slots.map(s => ({
-                            ...s,
-                            children: update(s.children),
-                        })),
-                    };
-                });
-            setLayouts(prev => update(prev));
-        },
-        [],
-    );
-
-    const handleUpdateGridDimensions = useCallback(
-        (
-            layoutId: string,
-            colWidths: number[],
-            rowHeights: number[],
-            colGap: number | null,
-            rowGap: number | null,
-        ) => {
-            const update = (items: NestedLayout[]): NestedLayout[] =>
-                items.map(l => {
-                    if (l.id === layoutId)
-                        return {
-                            ...l,
-                            gridConfig: {
-                                colWidths,
-                                rowHeights,
-                                colGap: colGap ?? l.gridConfig?.colGap ?? 8,
-                                rowGap: rowGap ?? l.gridConfig?.rowGap ?? 8,
-                            },
-                        };
-                    return {
-                        ...l,
-                        slots: l.slots.map(s => ({
-                            ...s,
-                            children: update(s.children),
-                        })),
-                    };
-                });
-            setLayouts(prev => update(prev));
-        },
-        [],
-    );
-
-    const handleUpdateFlexGap = useCallback((layoutId: string, gap: number) => {
-        const update = (items: NestedLayout[]): NestedLayout[] =>
-            items.map(l => {
-                if (l.id === layoutId)
-                    return { ...l, flexConfig: { ...l.flexConfig!, gap } };
-                return {
-                    ...l,
-                    slots: l.slots.map(s => ({
-                        ...s,
-                        children: update(s.children),
-                    })),
-                };
-            });
-        setLayouts(prev => update(prev));
-    }, []);
-
-    const handleUpdateFlexWrap = useCallback(
-        (layoutId: string, wrap: boolean) => {
-            const update = (items: NestedLayout[]): NestedLayout[] =>
-                items.map(l => {
-                    if (l.id === layoutId)
-                        return { ...l, flexConfig: { ...l.flexConfig!, wrap } };
-                    return {
-                        ...l,
-                        slots: l.slots.map(s => ({
-                            ...s,
-                            children: update(s.children),
-                        })),
-                    };
-                });
-            setLayouts(prev => update(prev));
-        },
-        [],
-    );
-
-    const handleUpdateFlexRowGap = useCallback(
-        (layoutId: string, rowGap: number) => {
-            const update = (items: NestedLayout[]): NestedLayout[] =>
-                items.map(l => {
-                    if (l.id === layoutId)
-                        return {
-                            ...l,
-                            flexConfig: { ...l.flexConfig!, rowGap },
-                        };
-                    return {
-                        ...l,
-                        slots: l.slots.map(s => ({
-                            ...s,
-                            children: update(s.children),
-                        })),
-                    };
-                });
-            setLayouts(prev => update(prev));
-        },
-        [],
-    );
-
-    const handleUpdateWrapSlotWidth = useCallback(
-        // 只更新指定 slot 的 widthPx（flex layout 換行模式專用）
-        (layoutId: string, slotId: string, widthPx: number) => {
-            const update = (items: NestedLayout[]): NestedLayout[] =>
-                items.map(l => {
-                    if (l.id === layoutId) {
-                        return {
-                            ...l,
-                            slots: l.slots.map(s =>
-                                s.id === slotId
-                                    ? {
-                                          ...s,
-                                          flexWidthConfig: {
-                                              ...s.flexWidthConfig,
-                                              widthPx,
-                                          },
-                                      }
-                                    : s,
-                            ),
-                        };
-                    }
-                    return {
-                        ...l,
-                        slots: l.slots.map(s => ({
-                            ...s,
-                            children: update(s.children),
-                        })),
-                    };
-                });
-            setLayouts(prev => update(prev));
-        },
-        [],
-    );
-
     console.log('layouts', layouts);
 
     const overlayLabel =
@@ -634,7 +333,7 @@ export default function DndBuilder() {
                     onUpdateFlexGap={handleUpdateFlexGap}
                     onUpdateFlexRowGap={handleUpdateFlexRowGap}
                     onUpdateFlexWrap={handleUpdateFlexWrap}
-                    onDeselect={() => setSelectedLayoutId(null)}
+                    onDeselect={deselectLayout}
                 />
                 <CanvasArea
                     layouts={layouts}

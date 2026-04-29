@@ -41,13 +41,13 @@ export default function LayoutFrame({
                 paddingBottom: mb,
                 paddingLeft: ml,
             }}
-            className={`rounded-xl transition-colors ${hasMargin ? '[&:has(>_.card:hover)]:bg-amber-100/70 [&:has(>_.card:hover)]:outline-dashed [&:has(>_.card:hover)]:outline-1 [&:has(>_.card:hover)]:outline-amber-300 [&:has(>_.card:hover)>div>.padding-layer]:opacity-100' : ''}`}
+            className={`rounded-xl transition-colors [&:has(>_.card:hover)>div>.padding-layer]:opacity-100 ${hasMargin ? '[&:has(>_.card:hover)]:bg-amber-100/70 [&:has(>_.card:hover)]:outline-dashed [&:has(>_.card:hover)]:outline-1 [&:has(>_.card:hover)]:outline-amber-300' : ''}`}
         >
             {/* 卡片主體 */}
             <div
                 ref={setNodeRef}
                 style={sortStyle}
-                className={`card relative rounded-lg border-2 transition-colors ${borderColor} ${bgColor} ${isSelected ? 'ring-2 ring-blue-500 ring-offset-1' : ''}`}
+                className={`group card relative rounded-lg border-2 transition-colors ${borderColor} ${bgColor} ${isSelected ? 'ring-2 ring-blue-500 ring-offset-1' : ''}`}
             >
                 {/* padding 視覺色塊 */}
                 {hasPadding && (
