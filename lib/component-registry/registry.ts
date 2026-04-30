@@ -19,11 +19,20 @@ import { CATEGORIES } from "./categories";
 import type { ModuleRegistry } from "../../types/component-registry";
 
 /**
+ * 辅助函数：安全获取 componentName
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getComponentName(component: React.ComponentType<any>): string {
+    return component.displayName || component.name || 'unknown';
+}
+
+/**
  * 組件註冊表
  */
 export const componentRegistry: ModuleRegistry = {
     H01: {
-        id: "H01",
+        componentId: "H01",
+        componentName: getComponentName(HeadingSimple),
         component: HeadingSimple,
         category: CATEGORIES.HEADING,
         label: "基礎標題",
@@ -33,7 +42,8 @@ export const componentRegistry: ModuleRegistry = {
         defaultStyle: DEFAULT_HEADING_SIMPLE_STYLE,
     },
     H02: {
-        id: "H02",
+        componentId: "H02",
+        componentName: getComponentName(HeadingDivided),
         component: HeadingDivided,
         category: CATEGORIES.HEADING,
         label: "帶裝飾標題",
@@ -43,7 +53,8 @@ export const componentRegistry: ModuleRegistry = {
         defaultStyle: DEFAULT_HEADING_DIVIDED_STYLE,
     },
     I01: {
-        id: "I01",
+        componentId: "I01",
+        componentName: getComponentName(ImageSimple),
         component: ImageSimple,
         category: CATEGORIES.IMAGE,
         label: "基礎圖片",
@@ -53,3 +64,21 @@ export const componentRegistry: ModuleRegistry = {
         defaultStyle: DEFAULT_IMAGE_SIMPLE_STYLE,
     },
 };
+
+/**
+ * 驗證 componentId 是否存在
+ */
+export function isValidComponentId(id: string): id is keyof ModuleRegistry {
+    return id in componentRegistry;
+}
+
+/**
+ * 取得 component config（含錯誤處理）
+ */
+export function getComponentConfig(componentId: string) {
+    if (!isValidComponentId(componentId)) {
+        console.warn(`Unknown component ID: ${componentId}`);
+        return undefined;
+    }
+    return componentRegistry[componentId];
+}

@@ -6,7 +6,6 @@
 export type {
     ModuleConfig,
     CategoryDefinition,
-    ModuleWithId,
     ModuleRegistry,
 } from "../../types/component-registry";
 
@@ -14,7 +13,7 @@ export type {
 export { CATEGORIES, categories, type CategoryId } from "./categories";
 
 // 註冊表
-export { componentRegistry } from "./registry";
+export { componentRegistry, getComponentConfig, isValidComponentId } from "./registry";
 
 // 工具函數
 export {

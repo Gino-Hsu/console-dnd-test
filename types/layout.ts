@@ -8,9 +8,24 @@ export interface LayoutItem {
     label: string;
 }
 
+// ─── Component 型別 ──────────────────────────────────────────
+
+export interface ComponentNode {
+    id: string;
+    type: 'component';
+    componentId: string;
+    label: string;
+    data: Record<string, unknown>;
+    style: Record<string, unknown>;
+}
+
+// ─── 統一節點型別 ────────────────────────────────────────────
+
+export type CanvasNode = NestedLayout | ComponentNode;
+
 export interface Slot {
     id: string;
-    children: NestedLayout[];
+    children: CanvasNode[];
     flexWidthConfig: {
         /** flex 佔比百分比（僅 flex layout 非換行模式使用），e.g. 50 = 50% */
         flexBasis: number;
@@ -124,6 +139,18 @@ export interface FlatSlot {
 }
 
 /**
+ * 扁平化的 Component 節點
+ */
+export interface FlatComponent {
+    id: string;
+    componentId: string;
+    label: string;
+    data: Record<string, unknown>;
+    style: Record<string, unknown>;
+    parentSlotId: string | null;
+}
+
+/**
  * 扁平化的頁面 Graph（O(1) 存取，JSON 可序列化）
  */
 export interface PageGraph {
@@ -134,6 +161,7 @@ export interface PageGraph {
     rootOrder: string[];
     layouts: Record<string, FlatLayout>;
     slots: Record<string, FlatSlot>;
+    components: Record<string, FlatComponent>;
 }
 
 // ─── 共編原子操作 ────────────────────────────────────────────
@@ -148,8 +176,22 @@ export type PageOperation =
           clientId: string;
       }
     | {
+          type: 'INSERT_COMPONENT';
+          component: FlatComponent;
+          targetSlotId: string;
+          atIndex: number;
+          seq: number;
+          clientId: string;
+      }
+    | {
           type: 'REMOVE_LAYOUT';
           layoutId: string;
+          seq: number;
+          clientId: string;
+      }
+    | {
+          type: 'REMOVE_COMPONENT';
+          componentId: string;
           seq: number;
           clientId: string;
       }
@@ -163,9 +205,27 @@ export type PageOperation =
           clientId: string;
       }
     | {
+          type: 'MOVE_COMPONENT';
+          componentId: string;
+          fromContainerId: string | 'root';
+          toContainerId: string | 'root';
+          atIndex: number;
+          seq: number;
+          clientId: string;
+      }
+    | {
           type: 'REORDER_LAYOUT';
           containerId: string | 'root';
           layoutId: string;
+          fromIndex: number;
+          toIndex: number;
+          seq: number;
+          clientId: string;
+      }
+    | {
+          type: 'REORDER_COMPONENT';
+          containerId: string | 'root';
+          componentId: string;
           fromIndex: number;
           toIndex: number;
           seq: number;
@@ -239,3 +299,13 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
         description: 'Grid — 二維格狀排列，同時控制列與欄',
     },
 ];
+
+// ─── Type Guards ─────────────────────────────────────────────────
+
+export function isLayoutNode(node: CanvasNode): node is NestedLayout {
+    return 'slots' in node;
+}
+
+export function isComponentNode(node: CanvasNode): node is ComponentNode {
+    return node.type === 'component';
+}

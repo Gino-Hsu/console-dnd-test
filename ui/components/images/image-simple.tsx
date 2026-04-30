@@ -48,4 +48,6 @@ export function ImageSimple({ data, style }: ImageSimpleProps) {
     );
 }
 
+ImageSimple.displayName = 'image-simple';
+
 export default ImageSimple;

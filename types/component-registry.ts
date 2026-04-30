@@ -8,8 +8,10 @@ import React from "react";
  * 模組配置介面
  */
 export interface ModuleConfig {
-    /** 模組 ID */
-    id: string;
+    /** 組件 ID */
+    componentId: string;
+    /** 組件名稱 */
+    componentName: string;
     /** React 組件 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     component: React.ComponentType<any>;
@@ -45,11 +47,4 @@ export interface CategoryDefinition {
     icon: string;
     description?: string;
     order?: number;
-}
-
-/**
- * 帶 ID 的模組配置
- */
-export interface ModuleWithId extends ModuleConfig {
-    id: string;
 }

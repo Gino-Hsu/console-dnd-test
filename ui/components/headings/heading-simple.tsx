@@ -44,4 +44,6 @@ export function HeadingSimple({ data, style }: HeadingSimpleProps) {
     return <Tag style={baseStyles}>{title}</Tag>;
 }
 
+HeadingSimple.displayName = 'heading-simple';
+
 export default HeadingSimple;

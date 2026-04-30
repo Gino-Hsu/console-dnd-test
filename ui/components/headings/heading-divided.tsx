@@ -57,4 +57,6 @@ export function HeadingDivided({ data, style }: HeadingDividedProps) {
     );
 }
 
+HeadingDivided.displayName = 'heading-divided';
+
 export default HeadingDivided;

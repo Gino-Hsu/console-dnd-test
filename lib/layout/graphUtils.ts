@@ -1,10 +1,13 @@
 import type {
     FlatLayout,
     FlatSlot,
+    FlatComponent,
     NestedLayout,
+    CanvasNode,
     PageGraph,
     PageOperation,
 } from '@/types/layout';
+import { isLayoutNode } from '@/types/layout';
 
 // ─── 轉換 ────────────────────────────────────────────────────
 
@@ -18,6 +21,7 @@ export function flattenToGraph(
 ): PageGraph {
     const layouts: Record<string, FlatLayout> = {};
     const slots: Record<string, FlatSlot> = {};
+    const components: Record<string, FlatComponent> = {};
 
     function visitLayout(
         layout: NestedLayout,
@@ -45,7 +49,19 @@ export function flattenToGraph(
                 },
             };
             for (const child of slot.children) {
-                visitLayout(child, slot.id);
+                if (isLayoutNode(child)) {
+                    visitLayout(child, slot.id);
+                } else {
+                    // 處理 ComponentNode
+                    components[child.id] = {
+                        id: child.id,
+                        componentId: child.componentId,
+                        label: child.label,
+                        data: child.data,
+                        style: child.style,
+                        parentSlotId: slot.id,
+                    };
+                }
             }
         }
     }
@@ -54,7 +70,7 @@ export function flattenToGraph(
         visitLayout(layout, null);
     }
 
-    return { ...meta, rootOrder: rootLayouts.map(l => l.id), layouts, slots };
+    return { ...meta, rootOrder: rootLayouts.map(l => l.id), layouts, slots, components };
 }
 
 /**
@@ -62,39 +78,55 @@ export function flattenToGraph(
  * 用於從 API 讀取扁平資料後，轉回 editor 的工作格式
  */
 export function graphToTree(graph: PageGraph): NestedLayout[] {
-    function buildLayout(id: string): NestedLayout {
+    function buildNode(id: string): CanvasNode {
+        // 先檢查是否為 Layout
         const flat = graph.layouts[id];
-        if (!flat) throw new Error(`graphToTree: layout "${id}" not found`);
+        if (flat) {
+            const slots = flat.slotIds.map(slotId => {
+                const flatSlot = graph.slots[slotId];
+                if (!flatSlot)
+                    throw new Error(`graphToTree: slot "${slotId}" not found`);
+                return {
+                    id: flatSlot.id,
+                    children: flatSlot.childIds.map(childId =>
+                        buildNode(childId),
+                    ),
+                    flexWidthConfig: {
+                        flexBasis: flatSlot.flexWidthConfig.flexBasis ?? 50,
+                        widthPx: flatSlot.flexWidthConfig.widthPx ?? 200,
+                    },
+                };
+            });
 
-        const slots = flat.slotIds.map(slotId => {
-            const flatSlot = graph.slots[slotId];
-            if (!flatSlot)
-                throw new Error(`graphToTree: slot "${slotId}" not found`);
             return {
-                id: flatSlot.id,
-                children: flatSlot.childIds.map(childId =>
-                    buildLayout(childId),
-                ),
-                flexWidthConfig: {
-                    flexBasis: flatSlot.flexWidthConfig.flexBasis ?? 50,
-                    widthPx: flatSlot.flexWidthConfig.widthPx ?? 200,
-                },
+                id: flat.id,
+                type: flat.type,
+                label: flat.label,
+                props: flat.props,
+                spacing: flat.spacing,
+                slots,
+                flexConfig: flat.flexConfig ?? null,
+                gridConfig: flat.gridConfig ?? null,
             };
-        });
+        }
 
-        return {
-            id: flat.id,
-            type: flat.type,
-            label: flat.label,
-            props: flat.props,
-            spacing: flat.spacing,
-            slots,
-            flexConfig: flat.flexConfig ?? null,
-            gridConfig: flat.gridConfig ?? null,
-        };
+        // 否則處理 Component
+        const component = graph.components[id];
+        if (component) {
+            return {
+                id: component.id,
+                type: 'component',
+                componentId: component.componentId,
+                label: component.label,
+                data: component.data,
+                style: component.style,
+            };
+        }
+
+        throw new Error(`graphToTree: node "${id}" not found`);
     }
 
-    return graph.rootOrder.map(id => buildLayout(id));
+    return graph.rootOrder.map(id => buildNode(id) as NestedLayout);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -307,7 +339,8 @@ export function applyOperation(graph: PageGraph, op: PageOperation): PageGraph {
         case 'REMOVE_SLOT': {
             const layout = graph.layouts[op.layoutId];
             if (!layout) return graph;
-            const { [op.slotId]: _removed, ...restSlots } = graph.slots;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { [op.slotId]: _, ...restSlots } = graph.slots;
             return {
                 ...graph,
                 layouts: {

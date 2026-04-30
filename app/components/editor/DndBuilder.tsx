@@ -13,19 +13,22 @@ import {
 } from '@dnd-kit/core';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useLayoutEditor } from '@/hooks/useLayoutEditor';
+import { useComponentEditor } from '@/hooks/useComponentEditor';
 import CanvasArea from './CanvasArea';
 import {
     createLayout,
+    createComponent,
     findContainer,
     findLayoutById,
+    findNodeById,
     insertIntoSlot,
     isSlotInsideLayout,
     MAX_DEPTH,
     moveItem,
-    removeItem,
 } from '@/lib/layout';
-import LayoutSidebar from './LayoutSidebar';
+import Sidebar from './Sidebar';
 import type { LayoutType } from '@/types/layout';
+import { isLayoutNode } from '@/types/layout';
 
 export default function DndBuilder() {
     const {
@@ -34,7 +37,7 @@ export default function DndBuilder() {
         selectedLayoutId,
         selectedLayout,
         handleRemove,
-        handleSelect,
+        handleSelect: handleSelectLayout,
         handleAddSlot,
         handleRemoveSlot,
         handleUpdateSpacing,
@@ -46,6 +49,36 @@ export default function DndBuilder() {
         handleUpdateFlexRowGap,
         deselectLayout,
     } = useLayoutEditor();
+
+    const {
+        selectedComponentId,
+        selectedComponent,
+        handleSelectComponent,
+        handleUpdateComponentData,
+        handleUpdateComponentStyle,
+        deselectComponent,
+    } = useComponentEditor({ layouts, setLayouts });
+
+    // 統一的選取邏輯：判斷是 Layout 還是 Component
+    const handleSelect = useCallback(
+        (id: string) => {
+            const node = findNodeById(id, layouts);
+            if (node && isLayoutNode(node)) {
+                handleSelectLayout(id);
+                deselectComponent();
+            } else {
+                handleSelectComponent(id);
+                deselectLayout();
+            }
+        },
+        [
+            layouts,
+            handleSelectLayout,
+            handleSelectComponent,
+            deselectComponent,
+            deselectLayout,
+        ],
+    );
 
     const [activeSidebarType, setActiveSidebarType] =
         useState<LayoutType | null>(null);
@@ -189,34 +222,57 @@ export default function DndBuilder() {
 
             // Sidebar → Canvas
             if (activeData?.source === 'sidebar') {
-                const newLayout = createLayout(
-                    activeData.type as LayoutType,
-                    activeData.label as string,
-                );
                 const overData = over.data.current;
 
-                if (overData?.type === 'slot') {
-                    const slotId = over.id as string;
-                    const ownerId = overData.ownerId as string;
-                    setLayouts(prev =>
-                        insertIntoSlot(
-                            prev,
-                            ownerId,
-                            slotId,
-                            newLayout,
-                            currentInsertIndex ?? undefined,
-                        ),
-                    );
-                } else if (overData?.type === 'canvas') {
-                    setLayouts(prev => {
-                        const next = [...prev];
-                        next.splice(
-                            currentInsertIndex ?? prev.length,
-                            0,
-                            newLayout,
+                // 判斷拖拽的是 Layout 還是 Component
+                if (activeData.type === 'component') {
+                    // Component 只能拖進 slot，不能放在 root
+                    if (overData?.type === 'slot') {
+                        const newComponent = createComponent(
+                            activeData.componentId as string,
+                            activeData.label as string,
                         );
-                        return next;
-                    });
+                        const slotId = over.id as string;
+                        const ownerId = overData.ownerId as string;
+                        setLayouts(prev =>
+                            insertIntoSlot(
+                                prev,
+                                ownerId,
+                                slotId,
+                                newComponent,
+                                currentInsertIndex ?? undefined,
+                            ),
+                        );
+                    }
+                } else {
+                    const newLayout = createLayout(
+                        activeData.type as LayoutType,
+                        activeData.label as string,
+                    );
+
+                    if (overData?.type === 'slot') {
+                        const slotId = over.id as string;
+                        const ownerId = overData.ownerId as string;
+                        setLayouts(prev =>
+                            insertIntoSlot(
+                                prev,
+                                ownerId,
+                                slotId,
+                                newLayout,
+                                currentInsertIndex ?? undefined,
+                            ),
+                        );
+                    } else if (overData?.type === 'canvas') {
+                        setLayouts(prev => {
+                            const next = [...prev];
+                            next.splice(
+                                currentInsertIndex ?? prev.length,
+                                0,
+                                newLayout,
+                            );
+                            return next;
+                        });
+                    }
                 }
                 return;
             }
@@ -324,8 +380,9 @@ export default function DndBuilder() {
             onDragCancel={handleDragCancel}
         >
             <div className='flex h-screen w-full overflow-hidden'>
-                <LayoutSidebar
+                <Sidebar
                     selectedLayout={selectedLayout}
+                    selectedComponent={selectedComponent}
                     onAddSlot={handleAddSlot}
                     onRemoveSlot={handleRemoveSlot}
                     onUpdateSpacing={handleUpdateSpacing}
@@ -333,7 +390,12 @@ export default function DndBuilder() {
                     onUpdateFlexGap={handleUpdateFlexGap}
                     onUpdateFlexRowGap={handleUpdateFlexRowGap}
                     onUpdateFlexWrap={handleUpdateFlexWrap}
-                    onDeselect={deselectLayout}
+                    onUpdateComponentData={handleUpdateComponentData}
+                    onUpdateComponentStyle={handleUpdateComponentStyle}
+                    onDeselect={() => {
+                        deselectLayout();
+                        deselectComponent();
+                    }}
                 />
                 <CanvasArea
                     layouts={layouts}

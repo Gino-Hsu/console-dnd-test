@@ -6,7 +6,6 @@ import { componentRegistry } from "./registry";
 import { categories } from "./categories";
 import type {
     CategoryDefinition,
-    ModuleWithId,
     ModuleConfig,
 } from "../../types/component-registry";
 
@@ -22,7 +21,7 @@ export function getCategories(): CategoryDefinition[] {
 /**
  * 根據類別取得模組
  */
-export function getModulesByCategory(categoryId: string): ModuleWithId[] {
+export function getModulesByCategory(categoryId: string): ModuleConfig[] {
     return Object.values(componentRegistry).filter(
         (module) => module.category === categoryId,
     );
@@ -31,7 +30,7 @@ export function getModulesByCategory(categoryId: string): ModuleWithId[] {
 /**
  * 搜尋模組
  */
-export function searchModules(query: string): ModuleWithId[] {
+export function searchModules(query: string): ModuleConfig[] {
     if (!query.trim()) {
         return getAllModules();
     }
@@ -39,7 +38,7 @@ export function searchModules(query: string): ModuleWithId[] {
     const lowerQuery = query.toLowerCase();
     return Object.values(componentRegistry).filter(
         (module) =>
-            module.id.toLowerCase().includes(lowerQuery) ||
+            module.componentId.toLowerCase().includes(lowerQuery) ||
             module.label.toLowerCase().includes(lowerQuery) ||
             module.tags?.some((tag) => tag.toLowerCase().includes(lowerQuery)),
     );
@@ -55,7 +54,7 @@ export function getModule(id: string): ModuleConfig | undefined {
 /**
  * 取得所有模組
  */
-export function getAllModules(): ModuleWithId[] {
+export function getAllModules(): ModuleConfig[] {
     return Object.values(componentRegistry);
 }
 
