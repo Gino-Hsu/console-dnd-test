@@ -1,28 +1,29 @@
 /**
- * 模組註冊表統一導出
+ * 元件註冊表統一導出
  */
 
 // 型別
 export type {
-    ModuleConfig,
+    ComponentConfig,
     CategoryDefinition,
-    ModuleRegistry,
+    ComponentRegistry,
 } from "../../types/component-registry";
 
 // 分類
 export { CATEGORIES, categories, type CategoryId } from "./categories";
 
 // 註冊表
-export { componentRegistry, getComponentConfig, isValidComponentId } from "./registry";
+export { componentRegistry } from "./registry";
 
 // 工具函數
 export {
     getCategories,
-    getModulesByCategory,
-    searchModules,
-    getModule,
-    getAllModules,
+    getComponentsByCategory,
+    searchComponents,
+    getComponentConfig,
+    getAllComponents,
     getCategory,
-    hasModule,
-    getCategoryModuleCount,
+    hasComponent,
+    getCategoryComponentCount,
+    getComponent,
 } from "./helpers";

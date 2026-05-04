@@ -1,12 +1,12 @@
 /**
- * 模組註冊表工具函數
+ * 元件註冊表工具函數
  */
 
 import { componentRegistry } from "./registry";
 import { categories } from "./categories";
 import type {
     CategoryDefinition,
-    ModuleConfig,
+    ComponentConfig,
 } from "../../types/component-registry";
 
 /**
@@ -19,42 +19,49 @@ export function getCategories(): CategoryDefinition[] {
 }
 
 /**
- * 根據類別取得模組
+ * 根據類別取得元件列表
  */
-export function getModulesByCategory(categoryId: string): ModuleConfig[] {
+export function getComponentsByCategory(categoryId: string): ComponentConfig[] {
     return Object.values(componentRegistry).filter(
-        (module) => module.category === categoryId,
+        (config) => config.category === categoryId,
     );
 }
 
 /**
- * 搜尋模組
+ * 搜尋元件
  */
-export function searchModules(query: string): ModuleConfig[] {
+export function searchComponents(query: string): ComponentConfig[] {
     if (!query.trim()) {
-        return getAllModules();
+        return getAllComponents();
     }
 
     const lowerQuery = query.toLowerCase();
     return Object.values(componentRegistry).filter(
-        (module) =>
-            module.componentId.toLowerCase().includes(lowerQuery) ||
-            module.label.toLowerCase().includes(lowerQuery) ||
-            module.tags?.some((tag) => tag.toLowerCase().includes(lowerQuery)),
+        (config) =>
+            config.componentId.toLowerCase().includes(lowerQuery) ||
+            config.label.toLowerCase().includes(lowerQuery) ||
+            config.tags?.some((tag) => tag.toLowerCase().includes(lowerQuery)),
     );
 }
 
 /**
- * 根據 ID 取得模組
+ * 根據 componentId 取得元件配置
  */
-export function getModule(id: string): ModuleConfig | undefined {
-    return componentRegistry[id];
+export function getComponentConfig(componentId: string): ComponentConfig | undefined {
+    return componentRegistry[componentId];
 }
 
 /**
- * 取得所有模組
+ * 根據 componentId 取得可渲染的 React 元件
  */
-export function getAllModules(): ModuleConfig[] {
+export function getComponent(componentId: string) {
+    return componentRegistry[componentId]?.component;
+}
+
+/**
+ * 取得所有元件配置
+ */
+export function getAllComponents(): ComponentConfig[] {
     return Object.values(componentRegistry);
 }
 
@@ -68,16 +75,16 @@ export function getCategory(
 }
 
 /**
- * 檢查模組是否存在
+ * 檢查元件是否存在
  */
-export function hasModule(id: string): boolean {
-    return id in componentRegistry;
+export function hasComponent(componentId: string): boolean {
+    return componentId in componentRegistry;
 }
 
 /**
- * 取得類別下的模組數量
+ * 取得類別下的元件數量
  */
-export function getCategoryModuleCount(categoryId: string): number {
+export function getCategoryComponentCount(categoryId: string): number {
     return Object.values(componentRegistry).filter(
         (config) => config.category === categoryId,
     ).length;

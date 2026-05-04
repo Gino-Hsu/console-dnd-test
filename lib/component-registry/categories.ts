@@ -1,5 +1,5 @@
 /**
- * 模組分類定義
+ * 元件分類定義
  */
 
 import type { CategoryDefinition } from "../../types/component-registry";

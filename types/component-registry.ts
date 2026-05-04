@@ -1,18 +1,18 @@
 /**
- * 模組註冊表型別定義
+ * 元件註冊表型別定義
  */
 
 import React from "react";
 
 /**
- * 模組配置介面
+ * 元件配置介面
  */
-export interface ModuleConfig {
-    /** 組件 ID */
+export interface ComponentConfig {
+    /** 元件 ID */
     componentId: string;
-    /** 組件名稱 */
+    /** 元件名稱 */
     componentName: string;
-    /** React 組件 */
+    /** React 元件 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     component: React.ComponentType<any>;
     /** 分類 ID */
@@ -34,9 +34,9 @@ export interface ModuleConfig {
 }
 
 /**
- * 模組註冊表型別
+ * 元件註冊表型別
  */
-export type ModuleRegistry = Record<string, ModuleConfig>;
+export type ComponentRegistry = Record<string, ComponentConfig>;
 
 /**
  * 分類定義

@@ -2,14 +2,14 @@
 
 import { useState, useMemo } from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { getCategories, getModulesByCategory } from '@/lib/component-registry/helpers';
-import type { ModuleConfig } from '@/types/component-registry';
+import { getCategories, getComponentsByCategory } from '@/lib/component-registry/helpers';
+import type { ComponentConfig } from '@/types/component-registry';
 import { Accordion } from '../common/Accordion';
 
 function DraggableComponent({
     component,
 }: {
-    component: ModuleConfig;
+    component: ComponentConfig;
 }) {
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
         id: `sidebar-component-${component.componentId}`,
@@ -53,7 +53,7 @@ export default function ComponentSidebar() {
     
     // 只包含有元件的 categories
     const categoriesWithComponents = allCategories.filter(
-        cat => getModulesByCategory(cat.id).length > 0
+        cat => getComponentsByCategory(cat.id).length > 0
     );
 
     // 管理每個 category 的展開狀態（預設全部展開）
@@ -108,7 +108,7 @@ export default function ComponentSidebar() {
             </div>
             <div className='flex flex-col gap-3 p-4 overflow-y-auto overflow-x-hidden'>
                 {categoriesWithComponents.map(cat => {
-                    const components = getModulesByCategory(cat.id);
+                    const components = getComponentsByCategory(cat.id);
                     return (
                         <Accordion
                             key={cat.id}

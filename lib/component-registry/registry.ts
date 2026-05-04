@@ -1,5 +1,5 @@
 /**
- * 組件模組註冊表
+ * 元件註冊表
  */
 
 import {
@@ -16,10 +16,10 @@ import {
     DEFAULT_IMAGE_SIMPLE_STYLE,
 } from "@/ui/components/images";
 import { CATEGORIES } from "./categories";
-import type { ModuleRegistry } from "../../types/component-registry";
+import type { ComponentRegistry } from "../../types/component-registry";
 
 /**
- * 辅助函数：安全获取 componentName
+ * 取得 componentName
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getComponentName(component: React.ComponentType<any>): string {
@@ -27,9 +27,9 @@ function getComponentName(component: React.ComponentType<any>): string {
 }
 
 /**
- * 組件註冊表
+ * 元件註冊表
  */
-export const componentRegistry: ModuleRegistry = {
+export const componentRegistry: ComponentRegistry = {
     H01: {
         componentId: "H01",
         componentName: getComponentName(HeadingSimple),
@@ -64,21 +64,3 @@ export const componentRegistry: ModuleRegistry = {
         defaultStyle: DEFAULT_IMAGE_SIMPLE_STYLE,
     },
 };
-
-/**
- * 驗證 componentId 是否存在
- */
-export function isValidComponentId(id: string): id is keyof ModuleRegistry {
-    return id in componentRegistry;
-}
-
-/**
- * 取得 component config（含錯誤處理）
- */
-export function getComponentConfig(componentId: string) {
-    if (!isValidComponentId(componentId)) {
-        console.warn(`Unknown component ID: ${componentId}`);
-        return undefined;
-    }
-    return componentRegistry[componentId];
-}
