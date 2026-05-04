@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { getCategories, getModulesByCategory } from '@/lib/component-registry/helpers';
 import type { ModuleConfig } from '@/types/component-registry';
+import { Accordion } from '../common/Accordion';
 
 function DraggableComponent({
     component,
@@ -46,76 +47,27 @@ function DraggableComponent({
     );
 }
 
-function CategoryAccordion({
-    categoryInfo,
-    components,
-    isOpen,
-    onToggle,
-}: {
-    categoryInfo: { id: string; name: string; icon: string };
-    components: ModuleConfig[];
-    isOpen: boolean;
-    onToggle: () => void;
-}) {
-
-    return (
-        <div className='overflow-hidden bg-white'>
-            {/* Category Header */}
-            <button
-                onClick={onToggle}
-                className='w-full flex items-center justify-between hover:bg-zinc-50 transition-colors'
-            >
-                <div className='flex items-center gap-2'>
-                    <span className='text-lg'>{categoryInfo.icon}</span>
-                    <span className='font-semibold text-sm text-zinc-800'>
-                        {categoryInfo.name}
-                    </span>
-                    <span className='text-xs text-zinc-500'>
-                        ({components.length})
-                    </span>
-                </div>
-                <svg
-                    width='16'
-                    height='16'
-                    viewBox='0 0 16 16'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeWidth='2'
-                    strokeLinecap='round'
-                    className={`transition-transform text-zinc-600 ${isOpen ? 'rotate-90' : ''}`}
-                >
-                    <path d='M6 4l4 4-4 4' />
-                </svg>
-            </button>
-
-            {/* Category Content */}
-            {isOpen && (
-                <div className='flex flex-col gap-2 border-t border-zinc-100'>
-                    {components.map(item => (
-                        <DraggableComponent key={item.componentId} component={item} />
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-}
-
 export default function ComponentSidebar() {
-    // 使用 helpers 获取所有 categories
+    // 取得所有 categories
     const allCategories = getCategories();
     
-    // 只包含有组件的 categories
+    // 只包含有元件的 categories
     const categoriesWithComponents = allCategories.filter(
         cat => getModulesByCategory(cat.id).length > 0
     );
 
-    // 管理每个 category 的展开状态（默认全部展开）
+    // 管理每個 category 的展開狀態（預設全部展開）
     const [openCategories, setOpenCategories] = useState<Record<string, boolean>>(
         categoriesWithComponents.reduce((acc, cat) => {
             acc[cat.id] = true;
             return acc;
         }, {} as Record<string, boolean>)
     );
+
+    // 判斷當前是否全部展開
+    const allExpanded = useMemo(() => {
+        return categoriesWithComponents.every(cat => openCategories[cat.id]);
+    }, [openCategories, categoriesWithComponents]);
 
     const toggleCategory = (categoryId: string) => {
         setOpenCategories(prev => ({
@@ -124,12 +76,32 @@ export default function ComponentSidebar() {
         }));
     };
 
+    // 切換全部類別
+    const toggleAll = () => {
+        const newState = !allExpanded;
+        setOpenCategories(
+            categoriesWithComponents.reduce((acc, cat) => {
+                acc[cat.id] = newState;
+                return acc;
+            }, {} as Record<string, boolean>)
+        );
+    };
+
     return (
         <>
             <div className='px-4 py-4 border-b border-zinc-200'>
-                <h2 className='text-base font-bold text-zinc-800'>
-                    Component 選單
-                </h2>
+                <div className='flex items-center justify-between mb-1'>
+                    <h2 className='text-base font-bold text-zinc-800'>
+                        Component 選單
+                    </h2>
+                    <button
+                        onClick={toggleAll}
+                        className='text-xs text-blue-600 cursor-pointer hover:text-blue-700 transition-colors'
+                        title={allExpanded ? '全部收合' : '全部展開'}
+                    >
+                        {allExpanded ? '全部收合' : '全部展開'}
+                    </button>
+                </div>
                 <p className='text-xs text-zinc-500 mt-0.5'>
                     拖曳元件到 Layout 的 Slot 中
                 </p>
@@ -138,13 +110,26 @@ export default function ComponentSidebar() {
                 {categoriesWithComponents.map(cat => {
                     const components = getModulesByCategory(cat.id);
                     return (
-                        <CategoryAccordion
+                        <Accordion
                             key={cat.id}
-                            categoryInfo={cat}
-                            components={components}
-                            isOpen={openCategories[cat.id] ?? false}
+                            header={
+                                <>
+                                    <span className='text-lg'>{cat.icon}</span>
+                                    <span className='font-semibold text-sm text-zinc-800'>
+                                        {cat.name}
+                                    </span>
+                                    <span className='text-xs text-zinc-500'>
+                                        ({components.length})
+                                    </span>
+                                </>
+                            }
+                            open={openCategories[cat.id] ?? false}
                             onToggle={() => toggleCategory(cat.id)}
-                        />
+                        >
+                            {components.map(item => (
+                                <DraggableComponent key={item.componentId} component={item} />
+                            ))}
+                        </Accordion>
                     );
                 })}
             </div>

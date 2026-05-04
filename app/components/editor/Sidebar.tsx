@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import LayoutSidebar from './LayoutSidebar';
-import ComponentSidebar from './ComponentSidebar';
+import ComponentSidebar from './component/ComponentSidebar';
 import LayoutEditor from './LayoutEditor';
-import ComponentEditor from './ComponentEditor';
+import ComponentEditor from './component/ComponentEditor';
 import type { LayoutSpacing, NestedLayout, ComponentNode } from './types';
 
 export default function Sidebar({
@@ -73,7 +73,7 @@ export default function Sidebar({
                         <div className='flex'>
                             <button
                                 onClick={() => setActiveTab('layouts')}
-                                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                                className={`flex-1 px-4 py-3 text-sm font-medium cursor-pointer transition-colors ${
                                     activeTab === 'layouts'
                                         ? 'text-blue-600 border-b-2 border-blue-600 bg-white'
                                         : 'text-zinc-600 hover:text-zinc-800'
@@ -83,7 +83,7 @@ export default function Sidebar({
                             </button>
                             <button
                                 onClick={() => setActiveTab('components')}
-                                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                                className={`flex-1 px-4 py-3 text-sm font-medium cursor-pointer transition-colors ${
                                     activeTab === 'components'
                                         ? 'text-blue-600 border-b-2 border-blue-600 bg-white'
                                         : 'text-zinc-600 hover:text-zinc-800'
