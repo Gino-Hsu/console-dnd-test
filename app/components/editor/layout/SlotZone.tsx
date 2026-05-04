@@ -7,13 +7,15 @@ import {
 } from '@dnd-kit/sortable';
 import { cn } from '@/lib/cn';
 import { InsertLine } from '../CanvasArea';
-import type { NestedLayout } from '@/types/layout';
+import type { CanvasNode } from '@/types/layout';
+import { isLayoutNode } from '@/types/layout';
 import type { SlotProps } from './types';
 import { MAX_DEPTH } from '@/lib/layout';
 
 // 延遲 import 避免循環依賴在模組初始化時出問題
 // （實際執行時是安全的，因為 LayoutCard 在 render 時才被呼叫）
 import LayoutCard from './LayoutCard';
+import ComponentCard from '../component/ComponentCard';
 
 export default function SlotZone({
     slot,
@@ -23,7 +25,7 @@ export default function SlotZone({
     depth,
     ...sp
 }: SlotProps & {
-    slot: { id: string; label?: string; children: NestedLayout[] };
+    slot: { id: string; label?: string; children: CanvasNode[] };
     flexBasis?: number;
     isGridItem?: boolean;
     isDragging?: boolean;
@@ -88,7 +90,7 @@ export default function SlotZone({
                             >
                                 {atMaxDepth
                                     ? `已達最大層數（${MAX_DEPTH} 層）`
-                                    : '拖曳 Layout 到此 slot'}
+                                    : '拖曳 Layout 或 Component 到此處'}
                             </div>
                         </>
                     ) : (
@@ -96,22 +98,37 @@ export default function SlotZone({
                             {isActive && sp.slotInsertIndex === 0 && (
                                 <InsertLine />
                             )}
-                            {slot.children.map((child, idx) => (
-                                <div key={child.id} data-canvas-item>
-                                    <div className='py-1'>
-                                        <LayoutCard
-                                            layout={child}
-                                            depth={depth + 1}
-                                            isDraggingFromParent={isDragging}
-                                            {...sp}
-                                        />
+                            {slot.children.map((child, idx) => {
+                                return (
+                                    <div key={child.id} data-canvas-item>
+                                        <div className='py-1'>
+                                            {isLayoutNode(child) ? (
+                                                <LayoutCard
+                                                    layout={child}
+                                                    depth={depth + 1}
+                                                    isDraggingFromParent={
+                                                        isDragging
+                                                    }
+                                                    {...sp}
+                                                />
+                                            ) : (
+                                                <ComponentCard
+                                                    component={child}
+                                                    depth={depth + 1}
+                                                    isDraggingFromParent={
+                                                        isDragging
+                                                    }
+                                                    {...sp}
+                                                />
+                                            )}
+                                        </div>
+                                        {isActive &&
+                                            sp.slotInsertIndex === idx + 1 && (
+                                                <InsertLine />
+                                            )}
                                     </div>
-                                    {isActive &&
-                                        sp.slotInsertIndex === idx + 1 && (
-                                            <InsertLine />
-                                        )}
-                                </div>
-                            ))}
+                                );
+                            })}
                         </>
                     )}
                 </div>
