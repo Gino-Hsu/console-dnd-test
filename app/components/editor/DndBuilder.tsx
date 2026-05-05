@@ -47,6 +47,7 @@ export default function DndBuilder() {
         handleUpdateFlexGap,
         handleUpdateFlexWrap,
         handleUpdateFlexRowGap,
+        handleUpdateSlotAlign,
         deselectLayout,
     } = useLayoutEditor();
 
@@ -409,6 +410,7 @@ export default function DndBuilder() {
                     onUpdateSlotWidths={handleUpdateSlotWidths}
                     onUpdateGridDimensions={handleUpdateGridDimensions}
                     onUpdateWrapSlotWidth={handleUpdateWrapSlotWidth}
+                    onUpdateSlotAlign={handleUpdateSlotAlign}
                 />
             </div>
 

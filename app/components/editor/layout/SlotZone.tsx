@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import {
     SortableContext,
@@ -7,13 +8,11 @@ import {
 } from '@dnd-kit/sortable';
 import { cn } from '@/lib/cn';
 import { InsertLine } from '../CanvasArea';
-import type { CanvasNode } from '@/types/layout';
-import { isLayoutNode } from '@/types/layout';
+import type { CanvasNode, SlotAlign } from '@/types/layout';
+import { isLayoutNode, ALIGN_CLASS } from '@/types/layout';
 import type { SlotProps } from './types';
 import { MAX_DEPTH } from '@/lib/layout';
-
-// 延遲 import 避免循環依賴在模組初始化時出問題
-// （實際執行時是安全的，因為 LayoutCard 在 render 時才被呼叫）
+import SlotEditor from './SlotEditor';
 import LayoutCard from './LayoutCard';
 import ComponentCard from '../component/ComponentCard';
 
@@ -25,7 +24,12 @@ export default function SlotZone({
     depth,
     ...sp
 }: SlotProps & {
-    slot: { id: string; label?: string; children: CanvasNode[] };
+    slot: {
+        id: string;
+        label?: string;
+        children: CanvasNode[];
+        align?: SlotAlign;
+    };
     flexBasis?: number;
     isGridItem?: boolean;
     isDragging?: boolean;
@@ -43,10 +47,15 @@ export default function SlotZone({
         disabled: atMaxDepth,
     });
     const isActive = sp.insertSlotId === slot.id;
+    const [editorOpen, setEditorOpen] = useState(false);
+    const gearRef = useRef<HTMLButtonElement>(null);
+
+    const alignClass = ALIGN_CLASS[slot.align ?? 'left'];
 
     return (
         <div
             className={cn(
+                'relative group/slot',
                 flexBasis !== undefined ? 'min-w-0' : 'flex-1 min-w-0',
                 isGridItem ? 'h-full' : undefined,
             )}
@@ -58,6 +67,53 @@ export default function SlotZone({
                 </div>
             )}
 
+            {/* gear button */}
+            {sp.onUpdateSlotAlign && (
+                <div className='absolute top-1 right-1 z-20 opacity-0 group-hover/slot:opacity-100 transition-opacity'>
+                    <button
+                        ref={gearRef}
+                        className='w-5 h-5 flex items-center justify-center z-0'
+                        onClick={e => {
+                            e.stopPropagation();
+                            setEditorOpen(o => !o);
+                        }}
+                        title='編輯 Slot 設定'
+                    >
+                        <svg
+                            width='12'
+                            height='12'
+                            viewBox='0 0 16 16'
+                            fill='none'
+                        >
+                            <path
+                                d='M8 10a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z'
+                                stroke='currentColor'
+                                strokeWidth='1.5'
+                            />
+                            <path
+                                d='M13.3 9.3a1.2 1.2 0 0 0 .24 1.32l.04.04a1.45 1.45 0 0 1-2.05 2.05l-.04-.04a1.2 1.2 0 0 0-1.32-.24 1.2 1.2 0 0 0-.73 1.1V14a1.45 1.45 0 0 1-2.9 0v-.06a1.2 1.2 0 0 0-.78-1.1 1.2 1.2 0 0 0-1.32.24l-.04.04a1.45 1.45 0 0 1-2.05-2.05l.04-.04A1.2 1.2 0 0 0 2.7 9.7a1.2 1.2 0 0 0-1.1-.73H1.5a1.45 1.45 0 0 1 0-2.9h.06a1.2 1.2 0 0 0 1.1-.78 1.2 1.2 0 0 0-.24-1.32l-.04-.04A1.45 1.45 0 0 1 4.43 1.88l.04.04A1.2 1.2 0 0 0 5.79 2.16a1.2 1.2 0 0 0 .73-1.1V1a1.45 1.45 0 0 1 2.9 0v.06a1.2 1.2 0 0 0 .73 1.1 1.2 1.2 0 0 0 1.32-.24l.04-.04a1.45 1.45 0 0 1 2.05 2.05l-.04.04A1.2 1.2 0 0 0 13.28 5.3a1.2 1.2 0 0 0 1.1.73H14.5a1.45 1.45 0 0 1 0 2.9h-.06a1.2 1.2 0 0 0-1.1.73Z'
+                                stroke='currentColor'
+                                strokeWidth='1.5'
+                            />
+                        </svg>
+                    </button>
+                    {editorOpen && (
+                        <SlotEditor
+                            anchorRef={gearRef}
+                            currentAlign={slot.align}
+                            onUpdate={align =>
+                                sp.onUpdateSlotAlign!(
+                                    sp.ownerId,
+                                    slot.id,
+                                    align,
+                                )
+                            }
+                            onClose={() => setEditorOpen(false)}
+                        />
+                    )}
+                </div>
+            )}
+
             <SortableContext
                 items={slot.children.map(c => c.id)}
                 strategy={verticalListSortingStrategy}
@@ -66,6 +122,7 @@ export default function SlotZone({
                     ref={setNodeRef}
                     className={cn(
                         'rounded-lg border-2 border-dashed h-full p-4 flex flex-col gap-2 transition-colors',
+                        alignClass,
                         isGridItem ? 'h-full' : 'min-h-16',
                         atMaxDepth
                             ? 'border-zinc-200 bg-zinc-50 opacity-60'

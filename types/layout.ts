@@ -23,6 +23,14 @@ export interface ComponentNode {
 
 export type CanvasNode = NestedLayout | ComponentNode;
 
+export type SlotAlign = 'left' | 'center' | 'right';
+
+export const ALIGN_CLASS: Record<SlotAlign, string> = {
+    left: 'items-start',
+    center: 'items-center',
+    right: 'items-end',
+};
+
 export interface Slot {
     id: string;
     children: CanvasNode[];
@@ -32,6 +40,8 @@ export interface Slot {
         /** flex layout 換行模式下各 slot 的像素寬度，預設 200px */
         widthPx: number;
     };
+    /** slot 內容的水平對齊方式，預設 left */
+    align: SlotAlign;
 }
 
 export const LAYOUT_CONFIG: Record<LayoutType, { slotCount: number }> = {
@@ -135,6 +145,8 @@ export interface FlatSlot {
         flexBasis: number | null;
         widthPx: number | null;
     };
+    /** slot 內容的水平對齊方式 */
+    align: SlotAlign;
     /** flex 佔比百分比（僅 flex layout 使用），e.g. 50 = 50% */
 }
 
@@ -163,116 +175,6 @@ export interface PageGraph {
     slots: Record<string, FlatSlot>;
     components: Record<string, FlatComponent>;
 }
-
-// ─── 共編原子操作 ────────────────────────────────────────────
-
-export type PageOperation =
-    | {
-          type: 'INSERT_LAYOUT';
-          layout: FlatLayout;
-          targetSlotId: string | 'root';
-          atIndex: number;
-          seq: number;
-          clientId: string;
-      }
-    | {
-          type: 'INSERT_COMPONENT';
-          component: FlatComponent;
-          targetSlotId: string;
-          atIndex: number;
-          seq: number;
-          clientId: string;
-      }
-    | {
-          type: 'REMOVE_LAYOUT';
-          layoutId: string;
-          seq: number;
-          clientId: string;
-      }
-    | {
-          type: 'REMOVE_COMPONENT';
-          componentId: string;
-          seq: number;
-          clientId: string;
-      }
-    | {
-          type: 'MOVE_LAYOUT';
-          layoutId: string;
-          fromContainerId: string | 'root';
-          toContainerId: string | 'root';
-          atIndex: number;
-          seq: number;
-          clientId: string;
-      }
-    | {
-          type: 'MOVE_COMPONENT';
-          componentId: string;
-          fromContainerId: string | 'root';
-          toContainerId: string | 'root';
-          atIndex: number;
-          seq: number;
-          clientId: string;
-      }
-    | {
-          type: 'REORDER_LAYOUT';
-          containerId: string | 'root';
-          layoutId: string;
-          fromIndex: number;
-          toIndex: number;
-          seq: number;
-          clientId: string;
-      }
-    | {
-          type: 'REORDER_COMPONENT';
-          containerId: string | 'root';
-          componentId: string;
-          fromIndex: number;
-          toIndex: number;
-          seq: number;
-          clientId: string;
-      }
-    | {
-          type: 'UPDATE_SPACING';
-          layoutId: string;
-          spacing: LayoutSpacing;
-          seq: number;
-          clientId: string;
-      }
-    | {
-          type: 'ADD_SLOT';
-          slot: FlatSlot;
-          seq: number;
-          clientId: string;
-      }
-    | {
-          type: 'REMOVE_SLOT';
-          layoutId: string;
-          slotId: string;
-          seq: number;
-          clientId: string;
-      }
-    | {
-          type: 'UPDATE_SLOT_WIDTHS';
-          layoutId: string;
-          /** 與 FlatLayout.slotIds 順序相同的 flexBasis 百分比陣列 */
-          widths: number[];
-          seq: number;
-          clientId: string;
-      }
-    | {
-          type: 'UPDATE_GRID_DIMENSIONS';
-          layoutId: string;
-          /** 欄寬百分比陣列，長度 = 欄數 */
-          colWidths: number[];
-          /** 列高像素陣列，長度 = 列數 */
-          rowHeights: number[];
-          /** 欄間距 px（可選） */
-          colGap?: number;
-          /** 列間距 px（可選） */
-          rowGap?: number;
-          seq: number;
-          clientId: string;
-      };
 
 // ─── 側邊欄 ──────────────────────────────────────────────────
 

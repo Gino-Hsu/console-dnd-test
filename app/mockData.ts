@@ -4,7 +4,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
     pageId: 'page-1',
     version: 1,
     status: 'published',
-    createdAt: '2026-05-04T08:51:02.033Z',
+    createdAt: '2026-05-05T06:22:48.251Z',
     rootOrder: [
         '09a9a9a9-fe51-4a2e-90dd-81eabd981b1b',
         '56a1597b-3d13-4e7e-a84d-1a6b349b22a4',
@@ -283,6 +283,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 100,
                 widthPx: 400,
             },
+            align: 'left',
         },
         'f0b9ef7f-369d-431d-9f36-df0e1f1f9fb1': {
             id: 'f0b9ef7f-369d-431d-9f36-df0e1f1f9fb1',
@@ -292,6 +293,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 35.16,
                 widthPx: 661,
             },
+            align: 'left',
         },
         'bbf2113c-a5a5-432e-a4bb-a625c00eee2d': {
             id: 'bbf2113c-a5a5-432e-a4bb-a625c00eee2d',
@@ -301,6 +303,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 50,
                 widthPx: 200,
             },
+            align: 'left',
         },
         'f49509b0-ec9e-4535-8ef9-e6ea614edb88': {
             id: 'f49509b0-ec9e-4535-8ef9-e6ea614edb88',
@@ -310,6 +313,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 64.84,
                 widthPx: 200,
             },
+            align: 'left',
         },
         '8ab825ec-0a63-4037-b57f-7bf43a1dd4d8': {
             id: '8ab825ec-0a63-4037-b57f-7bf43a1dd4d8',
@@ -319,6 +323,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 50,
                 widthPx: 200,
             },
+            align: 'left',
         },
         '7e1e3dd0-83cc-412b-8c9f-f9294b31bc4c': {
             id: '7e1e3dd0-83cc-412b-8c9f-f9294b31bc4c',
@@ -328,6 +333,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 83.02625000000002,
                 widthPx: 200,
             },
+            align: 'left',
         },
         'f4f216b1-d68e-4cb2-a0fa-891530a6710d': {
             id: 'f4f216b1-d68e-4cb2-a0fa-891530a6710d',
@@ -337,6 +343,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 50,
                 widthPx: 200,
             },
+            align: 'left',
         },
         'e4ace24a-0bd2-41fe-9b69-0435c11ee785': {
             id: 'e4ace24a-0bd2-41fe-9b69-0435c11ee785',
@@ -346,6 +353,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 50,
                 widthPx: 200,
             },
+            align: 'left',
         },
         '830f6643-9734-4b09-bc4b-33f340cf8ed3': {
             id: '830f6643-9734-4b09-bc4b-33f340cf8ed3',
@@ -355,6 +363,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 50,
                 widthPx: 200,
             },
+            align: 'left',
         },
         'bbc3eb97-f691-4c15-bf9e-9b99382e064c': {
             id: 'bbc3eb97-f691-4c15-bf9e-9b99382e064c',
@@ -364,6 +373,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 50,
                 widthPx: 200,
             },
+            align: 'left',
         },
         '0df08ed8-0317-4d64-b252-d44fa04cd4e1': {
             id: '0df08ed8-0317-4d64-b252-d44fa04cd4e1',
@@ -373,6 +383,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 16.97374999999999,
                 widthPx: 200,
             },
+            align: 'left',
         },
         '4d5a3e3e-84bb-4c02-b85a-062714761d59': {
             id: '4d5a3e3e-84bb-4c02-b85a-062714761d59',
@@ -382,6 +393,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 50,
                 widthPx: 200,
             },
+            align: 'left',
         },
         '73e12c90-af80-4954-8b83-9221fb2f1550': {
             id: '73e12c90-af80-4954-8b83-9221fb2f1550',
@@ -391,6 +403,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 50,
                 widthPx: 200,
             },
+            align: 'left',
         },
         'c7a0d3d4-2573-4074-a19b-3337653492df': {
             id: 'c7a0d3d4-2573-4074-a19b-3337653492df',
@@ -400,6 +413,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 50,
                 widthPx: 200,
             },
+            align: 'left',
         },
         '6f107e9d-0565-497b-b512-67565b189ce4': {
             id: '6f107e9d-0565-497b-b512-67565b189ce4',
@@ -409,6 +423,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 50,
                 widthPx: 200,
             },
+            align: 'left',
         },
         'b77cab67-a559-4cfd-b57e-9c9ab4578df7': {
             id: 'b77cab67-a559-4cfd-b57e-9c9ab4578df7',
@@ -418,6 +433,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 50,
                 widthPx: 200,
             },
+            align: 'left',
         },
         'feb0c5ee-9b2a-4ead-b888-7f7933b798e7': {
             id: 'feb0c5ee-9b2a-4ead-b888-7f7933b798e7',
@@ -427,6 +443,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 50,
                 widthPx: 200,
             },
+            align: 'left',
         },
         'bb850201-e23c-462b-adf7-65cd664a0c91': {
             id: 'bb850201-e23c-462b-adf7-65cd664a0c91',
@@ -436,6 +453,7 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 50,
                 widthPx: 200,
             },
+            align: 'left',
         },
     },
     components: {

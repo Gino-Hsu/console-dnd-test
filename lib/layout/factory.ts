@@ -26,6 +26,7 @@ export function createLayout(type: LayoutType, label: string): NestedLayout {
             flexBasis: equalBasis,
             widthPx: 400,
         },
+        align: 'left',
     }));
     return {
         id: genId(),
@@ -112,10 +113,7 @@ export function mapLayouts(
                 ...s,
                 children: [
                     ...s.children.filter(c => !isLayoutNode(c)),
-                    ...mapLayouts(
-                        s.children.filter(isLayoutNode),
-                        transform,
-                    ),
+                    ...mapLayouts(s.children.filter(isLayoutNode), transform),
                 ],
             })),
         };
@@ -153,6 +151,7 @@ export function addSlotToLayout(
             id: uuidv4(),
             children: [],
             flexWidthConfig: { flexBasis: 50, widthPx: 200 },
+            align: 'left',
         };
         const newSlots = [...l.slots, newSlot];
         if (l.type === 'flex') {

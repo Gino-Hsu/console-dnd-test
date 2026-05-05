@@ -10,7 +10,12 @@ import {
     mapLayouts,
     findLayout,
 } from '@/lib/layout';
-import type { LayoutSpacing, LayoutType, NestedLayout } from '@/types/layout';
+import type {
+    LayoutSpacing,
+    LayoutType,
+    NestedLayout,
+    SlotAlign,
+} from '@/types/layout';
 import { graphToTree } from '@/lib/layout';
 import { MOCK_PAGE_GRAPH } from '@/app/mockData';
 
@@ -159,6 +164,23 @@ export function useLayoutEditor() {
         [],
     );
 
+    const handleUpdateSlotAlign = useCallback(
+        (layoutId: string, slotId: string, align: SlotAlign) => {
+            setLayouts(prev =>
+                mapLayouts(prev, l => {
+                    if (l.id !== layoutId) return l;
+                    return {
+                        ...l,
+                        slots: l.slots.map(s =>
+                            s.id === slotId ? { ...s, align } : s,
+                        ),
+                    };
+                }),
+            );
+        },
+        [],
+    );
+
     const applyMove = useCallback(
         (
             activeId: string,
@@ -219,6 +241,7 @@ export function useLayoutEditor() {
         handleUpdateFlexGap,
         handleUpdateFlexWrap,
         handleUpdateFlexRowGap,
+        handleUpdateSlotAlign,
         applyMove,
         applySidebarDrop,
         deselectLayout: () => setSelectedLayoutId(null),
