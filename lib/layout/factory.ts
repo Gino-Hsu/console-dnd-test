@@ -1,6 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
-import type { LayoutType, NestedLayout, Slot } from '@/types/layout';
-import { DEFAULT_SPACING, LAYOUT_CONFIG } from '@/types/layout';
+import type {
+    LayoutType,
+    NestedLayout,
+    Slot,
+    ComponentNode,
+} from '@/types/layout';
+import { DEFAULT_SPACING, LAYOUT_CONFIG, isLayoutNode } from '@/types/layout';
+import { getComponentConfig } from '@/lib/component-registry';
 
 export function genId(): string {
     return uuidv4();
@@ -42,6 +48,32 @@ export function createLayout(type: LayoutType, label: string): NestedLayout {
 }
 
 /**
+ * 建立一個新的 Component
+ * @param componentId Component ID (e.g. 'H01', 'I01')
+ * @param label 顯示標籤
+ * @returns ComponentNode
+ */
+export function createComponent(
+    componentId: string,
+    label: string,
+): ComponentNode {
+    const config = getComponentConfig(componentId);
+
+    if (!config) {
+        throw new Error(`Invalid component ID: ${componentId}`);
+    }
+
+    return {
+        id: genId(),
+        type: 'component',
+        componentId,
+        label,
+        data: config.defaultData,
+        style: config.defaultStyle,
+    };
+}
+
+/**
  * 在巢狀的 layout tree 中尋找指定 id 的 layout
  * @param id layout id
  * @param items layouts 巢狀資料
@@ -54,7 +86,8 @@ export function findLayout(
     for (const l of items) {
         if (l.id === id) return l;
         for (const s of l.slots) {
-            const found = findLayout(id, s.children);
+            const layoutChildren = s.children.filter(isLayoutNode);
+            const found = findLayout(id, layoutChildren);
             if (found) return found;
         }
     }
@@ -77,7 +110,13 @@ export function mapLayouts(
             ...mapped,
             slots: mapped.slots.map(s => ({
                 ...s,
-                children: mapLayouts(s.children, transform),
+                children: [
+                    ...s.children.filter(c => !isLayoutNode(c)),
+                    ...mapLayouts(
+                        s.children.filter(isLayoutNode),
+                        transform,
+                    ),
+                ],
             })),
         };
     });

@@ -1,5 +1,6 @@
 import { arrayMove } from '@dnd-kit/sortable';
-import type { NestedLayout } from '@/types/layout';
+import type { NestedLayout, CanvasNode } from '@/types/layout';
+import { isLayoutNode } from '@/types/layout';
 
 // ─── 常數 ────────────────────────────────────────────────────
 
@@ -8,7 +9,7 @@ export const MAX_DEPTH = 3;
 
 // ─── 查詢 ────────────────────────────────────────────────────
 /**
- * 遞迴找出某個 layout 所在的容器
+ * 遞迴找出某個 layout 或 component 所在的容器
  * 回傳 'root' 或 slotId；找不到回傳 null
  */
 export function findContainer(
@@ -19,7 +20,9 @@ export function findContainer(
     for (const layout of items) {
         for (const slot of layout.slots) {
             if (slot.children.some(c => c.id === itemId)) return slot.id;
-            const found = findContainer(itemId, slot.children);
+            // 只遞迴進入 LayoutNode
+            const layoutChildren = slot.children.filter(isLayoutNode);
+            const found = findContainer(itemId, layoutChildren);
             if (found) return found;
         }
     }
@@ -34,7 +37,8 @@ export function findLayoutById(
     for (const l of items) {
         if (l.id === id) return l;
         for (const s of l.slots) {
-            const found = findLayoutById(id, s.children);
+            const layoutChildren = s.children.filter(isLayoutNode);
+            const found = findLayoutById(id, layoutChildren);
             if (found) return found;
         }
     }
@@ -56,7 +60,8 @@ export function isSlotInsideLayout(
     function check(node: NestedLayout): boolean {
         for (const slot of node.slots) {
             if (slot.id === slotId) return true;
-            for (const child of slot.children) {
+            const layoutChildren = slot.children.filter(isLayoutNode);
+            for (const child of layoutChildren) {
                 if (check(child)) return true;
             }
         }
@@ -67,12 +72,12 @@ export function isSlotInsideLayout(
 
 // ─── 變換（純函式，不 mutate） ───────────────────────────────
 
-/** 遞迴在指定 slot 內插入一個 layout（可指定位置） */
+/** 遞迴在指定 slot 內插入一個 node（layout 或 component，可指定位置） */
 export function insertIntoSlot(
     items: NestedLayout[],
     ownerId: string,
     slotId: string,
-    newLayout: NestedLayout,
+    newNode: CanvasNode,
     atIndex?: number,
 ): NestedLayout[] {
     return items.map(layout => {
@@ -83,7 +88,7 @@ export function insertIntoSlot(
                 slots: layout.slots.map((s, i) => {
                     if (i !== slotIdx) return s;
                     const children = [...s.children];
-                    children.splice(atIndex ?? children.length, 0, newLayout);
+                    children.splice(atIndex ?? children.length, 0, newNode);
                     return { ...s, children };
                 }),
             };
@@ -93,10 +98,10 @@ export function insertIntoSlot(
             slots: layout.slots.map(s => ({
                 ...s,
                 children: insertIntoSlot(
-                    s.children,
+                    s.children.filter(isLayoutNode),
                     ownerId,
                     slotId,
-                    newLayout,
+                    newNode,
                     atIndex,
                 ),
             })),
@@ -104,17 +109,52 @@ export function insertIntoSlot(
     });
 }
 
-/** 遞迴移除某個 layout */
-export function removeItem(items: NestedLayout[], id: string): NestedLayout[] {
+/**
+ * 遞迴找出指定 id 的 CanvasNode（Layout 或 Component）
+ */
+export function findNodeById(
+    id: string,
+    items: NestedLayout[],
+): CanvasNode | null {
+    for (const l of items) {
+        if (l.id === id) return l;
+        for (const s of l.slots) {
+            for (const child of s.children) {
+                if (child.id === id) return child;
+                if (isLayoutNode(child)) {
+                    const found = findNodeById(id, [child]);
+                    if (found) return found;
+                }
+            }
+        }
+    }
+    return null;
+}
+
+/**
+ * 遞迴移除任何 node（layout 或 component）
+ */
+export function removeNode(
+    items: NestedLayout[],
+    id: string,
+): NestedLayout[] {
     return items
         .filter(l => l.id !== id)
         .map(layout => ({
             ...layout,
             slots: layout.slots.map(s => ({
                 ...s,
-                children: removeItem(s.children, id),
+                children: s.children
+                    .filter(c => c.id !== id)
+                    .map(c => (isLayoutNode(c) ? removeNode([c], id)[0] : c))
+                    .filter(Boolean),
             })),
         }));
+}
+
+/** 遞迴移除某個 layout（向後兼容，內部呼叫 removeNode） */
+export function removeItem(items: NestedLayout[], id: string): NestedLayout[] {
+    return removeNode(items, id);
 }
 
 /**
@@ -127,12 +167,14 @@ export function moveItem(
     targetContainerId: string,
     atIndex?: number,
 ): NestedLayout[] {
-    const moving = findLayoutById(activeId, items);
+    const moving = findNodeById(activeId, items);
     if (!moving) return items;
 
-    const withoutActive = removeItem(items, activeId);
+    const withoutActive = removeNode(items, activeId);
 
     if (targetContainerId === 'root') {
+        // 只有 Layout 可以放在 root
+        if (!isLayoutNode(moving)) return items;
         const next = [...withoutActive];
         next.splice(atIndex ?? next.length, 0, moving);
         return next;

@@ -4,13 +4,38 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
     pageId: 'page-1',
     version: 1,
     status: 'published',
-    createdAt: '2026-04-29T07:41:51.148Z',
+    createdAt: '2026-05-04T08:51:02.033Z',
     rootOrder: [
+        '09a9a9a9-fe51-4a2e-90dd-81eabd981b1b',
         '56a1597b-3d13-4e7e-a84d-1a6b349b22a4',
         'dac899bc-26ef-4e9a-9e78-3ab2a77154e7',
         '1f055cb5-cd4c-49a6-b1c5-65b5ecf18815',
     ],
     layouts: {
+        '09a9a9a9-fe51-4a2e-90dd-81eabd981b1b': {
+            id: '09a9a9a9-fe51-4a2e-90dd-81eabd981b1b',
+            type: 'block',
+            label: '塊級 Layout',
+            props: {},
+            spacing: {
+                padding: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0,
+                },
+                margin: {
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    left: 0,
+                },
+            },
+            slotIds: ['573fcec2-1289-467d-9238-0e71ffdc0474'],
+            parentSlotId: null,
+            flexConfig: null,
+            gridConfig: null,
+        },
         '56a1597b-3d13-4e7e-a84d-1a6b349b22a4': {
             id: '56a1597b-3d13-4e7e-a84d-1a6b349b22a4',
             type: 'flex',
@@ -246,6 +271,19 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
         },
     },
     slots: {
+        '573fcec2-1289-467d-9238-0e71ffdc0474': {
+            id: '573fcec2-1289-467d-9238-0e71ffdc0474',
+            childIds: [
+                'c512ad29-e4c8-4647-b759-8349bdedf145',
+                '19d64acd-146a-42ab-b96c-1f5b036bf7af',
+                'bea99c48-e0c3-4515-aad3-a2a669877e8d',
+            ],
+            parentLayoutId: '09a9a9a9-fe51-4a2e-90dd-81eabd981b1b',
+            flexWidthConfig: {
+                flexBasis: 100,
+                widthPx: 400,
+            },
+        },
         'f0b9ef7f-369d-431d-9f36-df0e1f1f9fb1': {
             id: 'f0b9ef7f-369d-431d-9f36-df0e1f1f9fb1',
             childIds: ['77d8b27d-e22a-4771-8ec3-21ac10a7ebab'],
@@ -398,6 +436,54 @@ export const MOCK_PAGE_GRAPH: PageGraph = {
                 flexBasis: 50,
                 widthPx: 200,
             },
+        },
+    },
+    components: {
+        'c512ad29-e4c8-4647-b759-8349bdedf145': {
+            id: 'c512ad29-e4c8-4647-b759-8349bdedf145',
+            componentId: 'H01',
+            label: '基礎標題',
+            data: {
+                title: '義大利-威尼斯(含乘船導覽)一日遊| 米蘭出發',
+                level: 'h2',
+            },
+            style: {
+                align: 'center',
+                color: '#8780ea',
+                fontSize: 30,
+                fontWeight: '700',
+            },
+            parentSlotId: '573fcec2-1289-467d-9238-0e71ffdc0474',
+        },
+        '19d64acd-146a-42ab-b96c-1f5b036bf7af': {
+            id: '19d64acd-146a-42ab-b96c-1f5b036bf7af',
+            componentId: 'H02',
+            label: '帶裝飾標題',
+            data: {
+                title: '專屬推薦',
+                description: '奧捷夏日童話限量倒數',
+                level: 'h2',
+            },
+            style: {
+                underline: true,
+            },
+            parentSlotId: '573fcec2-1289-467d-9238-0e71ffdc0474',
+        },
+        'bea99c48-e0c3-4515-aad3-a2a669877e8d': {
+            id: 'bea99c48-e0c3-4515-aad3-a2a669877e8d',
+            componentId: 'I01',
+            label: '基礎圖片',
+            data: {
+                src: 'https://static.liontech.com.tw/ConsoleAPData/PublicationStatic/lion_tw_b2c/zh-tw/_ModelFile/Product/3866511/a251ac4acaeb4327bd680cc99226ad46.jpg',
+                alt: '圖片',
+            },
+            style: {
+                width: '50%',
+                height: 'auto',
+                borderRadius: '0px',
+                objectFit: 'cover',
+            },
+            parentSlotId: '573fcec2-1289-467d-9238-0e71ffdc0474',
         },
     },
 };

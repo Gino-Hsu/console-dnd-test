@@ -1,9 +1,8 @@
 'use client';
 
 import { useDraggable } from '@dnd-kit/core';
-import type { LayoutSpacing, NestedLayout, SidebarItem } from './types';
+import type { SidebarItem } from './types';
 import { SIDEBAR_ITEMS } from './types';
-import LayoutEditor from './LayoutEditor';
 
 function DraggableSidebarItem({ item }: { item: SidebarItem }) {
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
@@ -49,64 +48,22 @@ function DraggableSidebarItem({ item }: { item: SidebarItem }) {
     );
 }
 
-export default function LayoutSidebar({
-    selectedLayout,
-    onAddSlot,
-    onRemoveSlot,
-    onUpdateSpacing,
-    onUpdateGridDimensions,
-    onUpdateFlexGap,
-    onUpdateFlexRowGap,
-    onUpdateFlexWrap,
-    onDeselect,
-}: {
-    selectedLayout: NestedLayout | null;
-    onAddSlot: (layoutId: string) => void;
-    onRemoveSlot: (layoutId: string, slotId: string) => void;
-    onUpdateSpacing: (layoutId: string, spacing: LayoutSpacing) => void;
-    onUpdateGridDimensions?: (
-        layoutId: string,
-        colWidths: number[],
-        rowHeights: number[],
-        colGap: number | null,
-        rowGap: number | null,
-    ) => void;
-    onUpdateFlexGap?: (layoutId: string, flexGap: number) => void;
-    onUpdateFlexRowGap?: (layoutId: string, flexRowGap: number) => void;
-    onUpdateFlexWrap?: (layoutId: string, flexWrap: boolean) => void;
-    onDeselect: () => void;
-}) {
+export default function LayoutSidebar() {
     return (
-        <aside className='w-64 shrink-0 border-r border-zinc-200 bg-zinc-50 flex flex-col h-full overflow-x-hidden'>
-            {selectedLayout ? (
-                <LayoutEditor
-                    layout={selectedLayout}
-                    onAddSlot={onAddSlot}
-                    onRemoveSlot={onRemoveSlot}
-                    onUpdateSpacing={onUpdateSpacing}
-                    onUpdateGridDimensions={onUpdateGridDimensions}
-                    onUpdateFlexGap={onUpdateFlexGap}
-                    onUpdateFlexRowGap={onUpdateFlexRowGap}
-                    onUpdateFlexWrap={onUpdateFlexWrap}
-                    onDeselect={onDeselect}
-                />
-            ) : (
-                <>
-                    <div className='px-4 py-4 border-b border-zinc-200'>
-                        <h2 className='text-base font-bold text-zinc-800'>
-                            Layout 選單
-                        </h2>
-                        <p className='text-xs text-zinc-500 mt-0.5'>
-                            拖曳元素到右側畫布以新增 Layout
-                        </p>
-                    </div>
-                    <div className='flex flex-col gap-3 p-4 overflow-y-auto overflow-x-hidden'>
-                        {SIDEBAR_ITEMS.map(item => (
-                            <DraggableSidebarItem key={item.type} item={item} />
-                        ))}
-                    </div>
-                </>
-            )}
-        </aside>
+        <>
+            <div className='px-4 py-4 border-b border-zinc-200'>
+                <h2 className='text-base font-bold text-zinc-800'>
+                    Layout 選單
+                </h2>
+                <p className='text-xs text-zinc-500 mt-0.5'>
+                    拖曳元素到右側畫布以新增 Layout
+                </p>
+            </div>
+            <div className='flex flex-col gap-3 p-4 overflow-y-auto overflow-x-hidden'>
+                {SIDEBAR_ITEMS.map(item => (
+                    <DraggableSidebarItem key={item.type} item={item} />
+                ))}
+            </div>
+        </>
     );
 }

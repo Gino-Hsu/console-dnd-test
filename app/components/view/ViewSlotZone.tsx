@@ -1,5 +1,7 @@
 import type { NestedLayout } from '@/types/layout';
+import { isLayoutNode, isComponentNode } from '@/types/layout';
 import ViewLayoutCard from './ViewLayoutCard';
+import ViewComponentCard from './ViewComponentCard';
 
 export default function ViewSlotZone({
     slot,
@@ -25,9 +27,20 @@ export default function ViewSlotZone({
                     .filter(Boolean)
                     .join(' ')}
             >
-                {slot.children.map(child => (
-                    <ViewLayoutCard key={child.id} layout={child} />
-                ))}
+                {slot.children.map(child => {
+                    if (isLayoutNode(child)) {
+                        return <ViewLayoutCard key={child.id} layout={child} />;
+                    }
+                    if (isComponentNode(child)) {
+                        return (
+                            <ViewComponentCard
+                                key={child.id}
+                                component={child}
+                            />
+                        );
+                    }
+                    return null;
+                })}
             </div>
         </div>
     );
