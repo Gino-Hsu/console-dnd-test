@@ -1,3 +1,5 @@
+import type { ComponentId } from "@/lib/component-registry/component-ids";
+
 /**
  * Inspector 元件的 Props 定義
  */
@@ -16,6 +18,4 @@ export type InspectorComponent = React.ComponentType<InspectorProps>;
 /**
  * Inspector 註冊表類型
  */
-export interface InspectorRegistry {
-    [componentId: string]: InspectorComponent;
-}
+export type InspectorRegistry = Record<ComponentId, InspectorComponent>;
