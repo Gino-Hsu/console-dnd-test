@@ -1,3 +1,4 @@
+import { COMPONENT_IDS, type ComponentId } from '@/lib/component-registry/component-ids';
 import type { InspectorRegistry } from './types';
 
 // Heading inspectors
@@ -12,23 +13,23 @@ import ImageSimpleInspector from './images/ImageSimpleInspector';
  */
 export const inspectorRegistry: InspectorRegistry = {
     // Heading
-    H01: HeadingSimpleInspector,
-    H02: HeadingDividedInspector,
+    [COMPONENT_IDS.H01]: HeadingSimpleInspector,
+    [COMPONENT_IDS.H02]: HeadingDividedInspector,
 
     // Image
-    I01: ImageSimpleInspector,
-};
+    [COMPONENT_IDS.I01]: ImageSimpleInspector,
+} as const;
 
 /**
  * 取得 Inspector 元件
  */
-export function getInspector(componentId: string) {
+export function getInspector(componentId: ComponentId) {
     return inspectorRegistry[componentId];
 }
 
 /**
  * 檢查是否有註冊 Inspector
  */
-export function hasInspector(componentId: string): boolean {
+export function hasInspector(componentId: ComponentId): boolean {
     return componentId in inspectorRegistry;
 }

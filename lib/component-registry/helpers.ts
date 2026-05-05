@@ -4,6 +4,7 @@
 
 import { componentRegistry } from "./registry";
 import { categories } from "./categories";
+import type { ComponentId } from "./component-ids";
 import type {
     CategoryDefinition,
     ComponentConfig,
@@ -47,14 +48,16 @@ export function searchComponents(query: string): ComponentConfig[] {
 /**
  * 根據 componentId 取得元件配置
  */
-export function getComponentConfig(componentId: string): ComponentConfig | undefined {
+export function getComponentConfig(
+    componentId: ComponentId,
+): ComponentConfig | undefined {
     return componentRegistry[componentId];
 }
 
 /**
  * 根據 componentId 取得可渲染的 React 元件
  */
-export function getComponent(componentId: string) {
+export function getComponent(componentId: ComponentId) {
     return componentRegistry[componentId]?.component;
 }
 
@@ -77,7 +80,7 @@ export function getCategory(
 /**
  * 檢查元件是否存在
  */
-export function hasComponent(componentId: string): boolean {
+export function hasComponent(componentId: ComponentId): boolean {
     return componentId in componentRegistry;
 }
 
