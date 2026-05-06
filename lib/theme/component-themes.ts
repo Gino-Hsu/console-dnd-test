@@ -1,6 +1,6 @@
 /**
  * Component Category 主题配色
- * 
+ *
  * 此文件定义了不同 category 的 UI 样式主题
  * 所有与 component 显示相关的颜色配置都集中在这里管理
  */
@@ -34,6 +34,7 @@ export const CATEGORY_THEMES: Record<string, CategoryTheme> = {
  */
 export const DEFAULT_THEME: CategoryTheme = {
     bgColor: 'bg-zinc-50',
+    bgColorDark: 'bg-zinc-200',
     borderColor: 'border-zinc-300',
 };
 

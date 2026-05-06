@@ -30,7 +30,6 @@ export default function ViewLayoutCard({
                 paddingBottom: mb,
                 paddingLeft: ml,
             }}
-            className={` ${hasMargin ? 'bg-amber-100/60 outline-dashed outline-1 outline-amber-300' : ''}`}
         >
             <div
                 className={`border-2 ${borderColor} ${bgColor}`}

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     createLayout,
     insertIntoSlot,
@@ -14,18 +14,44 @@ import type {
     LayoutSpacing,
     LayoutType,
     NestedLayout,
+    PageGraph,
     SlotAlign,
 } from '@/types/layout';
 import { graphToTree } from '@/lib/layout';
-import { MOCK_PAGE_GRAPH } from '@/app/mockData';
+import getPageGraph from '@/app/api/getPageGraph';
+
+const PAGE_API = 'http://localhost:3001/pages/page-1';
 
 export function useLayoutEditor() {
-    const [layouts, setLayouts] = useState<NestedLayout[]>(() =>
-        graphToTree(MOCK_PAGE_GRAPH),
-    );
+    const [layouts, setLayouts] = useState<NestedLayout[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [loadError, setLoadError] = useState<string | null>(null);
     const [selectedLayoutId, setSelectedLayoutId] = useState<string | null>(
         null,
     );
+
+    useEffect(() => {
+        let cancelled = false;
+        setIsLoading(true);
+        setLoadError(null);
+        getPageGraph()
+            .then(graph => {
+                if (!cancelled) {
+                    setLayouts(graphToTree(graph));
+                    setIsLoading(false);
+                }
+            })
+            .catch(err => {
+                if (!cancelled) {
+                    console.error('[useLayoutEditor] 載入失敗', err);
+                    setLoadError(String(err));
+                    setIsLoading(false);
+                }
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     const selectedLayout = selectedLayoutId
         ? findLayout(selectedLayoutId, layouts)
@@ -228,6 +254,8 @@ export function useLayoutEditor() {
     return {
         layouts,
         setLayouts,
+        isLoading,
+        loadError,
         selectedLayoutId,
         selectedLayout,
         handleRemove,
