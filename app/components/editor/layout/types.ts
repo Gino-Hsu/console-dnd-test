@@ -23,6 +23,12 @@ export interface SharedProps {
         slotId: string,
         widthPx: number,
     ) => void;
+    /** 更新 slot 內容水平對齊 */
+    onUpdateSlotAlign?: (
+        layoutId: string,
+        slotId: string,
+        align: import('@/types/layout').SlotAlign,
+    ) => void;
 }
 
 /** SharedProps + ownerId，傳給 SlotZone */

@@ -35,6 +35,8 @@ export default function DndBuilder() {
     const {
         layouts,
         setLayouts,
+        isLoading,
+        loadError,
         selectedLayoutId,
         selectedLayout,
         handleRemove,
@@ -48,6 +50,7 @@ export default function DndBuilder() {
         handleUpdateFlexGap,
         handleUpdateFlexWrap,
         handleUpdateFlexRowGap,
+        handleUpdateSlotAlign,
         deselectLayout,
     } = useLayoutEditor();
 
@@ -370,6 +373,51 @@ export default function DndBuilder() {
               : 'border-emerald-400 bg-emerald-100 text-emerald-700'
         : '';
 
+    if (isLoading) {
+        return (
+            <div className='flex h-screen w-full items-center justify-center bg-zinc-50'>
+                <div className='text-center text-zinc-400'>
+                    <svg
+                        className='animate-spin mx-auto mb-3'
+                        width='28'
+                        height='28'
+                        viewBox='0 0 28 28'
+                        fill='none'
+                        stroke='currentColor'
+                        strokeWidth='2.5'
+                    >
+                        <path
+                            d='M14 3a11 11 0 1 1-7.778 3.222'
+                            strokeLinecap='round'
+                        />
+                    </svg>
+                    <p className='text-sm font-medium'>載入中…</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (loadError) {
+        return (
+            <div className='flex h-screen w-full items-center justify-center bg-zinc-50'>
+                <div className='text-center text-zinc-400'>
+                    <p className='text-2xl mb-2'>⚠️</p>
+                    <p className='font-medium text-zinc-600'>
+                        無法載入頁面資料
+                    </p>
+                    <p className='text-sm mt-1'>
+                        請確認{' '}
+                        <code className='bg-zinc-100 px-1 rounded'>
+                            pnpm db
+                        </code>{' '}
+                        已在執行中
+                    </p>
+                    <p className='text-xs mt-2 text-zinc-300'>{loadError}</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <DndContext
             id={dndId}
@@ -410,6 +458,7 @@ export default function DndBuilder() {
                     onUpdateSlotWidths={handleUpdateSlotWidths}
                     onUpdateGridDimensions={handleUpdateGridDimensions}
                     onUpdateWrapSlotWidth={handleUpdateWrapSlotWidth}
+                    onUpdateSlotAlign={handleUpdateSlotAlign}
                 />
             </div>
 

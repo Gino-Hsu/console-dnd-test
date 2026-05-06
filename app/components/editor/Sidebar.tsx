@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import LayoutSidebar from './LayoutSidebar';
+import LayoutSidebar from './layout/LayoutSidebar';
 import ComponentSidebar from './component/ComponentSidebar';
-import LayoutEditor from './LayoutEditor';
+import LayoutEditor from './layout/LayoutEditor';
 import ComponentEditor from './component/ComponentEditor';
 import type { LayoutSpacing, NestedLayout, ComponentNode } from './types';
 
@@ -36,8 +36,14 @@ export default function Sidebar({
     onUpdateFlexGap?: (layoutId: string, flexGap: number) => void;
     onUpdateFlexRowGap?: (layoutId: string, flexRowGap: number) => void;
     onUpdateFlexWrap?: (layoutId: string, flexWrap: boolean) => void;
-    onUpdateComponentData: (componentId: string, data: Record<string, unknown>) => void;
-    onUpdateComponentStyle: (componentId: string, style: Record<string, unknown>) => void;
+    onUpdateComponentData: (
+        componentId: string,
+        data: Record<string, unknown>,
+    ) => void;
+    onUpdateComponentStyle: (
+        componentId: string,
+        style: Record<string, unknown>,
+    ) => void;
     onDeselect: () => void;
 }) {
     const [activeTab, setActiveTab] = useState<'layouts' | 'components'>(
