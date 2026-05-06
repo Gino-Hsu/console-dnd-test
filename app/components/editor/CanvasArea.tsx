@@ -7,8 +7,7 @@ import {
 } from '@dnd-kit/sortable';
 import { useCallback, useState } from 'react';
 import LayoutCard from './layout/LayoutCard';
-import type { NestedLayout } from './types';
-import { flattenToGraph } from './types';
+import type { NestedLayout, PageGraph } from './types';
 
 /*  插入線  */
 export function InsertLine() {
@@ -24,6 +23,7 @@ export function InsertLine() {
 
 /*  畫布主元件  */
 export default function CanvasArea({
+  graph,
   layouts,
   onRemove,
   onSelect,
@@ -37,6 +37,7 @@ export default function CanvasArea({
   onUpdateWrapSlotWidth,
   onUpdateSlotAlign,
 }: {
+  graph: PageGraph | null;
   layouts: NestedLayout[];
   onRemove: (id: string) => void;
   onSelect: (id: string) => void;
@@ -73,16 +74,17 @@ export default function CanvasArea({
   const [publishState, setPublishState] = useState<PublishState>('idle');
 
   const handlePublish = useCallback(async () => {
+    if (!graph) return;
+
     setPublishState('loading');
     const now = new Date().toISOString();
-    const meta = {
-      pageId: 'page-1',
-      version: 1,
+
+    // 直接使用 SSOT 的 graph，僅更新 metadata
+    const pageGraph = {
+      ...graph,
       status: 'published' as const,
       createdAt: now,
     };
-
-    const pageGraph = flattenToGraph(layouts, meta);
 
     try {
       const res = await fetch('http://localhost:3001/pages/page-1', {
@@ -99,7 +101,7 @@ export default function CanvasArea({
       setPublishState('error');
       setTimeout(() => setPublishState('idle'), 3000);
     }
-  }, [layouts]);
+  }, [graph]);
 
   return (
     <main className="flex-1 flex flex-col h-full overflow-hidden">

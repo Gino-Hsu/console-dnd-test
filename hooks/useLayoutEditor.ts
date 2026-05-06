@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import {
   createLayout,
   insertIntoSlot,
@@ -15,12 +15,14 @@ import type {
   LayoutType,
   NestedLayout,
   SlotAlign,
+  PageGraph,
 } from '@/types/layout';
-import { graphToTree } from '@/lib/layout';
+import { graphToTree, flattenToGraph } from '@/lib/layout';
 import getPageGraph from '@/app/api/getPageGraph';
 
 export function useLayoutEditor() {
-  const [layouts, setLayouts] = useState<NestedLayout[]>([]);
+  // SSOT: 以扁平的 PageGraph 作為唯一狀態來源
+  const [graph, setGraph] = useState<PageGraph | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [selectedLayoutId, setSelectedLayoutId] = useState<string | null>(null);
@@ -33,10 +35,10 @@ export function useLayoutEditor() {
         setIsLoading(true);
         setLoadError(null);
 
-        const graph = await getPageGraph();
+        const fetchedGraph = await getPageGraph();
 
         if (!cancelled) {
-          setLayouts(graphToTree(graph));
+          setGraph(fetchedGraph);
         }
       } catch (err) {
         if (!cancelled) {
@@ -55,6 +57,30 @@ export function useLayoutEditor() {
       cancelled = true;
     };
   }, []);
+
+  // Selector: 動態產出 tree 供畫面渲染
+  const layouts = useMemo(() => {
+    return graph ? graphToTree(graph) : [];
+  }, [graph]);
+
+  // Updater: 修改 tree 然後同步回 graph (維持舊有 API 相容性)
+  const setLayouts = useCallback(
+    (updater: NestedLayout[] | ((prev: NestedLayout[]) => NestedLayout[])) => {
+      setGraph(prevGraph => {
+        if (!prevGraph) return prevGraph;
+        const currentTree = graphToTree(prevGraph);
+        const nextTree =
+          typeof updater === 'function' ? updater(currentTree) : updater;
+        return flattenToGraph(nextTree, {
+          pageId: prevGraph.pageId,
+          version: prevGraph.version,
+          status: prevGraph.status,
+          createdAt: prevGraph.createdAt,
+        });
+      });
+    },
+    [],
+  );
 
   const selectedLayout = selectedLayoutId
     ? findLayout(selectedLayoutId, layouts)
@@ -250,6 +276,7 @@ export function useLayoutEditor() {
   );
 
   return {
+    graph,
     layouts,
     setLayouts,
     isLoading,

@@ -33,6 +33,7 @@ import { isLayoutNode } from '@/types/layout';
 
 export default function DndBuilder() {
   const {
+    graph,
     layouts,
     setLayouts,
     isLoading,
@@ -429,6 +430,7 @@ export default function DndBuilder() {
           }}
         />
         <CanvasArea
+          graph={graph}
           layouts={layouts}
           onRemove={handleRemove}
           onSelect={handleSelect}
