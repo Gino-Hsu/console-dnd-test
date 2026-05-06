@@ -6,7 +6,7 @@ import type {
     ComponentNode,
 } from '@/types/layout';
 import { DEFAULT_SPACING, LAYOUT_CONFIG, isLayoutNode } from '@/types/layout';
-import { getComponentConfig } from '@/lib/component-registry';
+import { getComponentConfig, type ComponentId } from '@/lib/component-registry';
 
 export function genId(): string {
     return uuidv4();
@@ -54,7 +54,7 @@ export function createLayout(type: LayoutType, label: string): NestedLayout {
  * @returns ComponentNode
  */
 export function createComponent(
-    componentId: string,
+    componentId: ComponentId,
     label: string,
 ): ComponentNode {
     const config = getComponentConfig(componentId);
