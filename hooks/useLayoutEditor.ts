@@ -79,35 +79,47 @@ export function useLayoutEditor() {
         });
       });
     },
-    [],
+    [setGraph],
   );
 
   const selectedLayout = selectedLayoutId
     ? findLayout(selectedLayoutId, layouts)
     : null;
 
-  const handleRemove = useCallback((id: string) => {
-    setLayouts(prev => removeItem(prev, id));
-    setSelectedLayoutId(null);
-  }, []);
+  const handleRemove = useCallback(
+    (id: string) => {
+      setLayouts(prev => removeItem(prev, id));
+      setSelectedLayoutId(null);
+    },
+    [setLayouts, setSelectedLayoutId],
+  );
 
-  const handleSelect = useCallback((id: string) => {
-    setSelectedLayoutId(prev => (prev === id ? null : id));
-  }, []);
+  const handleSelect = useCallback(
+    (id: string) => {
+      setSelectedLayoutId(prev => (prev === id ? null : id));
+    },
+    [setSelectedLayoutId],
+  );
 
-  const handleAddSlot = useCallback((layoutId: string) => {
-    setLayouts(prev => addSlotToLayout(prev, layoutId));
-  }, []);
+  const handleAddSlot = useCallback(
+    (layoutId: string) => {
+      setLayouts(prev => addSlotToLayout(prev, layoutId));
+    },
+    [setLayouts],
+  );
 
-  const handleRemoveSlot = useCallback((layoutId: string, slotId: string) => {
-    setLayouts(prev => removeSlotFromLayout(prev, layoutId, slotId));
-  }, []);
+  const handleRemoveSlot = useCallback(
+    (layoutId: string, slotId: string) => {
+      setLayouts(prev => removeSlotFromLayout(prev, layoutId, slotId));
+    },
+    [setLayouts],
+  );
 
   const handleUpdateSpacing = useCallback(
     (layoutId: string, spacing: LayoutSpacing) => {
       setLayouts(prev => updateField(prev, layoutId, { spacing }));
     },
-    [],
+    [setLayouts],
   );
 
   const handleUpdateSlotWidths = useCallback(
@@ -128,7 +140,7 @@ export function useLayoutEditor() {
         }),
       );
     },
-    [],
+    [setLayouts],
   );
 
   const handleUpdateWrapSlotWidth = useCallback(
@@ -153,7 +165,7 @@ export function useLayoutEditor() {
         }),
       );
     },
-    [],
+    [setLayouts],
   );
 
   const handleUpdateGridDimensions = useCallback(
@@ -179,16 +191,21 @@ export function useLayoutEditor() {
         }),
       );
     },
-    [],
+    [setLayouts],
   );
 
-  const handleUpdateFlexGap = useCallback((layoutId: string, gap: number) => {
-    setLayouts(prev =>
-      mapLayouts(prev, l =>
-        l.id === layoutId ? { ...l, flexConfig: { ...l.flexConfig!, gap } } : l,
-      ),
-    );
-  }, []);
+  const handleUpdateFlexGap = useCallback(
+    (layoutId: string, gap: number) => {
+      setLayouts(prev =>
+        mapLayouts(prev, l =>
+          l.id === layoutId
+            ? { ...l, flexConfig: { ...l.flexConfig!, gap } }
+            : l,
+        ),
+      );
+    },
+    [setLayouts],
+  );
 
   const handleUpdateFlexWrap = useCallback(
     (layoutId: string, wrap: boolean) => {
@@ -200,7 +217,7 @@ export function useLayoutEditor() {
         ),
       );
     },
-    [],
+    [setLayouts],
   );
 
   const handleUpdateFlexRowGap = useCallback(
@@ -213,7 +230,7 @@ export function useLayoutEditor() {
         ),
       );
     },
-    [],
+    [setLayouts],
   );
 
   const handleUpdateSlotAlign = useCallback(
@@ -228,7 +245,7 @@ export function useLayoutEditor() {
         }),
       );
     },
-    [],
+    [setLayouts],
   );
 
   const applyMove = useCallback(
@@ -241,7 +258,7 @@ export function useLayoutEditor() {
         moveItem(prev, activeId, targetContainer, index ?? undefined),
       );
     },
-    [],
+    [setLayouts],
   );
 
   const applySidebarDrop = useCallback(
@@ -272,7 +289,7 @@ export function useLayoutEditor() {
         });
       }
     },
-    [],
+    [setLayouts],
   );
 
   return {
