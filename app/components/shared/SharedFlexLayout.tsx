@@ -29,7 +29,7 @@ export default function SharedFlexLayout(props: SharedFlexLayoutProps) {
     return (
         <div
             ref={props.mode === 'edit' ? props.containerRef : undefined}
-            className='flex flex-row'
+            className='flex flex-row w-full'
             style={{
                 flexWrap: isWrap ? 'wrap' : 'nowrap',
                 ...(isWrap

@@ -137,7 +137,7 @@ export default function SlotZone({
                                 <InsertLine />
                             )}
                             <div
-                                className={`flex items-center justify-center h-full text-xs transition-colors ${
+                                className={`w-full flex items-center justify-center h-full text-xs transition-colors ${
                                     atMaxDepth
                                         ? 'text-zinc-300'
                                         : isOver
@@ -157,7 +157,11 @@ export default function SlotZone({
                             )}
                             {slot.children.map((child, idx) => {
                                 return (
-                                    <div key={child.id} data-canvas-item>
+                                    <div
+                                        key={child.id}
+                                        data-canvas-item
+                                        className='w-full'
+                                    >
                                         <div className='py-1'>
                                             {isLayoutNode(child) ? (
                                                 <LayoutCard
