@@ -17,8 +17,17 @@ export default function LayoutHeader({
     onRemove: (id: string) => void;
     onSelect: (id: string) => void;
 }) {
-    const isBlock = layout.type === 'block';
-    const isFlex = layout.type === 'flex';
+    const nameMap = {
+        block: 'Block',
+        flex: 'Flex',
+        grid: 'Grid',
+    };
+
+    const styleMap = {
+        block: 'bg-violet-200 text-violet-700',
+        flex: 'bg-sky-200 text-sky-700',
+        grid: 'bg-emerald-200 text-emerald-700',
+    };
 
     return (
         <div
@@ -48,14 +57,10 @@ export default function LayoutHeader({
 
             <span
                 className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ${
-                    isBlock
-                        ? 'bg-violet-200 text-violet-700'
-                        : isFlex
-                          ? 'bg-sky-200 text-sky-700'
-                          : 'bg-emerald-200 text-emerald-700'
+                    styleMap[layout.type]
                 }`}
             >
-                {isBlock ? 'Block' : isFlex ? 'Flex' : 'Grid'}
+                {nameMap[layout.type]}
             </span>
 
             <span className='text-sm font-semibold text-zinc-700 flex-1 truncate'>

@@ -1,8 +1,8 @@
 'use client';
 
 import { useDraggable } from '@dnd-kit/core';
-import type { SidebarItem } from './types';
-import { SIDEBAR_ITEMS } from './types';
+import type { SidebarItem } from '../types';
+import { SIDEBAR_ITEMS } from '../types';
 
 function DraggableSidebarItem({ item }: { item: SidebarItem }) {
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({

@@ -5,9 +5,9 @@ import {
     SortableContext,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import LayoutCard from './layout/LayoutCard';
-import type { NestedLayout, PageVersion } from './types';
+import type { NestedLayout } from './types';
 import { flattenToGraph } from './types';
 
 /*  插入線  */
@@ -35,6 +35,7 @@ export default function CanvasArea({
     onUpdateSlotWidths,
     onUpdateGridDimensions,
     onUpdateWrapSlotWidth,
+    onUpdateSlotAlign,
 }: {
     layouts: NestedLayout[];
     onRemove: (id: string) => void;
@@ -57,13 +58,22 @@ export default function CanvasArea({
         slotId: string,
         widthPx: number,
     ) => void;
+    onUpdateSlotAlign?: (
+        layoutId: string,
+        slotId: string,
+        align: import('@/types/layout').SlotAlign,
+    ) => void;
 }) {
     const { setNodeRef, isOver } = useDroppable({
         id: 'canvas-root',
         data: { type: 'canvas', depth: 0 },
     });
 
-    const handlePublish = useCallback(() => {
+    type PublishState = 'idle' | 'loading' | 'success' | 'error';
+    const [publishState, setPublishState] = useState<PublishState>('idle');
+
+    const handlePublish = useCallback(async () => {
+        setPublishState('loading');
         const now = new Date().toISOString();
         const meta = {
             pageId: 'page-1',
@@ -72,19 +82,23 @@ export default function CanvasArea({
             createdAt: now,
         };
 
-        // 原始巢狀結構（保留備用）
-        const pageVersion: PageVersion = { ...meta, data: layouts };
-
-        // 扁平化 Graph（O(1) 查詢）
         const pageGraph = flattenToGraph(layouts, meta);
 
-        console.log('📦 PageVersion (nested):', pageVersion);
-        console.log('🗂️  PageGraph  (flat)   :', pageGraph);
-        console.log(
-            `   layouts: ${Object.keys(pageGraph.layouts).length} 個`,
-            `| slots: ${Object.keys(pageGraph.slots).length} 個`,
-            `| rootOrder: [${pageGraph.rootOrder.join(', ')}]`,
-        );
+        try {
+            const res = await fetch('http://localhost:3001/pages/page-1', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(pageGraph),
+            });
+            if (!res.ok) throw new Error(`Server returned ${res.status}`);
+            setPublishState('success');
+            setTimeout(() => setPublishState('idle'), 2000);
+            window.open('/frontpage', '_blank');
+        } catch (err) {
+            console.error('發布失敗', err);
+            setPublishState('error');
+            setTimeout(() => setPublishState('idle'), 3000);
+        }
     }, [layouts]);
 
     return (
@@ -98,22 +112,82 @@ export default function CanvasArea({
                 </div>
                 <button
                     onClick={handlePublish}
-                    className='flex items-center gap-2 px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold transition-colors shadow-sm'
+                    disabled={publishState === 'loading'}
+                    className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-white text-sm font-semibold transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed ${
+                        publishState === 'success'
+                            ? 'bg-green-600'
+                            : publishState === 'error'
+                              ? 'bg-red-600'
+                              : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
+                    }`}
                 >
-                    <svg
-                        width='14'
-                        height='14'
-                        viewBox='0 0 14 14'
-                        fill='none'
-                        stroke='currentColor'
-                        strokeWidth='2'
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                    >
-                        <path d='M7 1v8M4 6l3 3 3-3' />
-                        <path d='M1 10v1a2 2 0 002 2h8a2 2 0 002-2v-1' />
-                    </svg>
-                    發布
+                    {publishState === 'loading' ? (
+                        <>
+                            <svg
+                                className='animate-spin'
+                                width='14'
+                                height='14'
+                                viewBox='0 0 14 14'
+                                fill='none'
+                                stroke='currentColor'
+                                strokeWidth='2'
+                            >
+                                <path
+                                    d='M7 1a6 6 0 1 1-4.243 1.757'
+                                    strokeLinecap='round'
+                                />
+                            </svg>
+                            發布中…
+                        </>
+                    ) : publishState === 'success' ? (
+                        <>
+                            <svg
+                                width='14'
+                                height='14'
+                                viewBox='0 0 14 14'
+                                fill='none'
+                                stroke='currentColor'
+                                strokeWidth='2'
+                                strokeLinecap='round'
+                                strokeLinejoin='round'
+                            >
+                                <path d='M2 7l4 4 6-6' />
+                            </svg>
+                            已發布
+                        </>
+                    ) : publishState === 'error' ? (
+                        <>
+                            <svg
+                                width='14'
+                                height='14'
+                                viewBox='0 0 14 14'
+                                fill='none'
+                                stroke='currentColor'
+                                strokeWidth='2'
+                                strokeLinecap='round'
+                            >
+                                <path d='M7 2v5M7 10v1' />
+                            </svg>
+                            發布失敗
+                        </>
+                    ) : (
+                        <>
+                            <svg
+                                width='14'
+                                height='14'
+                                viewBox='0 0 14 14'
+                                fill='none'
+                                stroke='currentColor'
+                                strokeWidth='2'
+                                strokeLinecap='round'
+                                strokeLinejoin='round'
+                            >
+                                <path d='M7 1v8M4 6l3 3 3-3' />
+                                <path d='M1 10v1a2 2 0 002 2h8a2 2 0 002-2v-1' />
+                            </svg>
+                            發布
+                        </>
+                    )}
                 </button>
             </div>
 
@@ -167,6 +241,9 @@ export default function CanvasArea({
                                             }
                                             onUpdateWrapSlotWidth={
                                                 onUpdateWrapSlotWidth
+                                            }
+                                            onUpdateSlotAlign={
+                                                onUpdateSlotAlign
                                             }
                                         />
                                         {insertIndex === index + 1 && (
