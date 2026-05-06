@@ -12,6 +12,9 @@ export type {
 // 分類
 export { CATEGORIES, categories, type CategoryId } from "./categories";
 
+// Component IDs
+export { COMPONENT_IDS, type ComponentId } from "./component-ids";
+
 // 註冊表
 export { componentRegistry } from "./registry";
 

@@ -28,6 +28,7 @@ import {
 } from '@/lib/layout';
 import Sidebar from './Sidebar';
 import type { LayoutType } from '@/types/layout';
+import type { ComponentId } from '@/lib/component-registry/component-ids';
 import { isLayoutNode } from '@/types/layout';
 
 export default function DndBuilder() {
@@ -232,7 +233,7 @@ export default function DndBuilder() {
                     // Component 只能拖進 slot，不能放在 root
                     if (overData?.type === 'slot') {
                         const newComponent = createComponent(
-                            activeData.componentId as string,
+                            activeData.componentId as ComponentId,
                             activeData.label as string,
                         );
                         const slotId = over.id as string;

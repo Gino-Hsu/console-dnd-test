@@ -1,5 +1,7 @@
 // ─── 基礎型別 ────────────────────────────────────────────────
 
+import type { ComponentId } from "@/lib/component-registry/component-ids";
+
 export type LayoutType = 'block' | 'flex' | 'grid';
 
 export interface LayoutItem {
@@ -13,7 +15,7 @@ export interface LayoutItem {
 export interface ComponentNode {
     id: string;
     type: 'component';
-    componentId: string;
+    componentId: ComponentId;
     label: string;
     data: Record<string, unknown>;
     style: Record<string, unknown>;
