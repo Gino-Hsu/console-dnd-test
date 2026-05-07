@@ -33,7 +33,7 @@ export default function SharedGridLayout(props: SharedGridLayoutProps) {
     return (
         <div
             ref={props.mode === 'edit' ? props.containerRef : undefined}
-            className='relative h-fit'
+            className='relative h-fit w-full'
             style={gridContainerStyle(layout.gridConfig, cols, defColW)}
         >
             {layout.slots.map(slot =>
