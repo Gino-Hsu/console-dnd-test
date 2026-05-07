@@ -95,16 +95,21 @@ export function insertIntoSlot(
         }
         return {
             ...layout,
-            slots: layout.slots.map(s => ({
-                ...s,
-                children: insertIntoSlot(
-                    s.children.filter(isLayoutNode),
+            slots: layout.slots.map(s => {
+                const components = s.children.filter(c => !isLayoutNode(c));
+                const layouts = s.children.filter(isLayoutNode);
+                const updatedLayouts = insertIntoSlot(
+                    layouts,
                     ownerId,
                     slotId,
                     newNode,
                     atIndex,
-                ),
-            })),
+                );
+                return {
+                    ...s,
+                    children: [...components, ...updatedLayouts],
+                };
+            }),
         };
     });
 }
@@ -142,13 +147,15 @@ export function removeNode(
         .filter(l => l.id !== id)
         .map(layout => ({
             ...layout,
-            slots: layout.slots.map(s => ({
-                ...s,
-                children: s.children
-                    .filter(c => c.id !== id)
-                    .map(c => (isLayoutNode(c) ? removeNode([c], id)[0] : c))
-                    .filter(Boolean),
-            })),
+            slots: layout.slots.map(s => {
+                const components = s.children.filter(c => !isLayoutNode(c) && c.id !== id);
+                const layouts = s.children.filter(isLayoutNode);
+                const updatedLayouts = removeNode(layouts, id);
+                return {
+                    ...s,
+                    children: [...components, ...updatedLayouts],
+                };
+            }),
         }));
 }
 
