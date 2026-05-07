@@ -19,7 +19,7 @@ export interface ImageSimpleProps {
 
 // 匯出預設資料供後台使用
 export const DEFAULT_IMAGE_SIMPLE_DATA: ImageSimpleData = {
-    src: "https://picsum.photos/id/100/200/200.jpg",
+    src: "/default.png",
     alt: "圖片",
 };
 
