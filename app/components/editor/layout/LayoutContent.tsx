@@ -30,7 +30,7 @@ export default function LayoutContent({
     isDragging: boolean;
     depth: number;
 }) {
-    if (layout.type === 'block') {
+    if (layout.layoutType === 'block') {
         return (
             <BlockLayout
                 slots={layout.slots}
@@ -40,7 +40,7 @@ export default function LayoutContent({
             />
         );
     }
-    if (layout.type === 'flex') {
+    if (layout.layoutType === 'flex') {
         return (
             <FlexLayout
                 layout={layout}
@@ -52,7 +52,7 @@ export default function LayoutContent({
             />
         );
     }
-    if (layout.type === 'grid') {
+    if (layout.layoutType === 'grid') {
         return (
             <GridLayout
                 layout={layout}

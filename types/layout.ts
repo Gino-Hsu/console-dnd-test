@@ -95,14 +95,15 @@ export interface GridConfig {
 
 export interface NestedLayout {
     id: string;
-    type: LayoutType;
+    type: 'layout';
+    layoutType: LayoutType;
     label: string;
     props: Record<string, unknown>;
     slots: Slot[];
     spacing: LayoutSpacing;
-    /** flex layout 專用設定（type !== 'flex' 時為 null） */
+    /** flex layout 專用設定（layoutType !== 'flex' 時為 null） */
     flexConfig: FlexConfig | null;
-    /** grid layout 專用設定（type !== 'grid' 時為 null） */
+    /** grid layout 專用設定（layoutType !== 'grid' 時為 null） */
     gridConfig: GridConfig | null;
 }
 
@@ -124,15 +125,16 @@ export type PageVersion = {
  */
 export interface FlatLayout {
     id: string;
-    type: LayoutType;
+    type: 'layout';
+    layoutType: LayoutType;
     label: string;
     props: Record<string, unknown>;
     spacing: LayoutSpacing;
     slotIds: string[];
     parentSlotId: string | null;
-    /** flex layout 專用設定（type !== 'flex' 時為 null） */
+    /** flex layout 專用設定（layoutType !== 'flex' 時為 null） */
     flexConfig: FlexConfig | null;
-    /** grid layout 專用設定（type !== 'grid' 時為 null） */
+    /** grid layout 專用設定（layoutType !== 'grid' 時為 null） */
     gridConfig: GridConfig | null;
 }
 
@@ -157,6 +159,7 @@ export interface FlatSlot {
  */
 export interface FlatComponent {
     id: string;
+    type: 'component';
     componentId: ComponentId;
     label: string;
     data: Record<string, unknown>;
@@ -207,7 +210,7 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
 // ─── Type Guards ─────────────────────────────────────────────────
 
 export function isLayoutNode(node: CanvasNode): node is NestedLayout {
-    return 'slots' in node;
+    return node.type === 'layout';
 }
 
 export function isComponentNode(node: CanvasNode): node is ComponentNode {

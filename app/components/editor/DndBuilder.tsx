@@ -15,6 +15,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useLayoutEditor } from '@/hooks/useLayoutEditor';
 import { useComponentEditor } from '@/hooks/useComponentEditor';
 import CanvasArea from './CanvasArea';
+import DragOverlayContent from './common/DragOverlayContent';
 import {
     createLayout,
     createComponent,
@@ -347,31 +348,9 @@ export default function DndBuilder() {
 
     console.log('layouts', layouts);
 
-    const overlayLabel =
-        activeSidebarType === 'block'
-            ? '塊級 Layout'
-            : activeSidebarType === 'flex'
-              ? 'Flex Layout'
-              : 'Grid Layout';
-
-    const overlayColor =
-        activeSidebarType === 'block'
-            ? 'border-violet-400 bg-violet-100 text-violet-700'
-            : activeSidebarType === 'flex'
-              ? 'border-sky-400 bg-sky-100 text-sky-700'
-              : 'border-emerald-400 bg-emerald-100 text-emerald-700';
-
     const activeCanvasLayout = activeCanvasId
         ? findLayoutById(activeCanvasId, layouts)
         : null;
-
-    const canvasOverlayColor = activeCanvasLayout
-        ? activeCanvasLayout.type === 'block'
-            ? 'border-violet-400 bg-violet-100 text-violet-700'
-            : activeCanvasLayout.type === 'flex'
-              ? 'border-sky-400 bg-sky-100 text-sky-700'
-              : 'border-emerald-400 bg-emerald-100 text-emerald-700'
-        : '';
 
     if (isLoading) {
         return (
@@ -463,19 +442,10 @@ export default function DndBuilder() {
             </div>
 
             <DragOverlay dropAnimation={null}>
-                {activeSidebarType ? (
-                    <div
-                        className={`rounded-lg border-2 px-4 py-3 shadow-lg font-semibold text-sm ${overlayColor}`}
-                    >
-                        {overlayLabel}
-                    </div>
-                ) : activeCanvasLayout ? (
-                    <div
-                        className={`rounded-lg border-2 px-4 py-3 shadow-lg font-semibold text-sm opacity-80 ${canvasOverlayColor}`}
-                    >
-                        {activeCanvasLayout.label}
-                    </div>
-                ) : null}
+                <DragOverlayContent
+                    activeSidebarType={activeSidebarType}
+                    activeCanvasLayout={activeCanvasLayout}
+                />
             </DragOverlay>
         </DndContext>
     );

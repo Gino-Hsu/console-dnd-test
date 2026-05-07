@@ -97,7 +97,7 @@ export default function LayoutCard({
     );
 
     // ── 外觀 ──────────────────────────────────────────────────────────────────
-    const { borderColor, bgColor } = layoutTheme(layout.type);
+    const { borderColor, bgColor } = layoutTheme(layout.layoutType);
     const isSelected = shared.selectedLayoutId === layout.id;
     const sp = { ownerId: layout.id, ...shared };
 
