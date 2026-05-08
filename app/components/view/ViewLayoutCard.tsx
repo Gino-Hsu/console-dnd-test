@@ -6,6 +6,7 @@ import SharedGridLayout from '@/app/components/shared/SharedGridLayout';
 
 export default function ViewLayoutCard({
     layout,
+    depth = 0,
 }: {
     layout: NestedLayout;
     depth?: number;
@@ -20,28 +21,33 @@ export default function ViewLayoutCard({
         pr = sp?.padding.right ?? 0;
     const pb = sp?.padding.bottom ?? 0,
         pl = sp?.padding.left ?? 0;
-    const hasMargin = mt + mr + mb + ml > 0;
+
+    const isRoot = depth === 0;
+    const isContained =
+        isRoot && (layout.containerWidth ?? 'full') === 'contained';
 
     return (
-        <div
-            style={{
-                paddingTop: mt,
-                paddingRight: mr,
-                paddingBottom: mb,
-                paddingLeft: ml,
-            }}
-            className='w-full'
-        >
+        <div className={isContained ? 'max-w-300 mx-auto w-full' : 'w-full'}>
             <div
-                className={`border-2 ${borderColor} ${bgColor}`}
                 style={{
-                    paddingTop: Math.max(pt),
-                    paddingRight: Math.max(pr, 0),
-                    paddingBottom: Math.max(pb, 0),
-                    paddingLeft: Math.max(pl, 0),
+                    paddingTop: mt,
+                    paddingRight: mr,
+                    paddingBottom: mb,
+                    paddingLeft: ml,
                 }}
+                className='w-full'
             >
-                <ViewLayoutContent layout={layout} />
+                <div
+                    className={`border-2 ${borderColor} ${bgColor}`}
+                    style={{
+                        paddingTop: Math.max(pt),
+                        paddingRight: Math.max(pr, 0),
+                        paddingBottom: Math.max(pb, 0),
+                        paddingLeft: Math.max(pl, 0),
+                    }}
+                >
+                    <ViewLayoutContent layout={layout} />
+                </div>
             </div>
         </div>
     );

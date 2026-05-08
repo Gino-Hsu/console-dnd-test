@@ -36,6 +36,7 @@ export function flattenToGraph(
             parentSlotId,
             flexConfig: layout.flexConfig,
             gridConfig: layout.gridConfig,
+            containerWidth: layout.containerWidth,
         };
         for (const slot of layout.slots) {
             slots[slot.id] = {
@@ -114,6 +115,7 @@ export function graphToTree(graph: PageGraph): NestedLayout[] {
                 slots,
                 flexConfig: flat.flexConfig ?? null,
                 gridConfig: flat.gridConfig ?? null,
+                containerWidth: flat.containerWidth,
             };
         }
 

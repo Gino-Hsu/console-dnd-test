@@ -104,6 +104,7 @@ export default function LayoutCard({
     return (
         <LayoutFrame
             layout={layout}
+            depth={depth}
             setNodeRef={setNodeRef}
             sortStyle={sortStyle}
             borderColor={borderColor}
