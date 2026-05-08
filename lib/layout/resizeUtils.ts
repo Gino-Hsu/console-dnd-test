@@ -94,7 +94,7 @@ export function gridContainerStyle(
 
 // ── Layout type ─────────────────────────────────────────────────────────
 
-type LayoutType = NestedLayout['type'];
+type LayoutType = NestedLayout['layoutType'];
 
 const BORDER: Record<LayoutType, [string]> = {
     block: ['border-violet-200'],

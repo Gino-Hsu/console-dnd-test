@@ -96,9 +96,9 @@ export default function DndBuilder() {
         : null;
 
     const canvasOverlayColor = activeCanvasLayout
-        ? activeCanvasLayout.type === 'block'
+        ? activeCanvasLayout.layoutType === 'block'
             ? 'border-violet-400 bg-violet-100 text-violet-700'
-            : activeCanvasLayout.type === 'flex'
+            : activeCanvasLayout.layoutType === 'flex'
               ? 'border-sky-400 bg-sky-100 text-sky-700'
               : 'border-emerald-400 bg-emerald-100 text-emerald-700'
         : '';

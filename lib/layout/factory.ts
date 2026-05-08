@@ -30,7 +30,8 @@ export function createLayout(type: LayoutType, label: string): NestedLayout {
     }));
     return {
         id: genId(),
-        type,
+        type: 'layout',
+        layoutType: type,
         label,
         props: {},
         slots,
@@ -154,7 +155,7 @@ export function addSlotToLayout(
             align: 'left',
         };
         const newSlots = [...l.slots, newSlot];
-        if (l.type === 'flex') {
+        if (l.layoutType === 'flex') {
             const eq = 100 / newSlots.length;
             return {
                 ...l,
@@ -164,7 +165,7 @@ export function addSlotToLayout(
                 })),
             };
         }
-        if (l.type === 'grid') {
+        if (l.layoutType === 'grid') {
             const cols = l.gridConfig?.colWidths?.length ?? 2;
             const newRowCount = Math.ceil(newSlots.length / cols);
             const newRowHeights = Array.from(
@@ -196,7 +197,7 @@ export function removeSlotFromLayout(
     return mapLayouts(items, l => {
         if (l.id !== layoutId) return l;
         const remaining = l.slots.filter(s => s.id !== slotId);
-        if (l.type === 'flex' && remaining.length > 0) {
+        if (l.layoutType === 'flex' && remaining.length > 0) {
             const eq = 100 / remaining.length;
             return {
                 ...l,
@@ -206,7 +207,7 @@ export function removeSlotFromLayout(
                 })),
             };
         }
-        if (l.type === 'grid') {
+        if (l.layoutType === 'grid') {
             const cols = l.gridConfig?.colWidths?.length ?? 2;
             const newRowCount = Math.max(1, Math.ceil(remaining.length / cols));
             const newRowHeights = Array.from(

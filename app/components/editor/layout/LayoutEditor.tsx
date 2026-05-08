@@ -144,22 +144,22 @@ export default function LayoutEditor({
 
     const spacing = layout.spacing ?? DEFAULT_SPACING;
 
-    const isBlock = layout.type === 'block';
+    const isBlock = layout.layoutType === 'block';
     const accentColor = isBlock
         ? 'text-violet-700 bg-violet-100 border-violet-200'
-        : layout.type === 'flex'
+        : layout.layoutType === 'flex'
           ? 'text-sky-700 bg-sky-100 border-sky-200'
           : 'text-emerald-700 bg-emerald-100 border-emerald-200';
 
     const badgeColor = isBlock
         ? 'bg-violet-200 text-violet-700'
-        : layout.type === 'flex'
+        : layout.layoutType === 'flex'
           ? 'bg-sky-200 text-sky-700'
           : 'bg-emerald-200 text-emerald-700';
 
     const typeLabel = isBlock
         ? 'Block'
-        : layout.type === 'flex'
+        : layout.layoutType === 'flex'
           ? 'Flex'
           : 'Grid';
 
@@ -305,7 +305,7 @@ export default function LayoutEditor({
                 <div className='border-t border-zinc-100' />
 
                 {/* ── Grid 設定 手風琴（僅 grid layout 顯示） ── */}
-                {layout.type === 'grid' &&
+                {layout.layoutType === 'grid' &&
                     onUpdateGridDimensions &&
                     (() => {
                         const currentCols =
@@ -488,7 +488,7 @@ export default function LayoutEditor({
                 <div className='border-t border-zinc-100' />
 
                 {/* ── Flex 設定 手風琴（僅 flex layout 顯示） ── */}
-                {layout.type === 'flex' &&
+                {layout.layoutType === 'flex' &&
                     (onUpdateFlexGap || onUpdateFlexWrap) && (
                         <div className='flex flex-col gap-2'>
                             <AccordionHeader

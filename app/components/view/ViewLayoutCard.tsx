@@ -12,7 +12,7 @@ export default function ViewLayoutCard({
     layout: NestedLayout;
     depth?: number;
 }) {
-    const { borderColor, bgColor } = layoutTheme(layout.type);
+    const { borderColor, bgColor } = layoutTheme(layout.layoutType);
 
     return (
         <BaseLayoutFrame
@@ -27,15 +27,15 @@ export default function ViewLayoutCard({
 }
 
 function ViewLayoutContent({ layout }: { layout: NestedLayout }) {
-    if (layout.type === 'block') {
+    if (layout.layoutType === 'block') {
         return <SharedBlockLayout mode='view' slots={layout.slots} />;
     }
 
-    if (layout.type === 'flex') {
+    if (layout.layoutType === 'flex') {
         return <SharedFlexLayout mode='view' layout={layout} />;
     }
 
-    if (layout.type === 'grid') {
+    if (layout.layoutType === 'grid') {
         const cols = layout.gridConfig?.colWidths?.length ?? 2;
         const defColW = 100 / cols;
         return (
