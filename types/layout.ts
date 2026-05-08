@@ -165,7 +165,7 @@ export interface FlatSlot {
  */
 export interface FlatComponent {
     id: string;
-    componentId: string;
+    componentId: ComponentId;
     label: string;
     data: Record<string, unknown>;
     style: Record<string, unknown>;
