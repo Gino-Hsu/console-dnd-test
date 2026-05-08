@@ -1,5 +1,3 @@
-'use client';
-
 import SlotZone from '@/app/components/editor/layout/SlotZone';
 import ViewSlotZone from '@/app/components/view/ViewSlotZone';
 import type { SlotProps } from '@/app/components/editor/layout/types';
