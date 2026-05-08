@@ -44,7 +44,7 @@ export default function SlotZone({
             slotId: slot.id,
             depth: depth + 1,
         },
-        disabled: atMaxDepth,
+        disabled: false, // 始終可拖放；layout 的深度限制由 DndBuilder 處理
     });
     const isActive = sp.insertSlotId === slot.id;
     const [editorOpen, setEditorOpen] = useState(false);
@@ -146,7 +146,7 @@ export default function SlotZone({
                                 }`}
                             >
                                 {atMaxDepth
-                                    ? `已達最大層數（${MAX_DEPTH} 層）`
+                                    ? `已達最大層數(${MAX_DEPTH} 層)，只能放置 Component`
                                     : '拖曳 Layout 或 Component 到此處'}
                             </div>
                         </>

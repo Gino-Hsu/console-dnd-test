@@ -165,11 +165,22 @@ export default function DndBuilder() {
                     return;
                 }
 
-                // 不允許超過最大層數
+                // layout 不允許超過最大層數（component 不受限制）
                 if (overData?.depth >= MAX_DEPTH) {
-                    setInsertSlotId(null);
-                    setInsertIndex(null);
-                    return;
+                    const isDraggingLayout =
+                        activeData?.source === 'sidebar'
+                            ? activeData?.type !== 'component'
+                            : isLayoutNode(
+                                  findNodeById(
+                                      activeCanvasIdRef.current ?? '',
+                                      layouts,
+                                  ) ?? ({} as never),
+                              );
+                    if (isDraggingLayout) {
+                        setInsertSlotId(null);
+                        setInsertIndex(null);
+                        return;
+                    }
                 }
 
                 const elements = Array.from(
@@ -262,6 +273,8 @@ export default function DndBuilder() {
                     );
 
                     if (overData?.type === 'slot') {
+                        // layout 不允許放在最大層數的 slot
+                        if ((overData?.depth ?? 0) >= MAX_DEPTH) return;
                         const slotId = over.id as string;
                         const ownerId = overData.ownerId as string;
                         setLayouts(prev =>
@@ -329,6 +342,18 @@ export default function DndBuilder() {
                     isSlotInsideLayout(targetContainer, activeId, prev)
                 ) {
                     return prev;
+                }
+
+                // layout 跨容器搬移：不允許移入最大層數的 slot
+                if (targetContainer !== 'root') {
+                    const activeNode = findNodeById(activeId, prev);
+                    if (
+                        activeNode &&
+                        isLayoutNode(activeNode) &&
+                        (overData?.depth ?? 0) >= MAX_DEPTH
+                    ) {
+                        return prev;
+                    }
                 }
 
                 return moveItem(
