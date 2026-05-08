@@ -30,6 +30,7 @@ export default function ViewLayoutCard({
                 paddingBottom: mb,
                 paddingLeft: ml,
             }}
+            className='w-full'
         >
             <div
                 className={`border-2 ${borderColor} ${bgColor}`}
