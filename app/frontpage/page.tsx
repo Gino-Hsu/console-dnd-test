@@ -1,7 +1,7 @@
 import { graphToTree } from '@/lib/layout';
 import type { PageGraph } from '@/types/layout';
 import ViewLayoutCard from '@/app/components/view/ViewLayoutCard';
-import getPageGraph from '@/app/api/getPageGraph';
+import { getPageGraph } from '@/app/api/pageGraph';
 
 export default async function FrontPage() {
     let pageGraph: PageGraph;
@@ -14,10 +14,10 @@ export default async function FrontPage() {
                     <p className='text-2xl mb-2'>⚠️</p>
                     <p className='font-medium'>無法連線到 json-server</p>
                     <p className='text-sm mt-1'>
-                        請確認{' '}
+                        請確認
                         <code className='bg-zinc-100 px-1 rounded'>
                             pnpm db
-                        </code>{' '}
+                        </code>
                         已在執行中
                     </p>
                 </div>
