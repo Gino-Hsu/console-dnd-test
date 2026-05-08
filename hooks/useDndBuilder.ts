@@ -24,10 +24,11 @@ import {
 import type { LayoutType, NestedLayout } from '@/types/layout';
 import type { ComponentId } from '@/lib/component-registry/component-ids';
 import { isLayoutNode } from '@/types/layout';
+import type { LoggedSetLayouts } from './useLayoutEditor';
 
 type UseDndBuilderProps = {
     layouts: NestedLayout[];
-    setLayouts: React.Dispatch<React.SetStateAction<NestedLayout[]>>;
+    setLayouts: LoggedSetLayouts;
 };
 
 export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
@@ -247,14 +248,18 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
 
                         const ownerId = overData.ownerId as string;
 
-                        setLayouts(prev =>
-                            insertIntoSlot(
-                                prev,
-                                ownerId,
-                                slotId,
-                                newComponent,
-                                currentInsertIndex ?? undefined,
-                            ),
+                        setLayouts(
+                            prev =>
+                                insertIntoSlot(
+                                    prev,
+                                    ownerId,
+                                    slotId,
+                                    newComponent,
+                                    currentInsertIndex ?? undefined,
+                                ),
+                            'add-component',
+                            `新增 ${activeData.label}`,
+                            true,
                         );
                     }
 
@@ -276,31 +281,38 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
 
                     const ownerId = overData.ownerId as string;
 
-                    setLayouts(prev =>
-                        insertIntoSlot(
-                            prev,
-                            ownerId,
-                            slotId,
-                            newLayout,
-                            currentInsertIndex ?? undefined,
-                        ),
+                    setLayouts(
+                        prev =>
+                            insertIntoSlot(
+                                prev,
+                                ownerId,
+                                slotId,
+                                newLayout,
+                                currentInsertIndex ?? undefined,
+                            ),
+                        'add-layout',
+                        `新增 ${activeData.label}`,
+                        true,
                     );
 
                     return;
                 }
 
                 if (overData?.type === 'canvas') {
-                    setLayouts(prev => {
-                        const next = [...prev];
-
-                        next.splice(
-                            currentInsertIndex ?? prev.length,
-                            0,
-                            newLayout,
-                        );
-
-                        return next;
-                    });
+                    setLayouts(
+                        prev => {
+                            const next = [...prev];
+                            next.splice(
+                                currentInsertIndex ?? prev.length,
+                                0,
+                                newLayout,
+                            );
+                            return next;
+                        },
+                        'add-layout',
+                        `新增 ${activeData.label}`,
+                        true,
+                    );
 
                     return;
                 }
@@ -318,66 +330,71 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
 
             if (activeId === overId) return;
 
-            setLayouts(prev => {
-                const activeContainer = findContainer(activeId, prev);
+            setLayouts(
+                prev => {
+                    const activeContainer = findContainer(activeId, prev);
 
-                if (!activeContainer) return prev;
+                    if (!activeContainer) return prev;
 
-                const overData = over.data.current;
+                    const overData = over.data.current;
 
-                let targetContainer: string;
+                    let targetContainer: string;
 
-                if (overData?.type === 'slot') {
-                    targetContainer = over.id as string;
-                } else if (overData?.type === 'canvas') {
-                    targetContainer = 'root';
-                } else {
-                    targetContainer =
-                        findContainer(overId, prev) ?? activeContainer;
-                }
+                    if (overData?.type === 'slot') {
+                        targetContainer = over.id as string;
+                    } else if (overData?.type === 'canvas') {
+                        targetContainer = 'root';
+                    } else {
+                        targetContainer =
+                            findContainer(overId, prev) ?? activeContainer;
+                    }
 
-                // same container
-                if (activeContainer === targetContainer) {
-                    if (currentInsertIndex === null) {
+                    // same container
+                    if (activeContainer === targetContainer) {
+                        if (currentInsertIndex === null) {
+                            return prev;
+                        }
+
+                        return moveItem(
+                            prev,
+                            activeId,
+                            targetContainer,
+                            currentInsertIndex,
+                        );
+                    }
+
+                    // prevent self nesting
+                    if (
+                        targetContainer !== 'root' &&
+                        isSlotInsideLayout(targetContainer, activeId, prev)
+                    ) {
                         return prev;
+                    }
+
+                    // max depth
+                    if (targetContainer !== 'root') {
+                        const activeNode = findNodeById(activeId, prev);
+
+                        if (
+                            activeNode &&
+                            isLayoutNode(activeNode) &&
+                            (overData?.depth ?? 0) >= MAX_DEPTH
+                        ) {
+                            return prev;
+                        }
                     }
 
                     return moveItem(
                         prev,
                         activeId,
                         targetContainer,
-                        currentInsertIndex,
+                        currentInsertIndex ?? undefined,
                     );
-                }
-
-                // prevent self nesting
-                if (
-                    targetContainer !== 'root' &&
-                    isSlotInsideLayout(targetContainer, activeId, prev)
-                ) {
-                    return prev;
-                }
-
-                // max depth
-                if (targetContainer !== 'root') {
-                    const activeNode = findNodeById(activeId, prev);
-
-                    if (
-                        activeNode &&
-                        isLayoutNode(activeNode) &&
-                        (overData?.depth ?? 0) >= MAX_DEPTH
-                    ) {
-                        return prev;
-                    }
-                }
-
-                return moveItem(
-                    prev,
-                    activeId,
-                    targetContainer,
-                    currentInsertIndex ?? undefined,
-                );
-            });
+                },
+                'move',
+                '移動項目',
+                true,
+            );
         },
         [insertIndex, setLayouts],
     );

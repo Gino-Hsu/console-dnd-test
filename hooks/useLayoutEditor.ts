@@ -18,9 +18,21 @@ import type {
     PageGraph,
 } from '@/types/layout';
 import { graphToTree, flattenToGraph } from '@/lib/layout';
-import { getPageGraph, getDraft, saveDraft } from '@/app/api/pageGraph';
+import {
+    getLatestPage,
+    getLatestEditLog,
+    appendEditLog,
+} from '@/app/api/pageGraph';
 
 const AUTOSAVE_DELAY_MS = 3000;
+
+// Type shared with useDndBuilder and useComponentEditor
+export type LoggedSetLayouts = (
+    updater: NestedLayout[] | ((prev: NestedLayout[]) => NestedLayout[]),
+    action: string,
+    description: string,
+    immediate?: boolean,
+) => void;
 
 export function useLayoutEditor() {
     // SSOT: 以扁平的 PageGraph 作為唯一狀態來源
@@ -33,6 +45,11 @@ export function useLayoutEditor() {
     const [isSaving, setIsSaving] = useState(false);
     const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const isInitialLoadRef = useRef(true);
+    const pendingLogRef = useRef<{
+        action: string;
+        description: string;
+        immediate: boolean;
+    } | null>(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -42,16 +59,14 @@ export function useLayoutEditor() {
                 setIsLoading(true);
                 setLoadError(null);
 
-                // 優先讀草稿；若無則讀已發布頁面並建立草稿
-                let draft = await getDraft();
-                if (!draft) {
-                    const published = await getPageGraph();
-                    draft = { ...published, status: 'draft' };
-                    await saveDraft(draft);
+                // 優先讀最新的 editLog；若無則讀最新發布版本
+                let graph = await getLatestEditLog();
+                if (!graph) {
+                    graph = await getLatestPage();
                 }
 
                 if (!cancelled) {
-                    setGraph(draft);
+                    setGraph(graph);
                 }
             } catch (err) {
                 if (!cancelled) {
@@ -72,21 +87,38 @@ export function useLayoutEditor() {
         };
     }, []);
 
-    // Auto-save: debounce 3s after every graph change (skip initial load)
+    // EditLog dispatch: fires after each graph change (skip initial load)
     useEffect(() => {
         if (isInitialLoadRef.current || !graph) return;
 
-        if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
-        autosaveTimerRef.current = setTimeout(async () => {
-            try {
-                setIsSaving(true);
-                await saveDraft(graph);
-            } catch (err) {
-                console.warn('[autosave] failed:', err);
-            } finally {
-                setIsSaving(false);
-            }
-        }, AUTOSAVE_DELAY_MS);
+        const pending = pendingLogRef.current;
+        pendingLogRef.current = null;
+
+        const action = pending?.action ?? 'edit';
+        const description = pending?.description ?? '編輯';
+        const immediate = pending?.immediate ?? false;
+
+        if (immediate) {
+            if (autosaveTimerRef.current)
+                clearTimeout(autosaveTimerRef.current);
+            setIsSaving(true);
+            appendEditLog(graph, action, description)
+                .catch(err => console.warn('[editLog] failed:', err))
+                .finally(() => setIsSaving(false));
+        } else {
+            if (autosaveTimerRef.current)
+                clearTimeout(autosaveTimerRef.current);
+            autosaveTimerRef.current = setTimeout(async () => {
+                try {
+                    setIsSaving(true);
+                    await appendEditLog(graph, action, description);
+                } catch (err) {
+                    console.warn('[editLog] failed:', err);
+                } finally {
+                    setIsSaving(false);
+                }
+            }, AUTOSAVE_DELAY_MS);
+        }
 
         return () => {
             if (autosaveTimerRef.current)
@@ -124,16 +156,30 @@ export function useLayoutEditor() {
         [setGraph],
     );
 
+    // setLayouts + queues an editLog entry
+    const setLayoutsWithLog: LoggedSetLayouts = useCallback(
+        (updater, action, description, immediate = false) => {
+            pendingLogRef.current = { action, description, immediate };
+            setLayouts(updater);
+        },
+        [setLayouts],
+    );
+
     const selectedLayout = selectedLayoutId
         ? findLayout(selectedLayoutId, layouts)
         : null;
 
     const handleRemove = useCallback(
         (id: string) => {
-            setLayouts(prev => removeItem(prev, id));
+            setLayoutsWithLog(
+                prev => removeItem(prev, id),
+                'remove-layout',
+                '刪除 Layout',
+                true,
+            );
             setSelectedLayoutId(null);
         },
-        [setLayouts, setSelectedLayoutId],
+        [setLayoutsWithLog, setSelectedLayoutId],
     );
 
     const handleSelect = useCallback(
@@ -145,70 +191,91 @@ export function useLayoutEditor() {
 
     const handleAddSlot = useCallback(
         (layoutId: string) => {
-            setLayouts(prev => addSlotToLayout(prev, layoutId));
+            setLayoutsWithLog(
+                prev => addSlotToLayout(prev, layoutId),
+                'add-slot',
+                '新增 Slot',
+                true,
+            );
         },
-        [setLayouts],
+        [setLayoutsWithLog],
     );
 
     const handleRemoveSlot = useCallback(
         (layoutId: string, slotId: string) => {
-            setLayouts(prev => removeSlotFromLayout(prev, layoutId, slotId));
+            setLayoutsWithLog(
+                prev => removeSlotFromLayout(prev, layoutId, slotId),
+                'remove-slot',
+                '刪除 Slot',
+                true,
+            );
         },
-        [setLayouts],
+        [setLayoutsWithLog],
     );
 
     const handleUpdateSpacing = useCallback(
         (layoutId: string, spacing: LayoutSpacing) => {
-            setLayouts(prev => updateField(prev, layoutId, { spacing }));
+            setLayoutsWithLog(
+                prev => updateField(prev, layoutId, { spacing }),
+                'edit-layout',
+                '調整間距',
+            );
         },
-        [setLayouts],
+        [setLayoutsWithLog],
     );
 
     const handleUpdateSlotWidths = useCallback(
         (layoutId: string, widths: number[]) => {
-            setLayouts(prev =>
-                mapLayouts(prev, l => {
-                    if (l.id !== layoutId) return l;
-                    return {
-                        ...l,
-                        slots: l.slots.map((s, i) => ({
-                            ...s,
-                            flexWidthConfig: {
-                                ...s.flexWidthConfig,
-                                flexBasis:
-                                    widths[i] ?? s.flexWidthConfig.flexBasis,
-                            },
-                        })),
-                    };
-                }),
+            setLayoutsWithLog(
+                prev =>
+                    mapLayouts(prev, l => {
+                        if (l.id !== layoutId) return l;
+                        return {
+                            ...l,
+                            slots: l.slots.map((s, i) => ({
+                                ...s,
+                                flexWidthConfig: {
+                                    ...s.flexWidthConfig,
+                                    flexBasis:
+                                        widths[i] ??
+                                        s.flexWidthConfig.flexBasis,
+                                },
+                            })),
+                        };
+                    }),
+                'edit-slot',
+                '調整欄寬',
             );
         },
-        [setLayouts],
+        [setLayoutsWithLog],
     );
 
     const handleUpdateWrapSlotWidth = useCallback(
         (layoutId: string, slotId: string, widthPx: number) => {
-            setLayouts(prev =>
-                mapLayouts(prev, l => {
-                    if (l.id !== layoutId) return l;
-                    return {
-                        ...l,
-                        slots: l.slots.map(s =>
-                            s.id === slotId
-                                ? {
-                                      ...s,
-                                      flexWidthConfig: {
-                                          ...s.flexWidthConfig,
-                                          widthPx,
-                                      },
-                                  }
-                                : s,
-                        ),
-                    };
-                }),
+            setLayoutsWithLog(
+                prev =>
+                    mapLayouts(prev, l => {
+                        if (l.id !== layoutId) return l;
+                        return {
+                            ...l,
+                            slots: l.slots.map(s =>
+                                s.id === slotId
+                                    ? {
+                                          ...s,
+                                          flexWidthConfig: {
+                                              ...s.flexWidthConfig,
+                                              widthPx,
+                                          },
+                                      }
+                                    : s,
+                            ),
+                        };
+                    }),
+                'edit-slot',
+                '調整欄寬',
             );
         },
-        [setLayouts],
+        [setLayoutsWithLog],
     );
 
     const handleUpdateGridDimensions = useCallback(
@@ -219,89 +286,107 @@ export function useLayoutEditor() {
             colGap: number | null,
             rowGap: number | null,
         ) => {
-            setLayouts(prev =>
-                mapLayouts(prev, l => {
-                    if (l.id !== layoutId) return l;
-                    return {
-                        ...l,
-                        gridConfig: {
-                            colWidths,
-                            rowHeights,
-                            colGap: colGap ?? l.gridConfig?.colGap ?? 8,
-                            rowGap: rowGap ?? l.gridConfig?.rowGap ?? 8,
-                        },
-                    };
-                }),
+            setLayoutsWithLog(
+                prev =>
+                    mapLayouts(prev, l => {
+                        if (l.id !== layoutId) return l;
+                        return {
+                            ...l,
+                            gridConfig: {
+                                colWidths,
+                                rowHeights,
+                                colGap: colGap ?? l.gridConfig?.colGap ?? 8,
+                                rowGap: rowGap ?? l.gridConfig?.rowGap ?? 8,
+                            },
+                        };
+                    }),
+                'edit-layout',
+                '調整 Grid',
             );
         },
-        [setLayouts],
+        [setLayoutsWithLog],
     );
 
     const handleUpdateFlexGap = useCallback(
         (layoutId: string, gap: number) => {
-            setLayouts(prev =>
-                mapLayouts(prev, l =>
-                    l.id === layoutId
-                        ? { ...l, flexConfig: { ...l.flexConfig!, gap } }
-                        : l,
-                ),
+            setLayoutsWithLog(
+                prev =>
+                    mapLayouts(prev, l =>
+                        l.id === layoutId
+                            ? { ...l, flexConfig: { ...l.flexConfig!, gap } }
+                            : l,
+                    ),
+                'edit-layout',
+                '調整 Flex 間距',
             );
         },
-        [setLayouts],
+        [setLayoutsWithLog],
     );
 
     const handleUpdateFlexWrap = useCallback(
         (layoutId: string, wrap: boolean) => {
-            setLayouts(prev =>
-                mapLayouts(prev, l =>
-                    l.id === layoutId
-                        ? { ...l, flexConfig: { ...l.flexConfig!, wrap } }
-                        : l,
-                ),
+            setLayoutsWithLog(
+                prev =>
+                    mapLayouts(prev, l =>
+                        l.id === layoutId
+                            ? { ...l, flexConfig: { ...l.flexConfig!, wrap } }
+                            : l,
+                    ),
+                'edit-layout',
+                '調整 Flex 換行',
             );
         },
-        [setLayouts],
+        [setLayoutsWithLog],
     );
 
     const handleUpdateFlexRowGap = useCallback(
         (layoutId: string, rowGap: number) => {
-            setLayouts(prev =>
-                mapLayouts(prev, l =>
-                    l.id === layoutId
-                        ? { ...l, flexConfig: { ...l.flexConfig!, rowGap } }
-                        : l,
-                ),
+            setLayoutsWithLog(
+                prev =>
+                    mapLayouts(prev, l =>
+                        l.id === layoutId
+                            ? { ...l, flexConfig: { ...l.flexConfig!, rowGap } }
+                            : l,
+                    ),
+                'edit-layout',
+                '調整 Flex 行距',
             );
         },
-        [setLayouts],
+        [setLayoutsWithLog],
     );
 
     const handleUpdateSlotAlign = useCallback(
         (layoutId: string, slotId: string, align: SlotAlign) => {
-            setLayouts(prev =>
-                mapLayouts(prev, l => {
-                    if (l.id !== layoutId) return l;
-                    return {
-                        ...l,
-                        slots: l.slots.map(s =>
-                            s.id === slotId ? { ...s, align } : s,
-                        ),
-                    };
-                }),
+            setLayoutsWithLog(
+                prev =>
+                    mapLayouts(prev, l => {
+                        if (l.id !== layoutId) return l;
+                        return {
+                            ...l,
+                            slots: l.slots.map(s =>
+                                s.id === slotId ? { ...s, align } : s,
+                            ),
+                        };
+                    }),
+                'edit-slot',
+                '調整對齊方式',
             );
         },
-        [setLayouts],
+        [setLayoutsWithLog],
     );
 
     const handleUpdateContainerWidth = useCallback(
         (layoutId: string, containerWidth: 'full' | 'contained') => {
-            setLayouts(prev =>
-                mapLayouts(prev, l =>
-                    l.id === layoutId ? { ...l, containerWidth } : l,
-                ),
+            setLayoutsWithLog(
+                prev =>
+                    mapLayouts(prev, l =>
+                        l.id === layoutId ? { ...l, containerWidth } : l,
+                    ),
+                'edit-layout',
+                '調整容器寬度',
             );
         },
-        [setLayouts],
+        [setLayoutsWithLog],
     );
 
     const applyMove = useCallback(
@@ -310,11 +395,20 @@ export function useLayoutEditor() {
             targetContainer: string,
             index: number | null | undefined,
         ) => {
-            setLayouts(prev =>
-                moveItem(prev, activeId, targetContainer, index ?? undefined),
+            setLayoutsWithLog(
+                prev =>
+                    moveItem(
+                        prev,
+                        activeId,
+                        targetContainer,
+                        index ?? undefined,
+                    ),
+                'move',
+                '移動項目',
+                true,
             );
         },
-        [setLayouts],
+        [setLayoutsWithLog],
     );
 
     const applySidebarDrop = useCallback(
@@ -328,30 +422,39 @@ export function useLayoutEditor() {
         ) => {
             const newLayout = createLayout(type, label);
             if (target.type === 'slot') {
-                setLayouts(prev =>
-                    insertIntoSlot(
-                        prev,
-                        target.ownerId,
-                        target.slotId,
-                        newLayout,
-                        index ?? undefined,
-                    ),
+                setLayoutsWithLog(
+                    prev =>
+                        insertIntoSlot(
+                            prev,
+                            target.ownerId,
+                            target.slotId,
+                            newLayout,
+                            index ?? undefined,
+                        ),
+                    'add-layout',
+                    `新增 ${label}`,
+                    true,
                 );
             } else {
-                setLayouts(prev => {
-                    const next = [...prev];
-                    next.splice(index ?? prev.length, 0, newLayout);
-                    return next;
-                });
+                setLayoutsWithLog(
+                    prev => {
+                        const next = [...prev];
+                        next.splice(index ?? prev.length, 0, newLayout);
+                        return next;
+                    },
+                    'add-layout',
+                    `新增 ${label}`,
+                    true,
+                );
             }
         },
-        [setLayouts],
+        [setLayoutsWithLog],
     );
 
     return {
         graph,
         layouts,
-        setLayouts,
+        setLayouts: setLayoutsWithLog,
         isLoading,
         loadError,
         isSaving,
