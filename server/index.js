@@ -67,27 +67,19 @@ server.put('/pages/:id', (req, res) => {
         return res.status(400).json({ error: 'Invalid PageGraph body' });
     }
 
-    // 1. Upsert page metadata
+    // 1. Upsert page metadata only (no embedded layouts/slots/components)
     const existing = db.get('pages').find({ id: pageId }).value();
+    const pageMeta = {
+        version: graph.version,
+        status: graph.status,
+        createdAt: graph.createdAt,
+        rootOrder: graph.rootOrder,
+    };
     if (existing) {
-        db.get('pages')
-            .find({ id: pageId })
-            .assign({
-                version: graph.version,
-                status: graph.status,
-                createdAt: graph.createdAt,
-                rootOrder: graph.rootOrder,
-            })
-            .write();
+        db.get('pages').find({ id: pageId }).assign(pageMeta).write();
     } else {
         db.get('pages')
-            .push({
-                id: graph.pageId,
-                version: graph.version,
-                status: graph.status,
-                createdAt: graph.createdAt,
-                rootOrder: graph.rootOrder,
-            })
+            .push({ id: graph.pageId, ...pageMeta })
             .write();
     }
 
