@@ -14,6 +14,7 @@ export interface CategoryTheme {
     bgColor: string;
     bgColorDark: string;
     borderColor: string;
+    textColor: string;
 }
 
 /**
@@ -25,11 +26,13 @@ export const CATEGORY_THEMES: Record<CategoryId, CategoryTheme> = {
         bgColor: 'bg-purple-50',
         bgColorDark: 'bg-purple-300',
         borderColor: 'border-purple-300',
+        textColor: 'text-purple-700',
     },
     [CATEGORIES.IMAGE]: {
         bgColor: 'bg-blue-50',
         bgColorDark: 'bg-blue-300',
         borderColor: 'border-blue-300',
+        textColor: 'text-blue-700',
     },
 } as const;
 
@@ -40,6 +43,7 @@ export const DEFAULT_THEME: CategoryTheme = {
     bgColor: 'bg-zinc-50',
     bgColorDark: 'bg-zinc-300',
     borderColor: 'border-zinc-300',
+    textColor: 'text-zinc-700',
 } as const;
 
 /**

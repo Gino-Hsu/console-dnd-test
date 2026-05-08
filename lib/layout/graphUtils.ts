@@ -28,7 +28,8 @@ export function flattenToGraph(
     ): void {
         layouts[layout.id] = {
             id: layout.id,
-            type: layout.type,
+            type: 'layout',
+            layoutType: layout.layoutType,
             label: layout.label,
             props: layout.props,
             spacing: layout.spacing,
@@ -55,6 +56,7 @@ export function flattenToGraph(
                     // 處理 ComponentNode
                     components[child.id] = {
                         id: child.id,
+                        type: 'component',
                         componentId: child.componentId,
                         label: child.label,
                         data: child.data,
@@ -86,9 +88,9 @@ export function flattenToGraph(
 export function graphToTree(graph: PageGraph): NestedLayout[] {
     function buildNode(id: string): CanvasNode {
         // 先檢查是否為 Layout
-        const flat = graph.layouts[id];
-        if (flat) {
-            const slots = flat.slotIds.map(slotId => {
+        const layout = graph.layouts[id];
+        if (layout && layout.type === 'layout') {
+            const slots = layout.slotIds.map(slotId => {
                 const flatSlot = graph.slots[slotId];
                 if (!flatSlot)
                     throw new Error(`graphToTree: slot "${slotId}" not found`);
@@ -106,20 +108,21 @@ export function graphToTree(graph: PageGraph): NestedLayout[] {
             });
 
             return {
-                id: flat.id,
-                type: flat.type,
-                label: flat.label,
-                props: flat.props,
-                spacing: flat.spacing,
+                id: layout.id,
+                type: 'layout',
+                layoutType: layout.layoutType,
+                label: layout.label,
+                props: layout.props,
+                spacing: layout.spacing,
                 slots,
-                flexConfig: flat.flexConfig ?? null,
-                gridConfig: flat.gridConfig ?? null,
+                flexConfig: layout.flexConfig ?? null,
+                gridConfig: layout.gridConfig ?? null,
             };
         }
 
-        // 否則處理 Component
+        // 再檢查是否為 Component
         const component = graph.components[id];
-        if (component) {
+        if (component && component.type === 'component') {
             return {
                 id: component.id,
                 type: 'component',

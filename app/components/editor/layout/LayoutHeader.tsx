@@ -57,10 +57,10 @@ export default function LayoutHeader({
 
             <span
                 className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ${
-                    styleMap[layout.type]
+                    styleMap[layout.layoutType]
                 }`}
             >
-                {nameMap[layout.type]}
+                {nameMap[layout.layoutType]}
             </span>
 
             <span className='text-sm font-semibold text-zinc-700 flex-1 truncate'>

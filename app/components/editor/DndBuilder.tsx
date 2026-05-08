@@ -15,6 +15,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useLayoutEditor } from '@/hooks/useLayoutEditor';
 import { useComponentEditor } from '@/hooks/useComponentEditor';
 import CanvasArea from './CanvasArea';
+import DragOverlayContent from './common/DragOverlayContent';
 import {
   createLayout,
   createComponent,
@@ -27,7 +28,7 @@ import {
   moveItem,
 } from '@/lib/layout';
 import Sidebar from './Sidebar';
-import type { LayoutType } from '@/types/layout';
+import type { LayoutType, SidebarDragItem } from '@/types/layout';
 import type { ComponentId } from '@/lib/component-registry/component-ids';
 import { isLayoutNode } from '@/types/layout';
 
@@ -85,9 +86,7 @@ export default function DndBuilder() {
     ],
   );
 
-  const [activeSidebarType, setActiveSidebarType] = useState<LayoutType | null>(
-    null,
-  );
+  const [activeSidebarItem, setActiveSidebarItem] = useState<SidebarDragItem | null>(null);
   const [activeCanvasId, setActiveCanvasId] = useState<string | null>(null);
   const [insertIndex, setInsertIndex] = useState<number | null>(null);
   const [insertSlotId, setInsertSlotId] = useState<string | null>(null);
@@ -120,9 +119,26 @@ export default function DndBuilder() {
     (event: DragStartEvent) => {
       const data = event.active.data.current;
       if (data?.source === 'sidebar') {
-        setActiveSidebarType(data.type as LayoutType);
+        if (data.type === 'component') {
+            // 從 Sidebar 拖動 Component
+            setActiveSidebarItem({
+                type: 'component',
+                componentId: data.componentId as ComponentId,
+                label: data.label as string,
+            });
+        } else {
+            // 從 Sidebar 拖動 Layout
+            setActiveSidebarItem({
+                type: 'layout',
+                layoutType: data.type as LayoutType,
+                label: data.label as string,
+            });
+        }
+        setActiveCanvasId(null);
       } else {
+        // 從 Canvas 拖動
         setActiveCanvasId(event.active.id as string);
+        setActiveSidebarItem(null);
         activeCanvasIdRef.current = event.active.id as string;
         activeContainerRef.current = findContainer(
           event.active.id as string,
@@ -216,7 +232,7 @@ export default function DndBuilder() {
 
       const currentInsertIndex = insertIndex;
 
-      setActiveSidebarType(null);
+      setActiveSidebarItem(null);
       setActiveCanvasId(null);
       setInsertIndex(null);
       setInsertSlotId(null);
@@ -328,7 +344,7 @@ export default function DndBuilder() {
 
   // ── DragCancel ─────────────────────────
   const handleDragCancel = useCallback(() => {
-    setActiveSidebarType(null);
+    setActiveSidebarItem(null);
     setActiveCanvasId(null);
     setInsertIndex(null);
     setInsertSlotId(null);
@@ -338,31 +354,9 @@ export default function DndBuilder() {
 
   console.log('layouts', layouts);
 
-  const overlayLabel =
-    activeSidebarType === 'block'
-      ? '塊級 Layout'
-      : activeSidebarType === 'flex'
-        ? 'Flex Layout'
-        : 'Grid Layout';
-
-  const overlayColor =
-    activeSidebarType === 'block'
-      ? 'border-violet-400 bg-violet-100 text-violet-700'
-      : activeSidebarType === 'flex'
-        ? 'border-sky-400 bg-sky-100 text-sky-700'
-        : 'border-emerald-400 bg-emerald-100 text-emerald-700';
-
-  const activeCanvasLayout = activeCanvasId
+  const activeCanvasNode = activeCanvasId
     ? findLayoutById(activeCanvasId, layouts)
     : null;
-
-  const canvasOverlayColor = activeCanvasLayout
-    ? activeCanvasLayout.type === 'block'
-      ? 'border-violet-400 bg-violet-100 text-violet-700'
-      : activeCanvasLayout.type === 'flex'
-        ? 'border-sky-400 bg-sky-100 text-sky-700'
-        : 'border-emerald-400 bg-emerald-100 text-emerald-700'
-    : '';
 
   if (isLoading) {
     return (
@@ -447,19 +441,10 @@ export default function DndBuilder() {
       </div>
 
       <DragOverlay dropAnimation={null}>
-        {activeSidebarType ? (
-          <div
-            className={`rounded-lg border-2 px-4 py-3 shadow-lg font-semibold text-sm ${overlayColor}`}
-          >
-            {overlayLabel}
-          </div>
-        ) : activeCanvasLayout ? (
-          <div
-            className={`rounded-lg border-2 px-4 py-3 shadow-lg font-semibold text-sm opacity-80 ${canvasOverlayColor}`}
-          >
-            {activeCanvasLayout.label}
-          </div>
-        ) : null}
+        <DragOverlayContent
+          activeSidebarItem={activeSidebarItem}
+          activeCanvasNode={activeCanvasNode}
+        />
       </DragOverlay>
     </DndContext>
   );
