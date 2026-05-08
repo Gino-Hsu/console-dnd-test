@@ -1,51 +1,72 @@
-import type { LayoutType, NestedLayout } from '@/types/layout';
+import type { SidebarDragItem, CanvasNode } from '@/types/layout';
+import { isLayoutNode } from '@/types/layout';
+import { componentRegistry } from '@/lib/component-registry';
+import { CATEGORY_THEMES, DEFAULT_THEME } from '@/lib/theme/category-themes';
 
 interface DragOverlayContentProps {
-    activeSidebarType: LayoutType | null;
-    activeCanvasLayout: NestedLayout | null;
+    activeSidebarItem: SidebarDragItem | null;
+    activeCanvasNode: CanvasNode | null;
 }
 
 export default function DragOverlayContent({
-    activeSidebarType,
-    activeCanvasLayout,
+    activeSidebarItem,
+    activeCanvasNode,
 }: DragOverlayContentProps) {
-    const overlayLabel =
-        activeSidebarType === 'block'
-            ? '塊級 Layout'
-            : activeSidebarType === 'flex'
-              ? 'Flex Layout'
-              : 'Grid Layout';
+    const undefindedName = '未命名項目';
+    let label = '';
+    let color = '';
 
-    const overlayColor =
-        activeSidebarType === 'block'
-            ? 'border-violet-400 bg-violet-100 text-violet-700'
-            : activeSidebarType === 'flex'
-              ? 'border-sky-400 bg-sky-100 text-sky-700'
-              : 'border-emerald-400 bg-emerald-100 text-emerald-700';
-
-    const canvasOverlayColor = activeCanvasLayout
-        ? activeCanvasLayout.layoutType === 'block'
-            ? 'border-violet-400 bg-violet-100 text-violet-700'
-            : activeCanvasLayout.layoutType === 'flex'
-              ? 'border-sky-400 bg-sky-100 text-sky-700'
-              : 'border-emerald-400 bg-emerald-100 text-emerald-700'
-        : '';
+    if (activeSidebarItem) {
+        // 從 Sidebar 拖動
+        if (activeSidebarItem.type === 'layout') {
+            // Sidebar Layout
+            label = activeSidebarItem.label || undefindedName;
+            color = activeSidebarItem.layoutType === 'block'
+                ? 'border-violet-400 bg-violet-100 text-violet-700'
+                : activeSidebarItem.layoutType === 'flex'
+                  ? 'border-sky-400 bg-sky-100 text-sky-700'
+                  : 'border-emerald-400 bg-emerald-100 text-emerald-700';
+        } else {
+            // Sidebar Component
+            label = activeSidebarItem.label ? `${activeSidebarItem.componentId} ${activeSidebarItem.label}` : undefindedName;
+            const config = componentRegistry[activeSidebarItem.componentId];
+            const theme = config
+                ? CATEGORY_THEMES[config.category] || DEFAULT_THEME
+                : DEFAULT_THEME;
+            const bgClass = theme.bgColor;
+            const borderClass = theme.borderColor;
+            const textClass = theme.textColor;
+            color = `${borderClass} ${bgClass} ${textClass}`;
+        }
+    } else if (activeCanvasNode) {
+        // 從 Canvas 拖動
+        if (isLayoutNode(activeCanvasNode)) {
+            // Canvas Layout
+            label = activeCanvasNode.label || undefindedName;
+            color = activeCanvasNode.layoutType === 'block'
+                ? 'border-violet-400 bg-violet-100 text-violet-700'
+                : activeCanvasNode.layoutType === 'flex'
+                  ? 'border-sky-400 bg-sky-100 text-sky-700'
+                  : 'border-emerald-400 bg-emerald-100 text-emerald-700';
+        } else {
+            // Canvas Component
+            label = activeCanvasNode.label ? `${activeCanvasNode.componentId} ${activeCanvasNode.label}` : undefindedName;
+            const config = componentRegistry[activeCanvasNode.componentId];
+            const theme = config
+                ? CATEGORY_THEMES[config.category] || DEFAULT_THEME
+                : DEFAULT_THEME;
+            const bgClass = theme.bgColor;
+            const borderClass = theme.borderColor;
+            const textClass = theme.textColor;
+            color = `${borderClass} ${bgClass} ${textClass}`;
+        }
+    }
 
     return (
-        <>
-            {activeSidebarType ? (
-                <div
-                    className={`rounded-lg border-2 px-4 py-3 shadow-lg font-semibold text-sm ${overlayColor}`}
-                >
-                    {overlayLabel}
-                </div>
-            ) : activeCanvasLayout ? (
-                <div
-                    className={`rounded-lg border-2 px-4 py-3 shadow-lg font-semibold text-sm opacity-80 ${canvasOverlayColor}`}
-                >
-                    {activeCanvasLayout.label}
-                </div>
-            ) : null}
-        </>
+        <div
+            className={`rounded-lg border-2 px-4 py-3 shadow-lg font-semibold text-sm opacity-80 ${color}`}
+        >
+            {label}
+        </div>
     );
 }

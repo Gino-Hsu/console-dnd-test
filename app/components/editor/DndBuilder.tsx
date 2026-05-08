@@ -20,7 +20,6 @@ import {
     createLayout,
     createComponent,
     findContainer,
-    findLayoutById,
     findNodeById,
     insertIntoSlot,
     isSlotInsideLayout,
@@ -28,7 +27,7 @@ import {
     moveItem,
 } from '@/lib/layout';
 import Sidebar from './Sidebar';
-import type { LayoutType } from '@/types/layout';
+import type { LayoutType, SidebarDragItem } from '@/types/layout';
 import type { ComponentId } from '@/lib/component-registry/component-ids';
 import { isLayoutNode } from '@/types/layout';
 
@@ -85,8 +84,7 @@ export default function DndBuilder() {
         ],
     );
 
-    const [activeSidebarType, setActiveSidebarType] =
-        useState<LayoutType | null>(null);
+    const [activeSidebarItem, setActiveSidebarItem] = useState<SidebarDragItem | null>(null);
     const [activeCanvasId, setActiveCanvasId] = useState<string | null>(null);
     const [insertIndex, setInsertIndex] = useState<number | null>(null);
     const [insertSlotId, setInsertSlotId] = useState<string | null>(null);
@@ -116,9 +114,26 @@ export default function DndBuilder() {
     const handleDragStart = useCallback((event: DragStartEvent) => {
         const data = event.active.data.current;
         if (data?.source === 'sidebar') {
-            setActiveSidebarType(data.type as LayoutType);
+            if (data.type === 'component') {
+                // 從 Sidebar 拖動 Component
+                setActiveSidebarItem({
+                    type: 'component',
+                    componentId: data.componentId as ComponentId,
+                    label: data.label as string,
+                });
+            } else {
+                // 從 Sidebar 拖動 Layout
+                setActiveSidebarItem({
+                    type: 'layout',
+                    layoutType: data.type as LayoutType,
+                    label: data.label as string,
+                });
+            }
+            setActiveCanvasId(null);
         } else {
+            // 從 Canvas 拖動
             setActiveCanvasId(event.active.id as string);
+            setActiveSidebarItem(null);
             activeCanvasIdRef.current = event.active.id as string;
             activeContainerRef.current = findContainer(
                 event.active.id as string,
@@ -216,7 +231,7 @@ export default function DndBuilder() {
 
             const currentInsertIndex = insertIndex;
 
-            setActiveSidebarType(null);
+            setActiveSidebarItem(null);
             setActiveCanvasId(null);
             setInsertIndex(null);
             setInsertSlotId(null);
@@ -338,7 +353,7 @@ export default function DndBuilder() {
 
     // ── DragCancel ─────────────────────────
     const handleDragCancel = useCallback(() => {
-        setActiveSidebarType(null);
+        setActiveSidebarItem(null);
         setActiveCanvasId(null);
         setInsertIndex(null);
         setInsertSlotId(null);
@@ -346,10 +361,8 @@ export default function DndBuilder() {
         activeCanvasIdRef.current = null;
     }, []);
 
-    console.log('layouts', layouts);
-
-    const activeCanvasLayout = activeCanvasId
-        ? findLayoutById(activeCanvasId, layouts)
+    const activeCanvasNode = activeCanvasId
+        ? findNodeById(activeCanvasId, layouts)
         : null;
 
     if (isLoading) {
@@ -443,8 +456,8 @@ export default function DndBuilder() {
 
             <DragOverlay dropAnimation={null}>
                 <DragOverlayContent
-                    activeSidebarType={activeSidebarType}
-                    activeCanvasLayout={activeCanvasLayout}
+                    activeSidebarItem={activeSidebarItem}
+                    activeCanvasNode={activeCanvasNode}
                 />
             </DragOverlay>
         </DndContext>

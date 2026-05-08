@@ -25,6 +25,14 @@ export interface ComponentNode {
 
 export type CanvasNode = NestedLayout | ComponentNode;
 
+// ─── Drag Overlay 型別 ────────────────────────────────────────
+
+export type SidebarDragItem = 
+    | { type: 'layout'; layoutType: LayoutType; label: string }
+    | { type: 'component'; componentId: ComponentId; label: string };
+
+// ─── Slot 型別 ────────────────────────────────────────────────
+
 export type SlotAlign = 'left' | 'center' | 'right';
 
 export const ALIGN_CLASS: Record<SlotAlign, string> = {
