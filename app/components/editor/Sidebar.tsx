@@ -9,6 +9,7 @@ import type { LayoutSpacing, NestedLayout, ComponentNode } from './types';
 
 export default function Sidebar({
     selectedLayout,
+    selectedLayoutIsRoot = false,
     selectedComponent,
     onAddSlot,
     onRemoveSlot,
@@ -17,11 +18,13 @@ export default function Sidebar({
     onUpdateFlexGap,
     onUpdateFlexRowGap,
     onUpdateFlexWrap,
+    onUpdateContainerWidth,
     onUpdateComponentData,
     onUpdateComponentStyle,
     onDeselect,
 }: {
     selectedLayout: NestedLayout | null;
+    selectedLayoutIsRoot?: boolean;
     selectedComponent: ComponentNode | null;
     onAddSlot: (layoutId: string) => void;
     onRemoveSlot: (layoutId: string, slotId: string) => void;
@@ -36,6 +39,10 @@ export default function Sidebar({
     onUpdateFlexGap?: (layoutId: string, flexGap: number) => void;
     onUpdateFlexRowGap?: (layoutId: string, flexRowGap: number) => void;
     onUpdateFlexWrap?: (layoutId: string, flexWrap: boolean) => void;
+    onUpdateContainerWidth?: (
+        layoutId: string,
+        containerWidth: 'full' | 'contained',
+    ) => void;
     onUpdateComponentData: (
         componentId: string,
         data: Record<string, unknown>,
@@ -56,6 +63,7 @@ export default function Sidebar({
             {selectedLayout ? (
                 <LayoutEditor
                     layout={selectedLayout}
+                    isRoot={selectedLayoutIsRoot}
                     onAddSlot={onAddSlot}
                     onRemoveSlot={onRemoveSlot}
                     onUpdateSpacing={onUpdateSpacing}
@@ -63,6 +71,7 @@ export default function Sidebar({
                     onUpdateFlexGap={onUpdateFlexGap}
                     onUpdateFlexRowGap={onUpdateFlexRowGap}
                     onUpdateFlexWrap={onUpdateFlexWrap}
+                    onUpdateContainerWidth={onUpdateContainerWidth}
                     onDeselect={onDeselect}
                 />
             ) : selectedComponent ? (

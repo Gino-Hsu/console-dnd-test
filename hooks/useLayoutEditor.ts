@@ -1,319 +1,342 @@
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import {
-  createLayout,
-  insertIntoSlot,
-  moveItem,
-  removeItem,
-  addSlotToLayout,
-  removeSlotFromLayout,
-  updateField,
-  mapLayouts,
-  findLayout,
+    createLayout,
+    insertIntoSlot,
+    moveItem,
+    removeItem,
+    addSlotToLayout,
+    removeSlotFromLayout,
+    updateField,
+    mapLayouts,
+    findLayout,
 } from '@/lib/layout';
 import type {
-  LayoutSpacing,
-  LayoutType,
-  NestedLayout,
-  SlotAlign,
-  PageGraph,
+    LayoutSpacing,
+    LayoutType,
+    NestedLayout,
+    SlotAlign,
+    PageGraph,
 } from '@/types/layout';
 import { graphToTree, flattenToGraph } from '@/lib/layout';
 import getPageGraph from '@/app/api/getPageGraph';
 
 export function useLayoutEditor() {
-  // SSOT: 以扁平的 PageGraph 作為唯一狀態來源
-  const [graph, setGraph] = useState<PageGraph | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [selectedLayoutId, setSelectedLayoutId] = useState<string | null>(null);
+    // SSOT: 以扁平的 PageGraph 作為唯一狀態來源
+    const [graph, setGraph] = useState<PageGraph | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [loadError, setLoadError] = useState<string | null>(null);
+    const [selectedLayoutId, setSelectedLayoutId] = useState<string | null>(
+        null,
+    );
 
-  useEffect(() => {
-    let cancelled = false;
+    useEffect(() => {
+        let cancelled = false;
 
-    async function load() {
-      try {
-        setIsLoading(true);
-        setLoadError(null);
+        async function load() {
+            try {
+                setIsLoading(true);
+                setLoadError(null);
 
-        const fetchedGraph = await getPageGraph();
+                const fetchedGraph = await getPageGraph();
 
-        if (!cancelled) {
-          setGraph(fetchedGraph);
+                if (!cancelled) {
+                    setGraph(fetchedGraph);
+                }
+            } catch (err) {
+                if (!cancelled) {
+                    setLoadError(String(err));
+                }
+            } finally {
+                if (!cancelled) {
+                    setIsLoading(false);
+                }
+            }
         }
-      } catch (err) {
-        if (!cancelled) {
-          setLoadError(String(err));
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    }
 
-    load();
+        load();
 
-    return () => {
-      cancelled = true;
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    // Selector: 動態產出 tree 供畫面渲染
+    const layouts = useMemo(() => {
+        return graph ? graphToTree(graph) : [];
+    }, [graph]);
+
+    // Updater: 修改 tree 然後同步回 graph (維持舊有 API 相容性)
+    const setLayouts = useCallback(
+        (
+            updater:
+                | NestedLayout[]
+                | ((prev: NestedLayout[]) => NestedLayout[]),
+        ) => {
+            setGraph(prevGraph => {
+                if (!prevGraph) return prevGraph;
+                const currentTree = graphToTree(prevGraph);
+                const nextTree =
+                    typeof updater === 'function'
+                        ? updater(currentTree)
+                        : updater;
+                return flattenToGraph(nextTree, {
+                    pageId: prevGraph.pageId,
+                    version: prevGraph.version,
+                    status: prevGraph.status,
+                    createdAt: prevGraph.createdAt,
+                });
+            });
+        },
+        [setGraph],
+    );
+
+    const selectedLayout = selectedLayoutId
+        ? findLayout(selectedLayoutId, layouts)
+        : null;
+
+    const handleRemove = useCallback(
+        (id: string) => {
+            setLayouts(prev => removeItem(prev, id));
+            setSelectedLayoutId(null);
+        },
+        [setLayouts, setSelectedLayoutId],
+    );
+
+    const handleSelect = useCallback(
+        (id: string) => {
+            setSelectedLayoutId(prev => (prev === id ? null : id));
+        },
+        [setSelectedLayoutId],
+    );
+
+    const handleAddSlot = useCallback(
+        (layoutId: string) => {
+            setLayouts(prev => addSlotToLayout(prev, layoutId));
+        },
+        [setLayouts],
+    );
+
+    const handleRemoveSlot = useCallback(
+        (layoutId: string, slotId: string) => {
+            setLayouts(prev => removeSlotFromLayout(prev, layoutId, slotId));
+        },
+        [setLayouts],
+    );
+
+    const handleUpdateSpacing = useCallback(
+        (layoutId: string, spacing: LayoutSpacing) => {
+            setLayouts(prev => updateField(prev, layoutId, { spacing }));
+        },
+        [setLayouts],
+    );
+
+    const handleUpdateSlotWidths = useCallback(
+        (layoutId: string, widths: number[]) => {
+            setLayouts(prev =>
+                mapLayouts(prev, l => {
+                    if (l.id !== layoutId) return l;
+                    return {
+                        ...l,
+                        slots: l.slots.map((s, i) => ({
+                            ...s,
+                            flexWidthConfig: {
+                                ...s.flexWidthConfig,
+                                flexBasis:
+                                    widths[i] ?? s.flexWidthConfig.flexBasis,
+                            },
+                        })),
+                    };
+                }),
+            );
+        },
+        [setLayouts],
+    );
+
+    const handleUpdateWrapSlotWidth = useCallback(
+        (layoutId: string, slotId: string, widthPx: number) => {
+            setLayouts(prev =>
+                mapLayouts(prev, l => {
+                    if (l.id !== layoutId) return l;
+                    return {
+                        ...l,
+                        slots: l.slots.map(s =>
+                            s.id === slotId
+                                ? {
+                                      ...s,
+                                      flexWidthConfig: {
+                                          ...s.flexWidthConfig,
+                                          widthPx,
+                                      },
+                                  }
+                                : s,
+                        ),
+                    };
+                }),
+            );
+        },
+        [setLayouts],
+    );
+
+    const handleUpdateGridDimensions = useCallback(
+        (
+            layoutId: string,
+            colWidths: number[],
+            rowHeights: number[],
+            colGap: number | null,
+            rowGap: number | null,
+        ) => {
+            setLayouts(prev =>
+                mapLayouts(prev, l => {
+                    if (l.id !== layoutId) return l;
+                    return {
+                        ...l,
+                        gridConfig: {
+                            colWidths,
+                            rowHeights,
+                            colGap: colGap ?? l.gridConfig?.colGap ?? 8,
+                            rowGap: rowGap ?? l.gridConfig?.rowGap ?? 8,
+                        },
+                    };
+                }),
+            );
+        },
+        [setLayouts],
+    );
+
+    const handleUpdateFlexGap = useCallback(
+        (layoutId: string, gap: number) => {
+            setLayouts(prev =>
+                mapLayouts(prev, l =>
+                    l.id === layoutId
+                        ? { ...l, flexConfig: { ...l.flexConfig!, gap } }
+                        : l,
+                ),
+            );
+        },
+        [setLayouts],
+    );
+
+    const handleUpdateFlexWrap = useCallback(
+        (layoutId: string, wrap: boolean) => {
+            setLayouts(prev =>
+                mapLayouts(prev, l =>
+                    l.id === layoutId
+                        ? { ...l, flexConfig: { ...l.flexConfig!, wrap } }
+                        : l,
+                ),
+            );
+        },
+        [setLayouts],
+    );
+
+    const handleUpdateFlexRowGap = useCallback(
+        (layoutId: string, rowGap: number) => {
+            setLayouts(prev =>
+                mapLayouts(prev, l =>
+                    l.id === layoutId
+                        ? { ...l, flexConfig: { ...l.flexConfig!, rowGap } }
+                        : l,
+                ),
+            );
+        },
+        [setLayouts],
+    );
+
+    const handleUpdateSlotAlign = useCallback(
+        (layoutId: string, slotId: string, align: SlotAlign) => {
+            setLayouts(prev =>
+                mapLayouts(prev, l => {
+                    if (l.id !== layoutId) return l;
+                    return {
+                        ...l,
+                        slots: l.slots.map(s =>
+                            s.id === slotId ? { ...s, align } : s,
+                        ),
+                    };
+                }),
+            );
+        },
+        [setLayouts],
+    );
+
+    const handleUpdateContainerWidth = useCallback(
+        (layoutId: string, containerWidth: 'full' | 'contained') => {
+            setLayouts(prev =>
+                mapLayouts(prev, l =>
+                    l.id === layoutId ? { ...l, containerWidth } : l,
+                ),
+            );
+        },
+        [setLayouts],
+    );
+
+    const applyMove = useCallback(
+        (
+            activeId: string,
+            targetContainer: string,
+            index: number | null | undefined,
+        ) => {
+            setLayouts(prev =>
+                moveItem(prev, activeId, targetContainer, index ?? undefined),
+            );
+        },
+        [setLayouts],
+    );
+
+    const applySidebarDrop = useCallback(
+        (
+            type: LayoutType,
+            label: string,
+            target:
+                | { type: 'slot'; ownerId: string; slotId: string }
+                | { type: 'canvas' },
+            index: number | null,
+        ) => {
+            const newLayout = createLayout(type, label);
+            if (target.type === 'slot') {
+                setLayouts(prev =>
+                    insertIntoSlot(
+                        prev,
+                        target.ownerId,
+                        target.slotId,
+                        newLayout,
+                        index ?? undefined,
+                    ),
+                );
+            } else {
+                setLayouts(prev => {
+                    const next = [...prev];
+                    next.splice(index ?? prev.length, 0, newLayout);
+                    return next;
+                });
+            }
+        },
+        [setLayouts],
+    );
+
+    return {
+        graph,
+        layouts,
+        setLayouts,
+        isLoading,
+        loadError,
+        selectedLayoutId,
+        selectedLayout,
+        handleRemove,
+        handleSelect,
+        handleAddSlot,
+        handleRemoveSlot,
+        handleUpdateSpacing,
+        handleUpdateSlotWidths,
+        handleUpdateWrapSlotWidth,
+        handleUpdateGridDimensions,
+        handleUpdateFlexGap,
+        handleUpdateFlexWrap,
+        handleUpdateFlexRowGap,
+        handleUpdateSlotAlign,
+        handleUpdateContainerWidth,
+        applyMove,
+        applySidebarDrop,
+        deselectLayout: () => setSelectedLayoutId(null),
     };
-  }, []);
-
-  // Selector: 動態產出 tree 供畫面渲染
-  const layouts = useMemo(() => {
-    return graph ? graphToTree(graph) : [];
-  }, [graph]);
-
-  // Updater: 修改 tree 然後同步回 graph (維持舊有 API 相容性)
-  const setLayouts = useCallback(
-    (updater: NestedLayout[] | ((prev: NestedLayout[]) => NestedLayout[])) => {
-      setGraph(prevGraph => {
-        if (!prevGraph) return prevGraph;
-        const currentTree = graphToTree(prevGraph);
-        const nextTree =
-          typeof updater === 'function' ? updater(currentTree) : updater;
-        return flattenToGraph(nextTree, {
-          pageId: prevGraph.pageId,
-          version: prevGraph.version,
-          status: prevGraph.status,
-          createdAt: prevGraph.createdAt,
-        });
-      });
-    },
-    [setGraph],
-  );
-
-  const selectedLayout = selectedLayoutId
-    ? findLayout(selectedLayoutId, layouts)
-    : null;
-
-  const handleRemove = useCallback(
-    (id: string) => {
-      setLayouts(prev => removeItem(prev, id));
-      setSelectedLayoutId(null);
-    },
-    [setLayouts, setSelectedLayoutId],
-  );
-
-  const handleSelect = useCallback(
-    (id: string) => {
-      setSelectedLayoutId(prev => (prev === id ? null : id));
-    },
-    [setSelectedLayoutId],
-  );
-
-  const handleAddSlot = useCallback(
-    (layoutId: string) => {
-      setLayouts(prev => addSlotToLayout(prev, layoutId));
-    },
-    [setLayouts],
-  );
-
-  const handleRemoveSlot = useCallback(
-    (layoutId: string, slotId: string) => {
-      setLayouts(prev => removeSlotFromLayout(prev, layoutId, slotId));
-    },
-    [setLayouts],
-  );
-
-  const handleUpdateSpacing = useCallback(
-    (layoutId: string, spacing: LayoutSpacing) => {
-      setLayouts(prev => updateField(prev, layoutId, { spacing }));
-    },
-    [setLayouts],
-  );
-
-  const handleUpdateSlotWidths = useCallback(
-    (layoutId: string, widths: number[]) => {
-      setLayouts(prev =>
-        mapLayouts(prev, l => {
-          if (l.id !== layoutId) return l;
-          return {
-            ...l,
-            slots: l.slots.map((s, i) => ({
-              ...s,
-              flexWidthConfig: {
-                ...s.flexWidthConfig,
-                flexBasis: widths[i] ?? s.flexWidthConfig.flexBasis,
-              },
-            })),
-          };
-        }),
-      );
-    },
-    [setLayouts],
-  );
-
-  const handleUpdateWrapSlotWidth = useCallback(
-    (layoutId: string, slotId: string, widthPx: number) => {
-      setLayouts(prev =>
-        mapLayouts(prev, l => {
-          if (l.id !== layoutId) return l;
-          return {
-            ...l,
-            slots: l.slots.map(s =>
-              s.id === slotId
-                ? {
-                    ...s,
-                    flexWidthConfig: {
-                      ...s.flexWidthConfig,
-                      widthPx,
-                    },
-                  }
-                : s,
-            ),
-          };
-        }),
-      );
-    },
-    [setLayouts],
-  );
-
-  const handleUpdateGridDimensions = useCallback(
-    (
-      layoutId: string,
-      colWidths: number[],
-      rowHeights: number[],
-      colGap: number | null,
-      rowGap: number | null,
-    ) => {
-      setLayouts(prev =>
-        mapLayouts(prev, l => {
-          if (l.id !== layoutId) return l;
-          return {
-            ...l,
-            gridConfig: {
-              colWidths,
-              rowHeights,
-              colGap: colGap ?? l.gridConfig?.colGap ?? 8,
-              rowGap: rowGap ?? l.gridConfig?.rowGap ?? 8,
-            },
-          };
-        }),
-      );
-    },
-    [setLayouts],
-  );
-
-  const handleUpdateFlexGap = useCallback(
-    (layoutId: string, gap: number) => {
-      setLayouts(prev =>
-        mapLayouts(prev, l =>
-          l.id === layoutId
-            ? { ...l, flexConfig: { ...l.flexConfig!, gap } }
-            : l,
-        ),
-      );
-    },
-    [setLayouts],
-  );
-
-  const handleUpdateFlexWrap = useCallback(
-    (layoutId: string, wrap: boolean) => {
-      setLayouts(prev =>
-        mapLayouts(prev, l =>
-          l.id === layoutId
-            ? { ...l, flexConfig: { ...l.flexConfig!, wrap } }
-            : l,
-        ),
-      );
-    },
-    [setLayouts],
-  );
-
-  const handleUpdateFlexRowGap = useCallback(
-    (layoutId: string, rowGap: number) => {
-      setLayouts(prev =>
-        mapLayouts(prev, l =>
-          l.id === layoutId
-            ? { ...l, flexConfig: { ...l.flexConfig!, rowGap } }
-            : l,
-        ),
-      );
-    },
-    [setLayouts],
-  );
-
-  const handleUpdateSlotAlign = useCallback(
-    (layoutId: string, slotId: string, align: SlotAlign) => {
-      setLayouts(prev =>
-        mapLayouts(prev, l => {
-          if (l.id !== layoutId) return l;
-          return {
-            ...l,
-            slots: l.slots.map(s => (s.id === slotId ? { ...s, align } : s)),
-          };
-        }),
-      );
-    },
-    [setLayouts],
-  );
-
-  const applyMove = useCallback(
-    (
-      activeId: string,
-      targetContainer: string,
-      index: number | null | undefined,
-    ) => {
-      setLayouts(prev =>
-        moveItem(prev, activeId, targetContainer, index ?? undefined),
-      );
-    },
-    [setLayouts],
-  );
-
-  const applySidebarDrop = useCallback(
-    (
-      type: LayoutType,
-      label: string,
-      target:
-        | { type: 'slot'; ownerId: string; slotId: string }
-        | { type: 'canvas' },
-      index: number | null,
-    ) => {
-      const newLayout = createLayout(type, label);
-      if (target.type === 'slot') {
-        setLayouts(prev =>
-          insertIntoSlot(
-            prev,
-            target.ownerId,
-            target.slotId,
-            newLayout,
-            index ?? undefined,
-          ),
-        );
-      } else {
-        setLayouts(prev => {
-          const next = [...prev];
-          next.splice(index ?? prev.length, 0, newLayout);
-          return next;
-        });
-      }
-    },
-    [setLayouts],
-  );
-
-  return {
-    graph,
-    layouts,
-    setLayouts,
-    isLoading,
-    loadError,
-    selectedLayoutId,
-    selectedLayout,
-    handleRemove,
-    handleSelect,
-    handleAddSlot,
-    handleRemoveSlot,
-    handleUpdateSpacing,
-    handleUpdateSlotWidths,
-    handleUpdateWrapSlotWidth,
-    handleUpdateGridDimensions,
-    handleUpdateFlexGap,
-    handleUpdateFlexWrap,
-    handleUpdateFlexRowGap,
-    handleUpdateSlotAlign,
-    applyMove,
-    applySidebarDrop,
-    deselectLayout: () => setSelectedLayoutId(null),
-  };
 }

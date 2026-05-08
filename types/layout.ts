@@ -1,6 +1,6 @@
 // ─── 基礎型別 ────────────────────────────────────────────────
 
-import type { ComponentId } from "@/lib/component-registry/component-ids";
+import type { ComponentId } from '@/lib/component-registry/component-ids';
 
 export type LayoutType = 'block' | 'flex' | 'grid';
 
@@ -113,6 +113,12 @@ export interface NestedLayout {
     flexConfig: FlexConfig | null;
     /** grid layout 專用設定（layoutType !== 'grid' 時為 null） */
     gridConfig: GridConfig | null;
+    /**
+     * 僅 root layout（depth === 0）有意義。
+     * 'full'      = 100% 寬（預設）
+     * 'contained' = 置中容器（max-w-5xl mx-auto）
+     */
+    containerWidth?: 'full' | 'contained';
 }
 
 // ─── 版本快照 ─────────────────────────────────────────────────
@@ -144,6 +150,8 @@ export interface FlatLayout {
     flexConfig: FlexConfig | null;
     /** grid layout 專用設定（layoutType !== 'grid' 時為 null） */
     gridConfig: GridConfig | null;
+    /** 僅 root layout 有意義 */
+    containerWidth?: 'full' | 'contained';
 }
 
 /**

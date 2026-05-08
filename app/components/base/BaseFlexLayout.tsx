@@ -1,5 +1,3 @@
-'use client';
-
 import { Fragment, type RefObject } from 'react';
 import ResizeHandle from '@/app/components/editor/ResizeHandle';
 import SlotZone from '@/app/components/editor/layout/SlotZone';

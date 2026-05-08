@@ -105,6 +105,7 @@ function SpacingInput({
 /* ── 主元件 ─────────────────────────────────────────── */
 export default function LayoutEditor({
     layout,
+    isRoot = false,
     onAddSlot,
     onRemoveSlot,
     onUpdateSpacing,
@@ -112,9 +113,11 @@ export default function LayoutEditor({
     onUpdateFlexGap,
     onUpdateFlexRowGap,
     onUpdateFlexWrap,
+    onUpdateContainerWidth,
     onDeselect,
 }: {
     layout: NestedLayout;
+    isRoot?: boolean;
     onAddSlot: (layoutId: string) => void;
     onRemoveSlot: (layoutId: string, slotId: string) => void;
     onUpdateSpacing: (layoutId: string, spacing: LayoutSpacing) => void;
@@ -128,6 +131,10 @@ export default function LayoutEditor({
     onUpdateFlexGap?: (layoutId: string, flexGap: number) => void;
     onUpdateFlexRowGap?: (layoutId: string, flexRowGap: number) => void;
     onUpdateFlexWrap?: (layoutId: string, flexWrap: boolean) => void;
+    onUpdateContainerWidth?: (
+        layoutId: string,
+        containerWidth: 'full' | 'contained',
+    ) => void;
     onDeselect: () => void;
 }) {
     const [slotsOpen, setSlotsOpen] = useState(true);
@@ -588,6 +595,96 @@ export default function LayoutEditor({
                             )}
                         </div>
                     )}
+
+                {/* 分隔線 */}
+                <div className='border-t border-zinc-100' />
+
+                {/* ── 容器寬度（僅 root layout） ── */}
+                {isRoot && onUpdateContainerWidth && (
+                    <div className='flex flex-col gap-2'>
+                        <p className='text-xs font-semibold text-zinc-500 uppercase tracking-wide'>
+                            容器寬度
+                        </p>
+                        <div className='grid grid-cols-2 gap-1'>
+                            {(
+                                [
+                                    { value: 'full', label: '滿版' },
+                                    { value: 'contained', label: '未滿版' },
+                                ] as const
+                            ).map(({ value, label }) => {
+                                const active =
+                                    (layout.containerWidth ?? 'full') === value;
+                                return (
+                                    <button
+                                        key={value}
+                                        onClick={() =>
+                                            onUpdateContainerWidth(
+                                                layout.id,
+                                                value,
+                                            )
+                                        }
+                                        className={`flex items-center justify-center gap-1.5 py-1.5 rounded text-xs font-medium border transition-colors ${
+                                            active
+                                                ? 'bg-blue-50 border-blue-400 text-blue-600'
+                                                : 'bg-white border-zinc-200 text-zinc-500 hover:border-zinc-400'
+                                        }`}
+                                    >
+                                        {value === 'full' ? (
+                                            <svg
+                                                width='14'
+                                                height='14'
+                                                viewBox='0 0 14 14'
+                                                fill='none'
+                                                stroke='currentColor'
+                                                strokeWidth='1.5'
+                                            >
+                                                <rect
+                                                    x='1'
+                                                    y='3'
+                                                    width='12'
+                                                    height='8'
+                                                    rx='1'
+                                                />
+                                            </svg>
+                                        ) : (
+                                            <svg
+                                                width='14'
+                                                height='14'
+                                                viewBox='0 0 14 14'
+                                                fill='none'
+                                                stroke='currentColor'
+                                                strokeWidth='1.5'
+                                            >
+                                                <rect
+                                                    x='3'
+                                                    y='3'
+                                                    width='8'
+                                                    height='8'
+                                                    rx='1'
+                                                />
+                                                <line
+                                                    x1='1'
+                                                    y1='3'
+                                                    x2='1'
+                                                    y2='11'
+                                                    strokeDasharray='2 1'
+                                                />
+                                                <line
+                                                    x1='13'
+                                                    y1='3'
+                                                    x2='13'
+                                                    y2='11'
+                                                    strokeDasharray='2 1'
+                                                />
+                                            </svg>
+                                        )}
+                                        {label}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
 
                 {/* 分隔線 */}
                 <div className='border-t border-zinc-100' />

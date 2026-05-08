@@ -1,49 +1,28 @@
 import { layoutTheme } from '@/lib/layout/resizeUtils';
 import type { NestedLayout } from '@/types/layout';
-import SharedBlockLayout from '@/app/components/shared/SharedBlockLayout';
-import SharedFlexLayout from '@/app/components/shared/SharedFlexLayout';
-import SharedGridLayout from '@/app/components/shared/SharedGridLayout';
+import BaseLayoutFrame from '@/app/components/base/BaseLayoutFrame';
+import SharedBlockLayout from '@/app/components/base/BaseBlockLayout';
+import SharedFlexLayout from '@/app/components/base/BaseFlexLayout';
+import SharedGridLayout from '@/app/components/base/BaseGridLayout';
 
 export default function ViewLayoutCard({
     layout,
+    depth = 0,
 }: {
     layout: NestedLayout;
     depth?: number;
 }) {
     const { borderColor, bgColor } = layoutTheme(layout.layoutType);
-    const sp = layout.spacing;
-    const mt = sp?.margin.top ?? 0,
-        mr = sp?.margin.right ?? 0;
-    const mb = sp?.margin.bottom ?? 0,
-        ml = sp?.margin.left ?? 0;
-    const pt = sp?.padding.top ?? 0,
-        pr = sp?.padding.right ?? 0;
-    const pb = sp?.padding.bottom ?? 0,
-        pl = sp?.padding.left ?? 0;
-    const hasMargin = mt + mr + mb + ml > 0;
 
     return (
-        <div
-            style={{
-                paddingTop: mt,
-                paddingRight: mr,
-                paddingBottom: mb,
-                paddingLeft: ml,
-            }}
-            className='w-full'
+        <BaseLayoutFrame
+            layout={layout}
+            depth={depth}
+            outerClassName='w-full'
+            innerClassName={`border-2 ${borderColor} ${bgColor}`}
         >
-            <div
-                className={`border-2 ${borderColor} ${bgColor}`}
-                style={{
-                    paddingTop: Math.max(pt),
-                    paddingRight: Math.max(pr, 0),
-                    paddingBottom: Math.max(pb, 0),
-                    paddingLeft: Math.max(pl, 0),
-                }}
-            >
-                <ViewLayoutContent layout={layout} />
-            </div>
-        </div>
+            <ViewLayoutContent layout={layout} />
+        </BaseLayoutFrame>
     );
 }
 
