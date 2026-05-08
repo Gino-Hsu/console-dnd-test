@@ -4,7 +4,7 @@ import { isLayoutNode } from '@/types/layout';
 
 // ─── 常數 ────────────────────────────────────────────────────
 
-/** 最大允許巢狀層數（root = 0，最深 = MAX_DEPTH） */
+/** 最大允許巢狀層數（root = 0，最深 = MAX_DEPTH - 1） */
 export const MAX_DEPTH = 3;
 
 // ─── 查詢 ────────────────────────────────────────────────────
@@ -139,10 +139,7 @@ export function findNodeById(
 /**
  * 遞迴移除任何 node（layout 或 component）
  */
-export function removeNode(
-    items: NestedLayout[],
-    id: string,
-): NestedLayout[] {
+export function removeNode(items: NestedLayout[], id: string): NestedLayout[] {
     return items
         .filter(l => l.id !== id)
         .map(layout => ({

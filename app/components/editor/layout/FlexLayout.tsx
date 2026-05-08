@@ -1,7 +1,7 @@
 'use client';
 
 import type { RefObject } from 'react';
-import SharedFlexLayout from '@/app/components/shared/SharedFlexLayout';
+import SharedFlexLayout from '@/app/components/base/BaseFlexLayout';
 import type { NestedLayout } from '@/types/layout';
 import type { SlotProps } from './types';
 

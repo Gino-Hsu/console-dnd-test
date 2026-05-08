@@ -92,9 +92,9 @@ export function gridContainerStyle(
     };
 }
 
-// ── Layout type theme ─────────────────────────────────────────────────────────
+// ── Layout type ─────────────────────────────────────────────────────────
 
-type LayoutType = NestedLayout['type'];
+type LayoutType = NestedLayout['layoutType'];
 
 const BORDER: Record<LayoutType, [string]> = {
     block: ['border-violet-200'],
@@ -114,4 +114,21 @@ export function layoutTheme(type: LayoutType): {
     bgColor: string;
 } {
     return { borderColor: BORDER[type][0], bgColor: BG[type][0] };
+}
+
+/** 從 layout 物件取出 spacing，轉換為適合直接放入 style 的格式 */
+export function getSpacing(layout: NestedLayout) {
+    const sp = layout.spacing;
+
+    return {
+        mt: sp?.margin.top ?? 0,
+        mr: sp?.margin.right ?? 0,
+        mb: sp?.margin.bottom ?? 0,
+        ml: sp?.margin.left ?? 0,
+
+        pt: sp?.padding.top ?? 0,
+        pr: sp?.padding.right ?? 0,
+        pb: sp?.padding.bottom ?? 0,
+        pl: sp?.padding.left ?? 0,
+    };
 }

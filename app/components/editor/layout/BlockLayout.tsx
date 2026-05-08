@@ -1,6 +1,6 @@
 'use client';
 
-import SharedBlockLayout from '@/app/components/shared/SharedBlockLayout';
+import SharedBlockLayout from '@/app/components/base/BaseBlockLayout';
 import type { NestedLayout } from '@/types/layout';
 import type { SlotProps } from './types';
 
