@@ -3,50 +3,7 @@
 import { useState } from 'react';
 import type { LayoutSpacing, NestedLayout, SpacingValue } from '@/types/layout';
 import { DEFAULT_SPACING } from '@/types/layout';
-
-/* ── 小工具：手風琴 header ─────────────────────────── */
-function AccordionHeader({
-  label,
-  count,
-  open,
-  onToggle,
-  action,
-}: {
-  label: string;
-  count?: number;
-  open: boolean;
-  onToggle: () => void;
-  action?: React.ReactNode;
-}) {
-  return (
-    <div className="flex items-center justify-between">
-      <button
-        onClick={onToggle}
-        className="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 uppercase tracking-wide hover:text-zinc-700 transition-colors"
-      >
-        <svg
-          width="10"
-          height="10"
-          viewBox="0 0 10 10"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          className={`transition-transform ${open ? 'rotate-90' : ''}`}
-        >
-          <path d="M3 2l4 3-4 3" />
-        </svg>
-        {label}
-        {count !== undefined && (
-          <span className="ml-0.5 text-zinc-400 normal-case font-normal">
-            （{count}）
-          </span>
-        )}
-      </button>
-      {action}
-    </div>
-  );
-}
+import { Accordion } from '../common/Accordion';
 
 /* ── 間距輸入器（四方向） ────────────────────────────── */
 function SpacingInput({
@@ -204,36 +161,37 @@ export default function LayoutEditor({
       {/* 捲動區 */}
       <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
         {/* ── Slots 手風琴 ── */}
-        <div className="flex flex-col gap-2">
-          <AccordionHeader
-            label="Slots"
-            count={layout.slots.length}
-            open={slotsOpen}
-            onToggle={() => setSlotsOpen(o => !o)}
-            action={
-              <button
-                onClick={() => onAddSlot(layout.id)}
-                className="flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700 px-2 py-1 rounded hover:bg-blue-50 transition-colors"
+        <Accordion
+          open={slotsOpen}
+          onToggle={() => setSlotsOpen(o => !o)}
+          header={
+            <div className="flex items-center gap-1">
+              <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Slots</span>
+              <span className="text-zinc-400 text-xs normal-case font-normal">（{layout.slots.length}）</span>
+            </div>
+          }
+          action={
+            <button
+              onClick={() => onAddSlot(layout.id)}
+              className="flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700 px-2 py-1 rounded hover:bg-blue-50 transition-colors"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
               >
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                >
-                  <path d="M6 1v10M1 6h10" />
-                </svg>
-                新增
-              </button>
-            }
-          />
-
-          {slotsOpen && (
-            <div className="flex flex-col gap-1.5 mt-0.5">
-              {layout.slots.length === 0 ? (
+                <path d="M6 1v10M1 6h10" />
+              </svg>
+              新增
+            </button>
+          }
+        >
+          <div className="flex flex-col gap-1.5">
+            {layout.slots.length === 0 ? (
                 <div className="flex items-center justify-center h-16 rounded-lg border-2 border-dashed border-zinc-200 text-zinc-400 text-xs">
                   尚無 Slot
                 </div>
@@ -282,8 +240,7 @@ export default function LayoutEditor({
                 ))
               )}
             </div>
-          )}
-        </div>
+        </Accordion>
 
         {/* ── Grid 設定 手風琴（僅 grid layout 顯示） ── */}
         {layout.layoutType === 'grid' &&
@@ -331,15 +288,15 @@ export default function LayoutEditor({
             };
 
             return (
-              <div className="flex flex-col gap-2">
-                <AccordionHeader
-                  label="Grid 設定"
-                  open={gridOpen}
-                  onToggle={() => setGridOpen(o => !o)}
-                />
-                {gridOpen && (
-                  <div className="flex flex-col gap-3 mt-1">
-                    {/* 每列欄數 */}
+              <Accordion
+                open={gridOpen}
+                onToggle={() => setGridOpen(o => !o)}
+                header={
+                  <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Grid 設定</span>
+                }
+              >
+                <div className="flex flex-col gap-3">
+                  {/* 每列欄數 */}
                     <div>
                       <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide mb-2">
                         每列欄數
@@ -416,23 +373,22 @@ export default function LayoutEditor({
                       </div>
                     </div>
                   </div>
-                )}
-              </div>
+              </Accordion>
             );
           })()}
 
         {/* ── Flex 設定 手風琴（僅 flex layout 顯示） ── */}
         {layout.layoutType === 'flex' &&
           (onUpdateFlexGap || onUpdateFlexWrap) && (
-            <div className="flex flex-col gap-2">
-              <AccordionHeader
-                label="Flex 設定"
-                open={flexOpen}
-                onToggle={() => setFlexOpen(o => !o)}
-              />
-              {flexOpen && (
-                <div className="flex flex-col gap-3 mt-1">
-                  {onUpdateFlexGap && (
+            <Accordion
+              open={flexOpen}
+              onToggle={() => setFlexOpen(o => !o)}
+              header={
+                <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">Flex 設定</span>
+              }
+            >
+              <div className="flex flex-col gap-3">
+                {onUpdateFlexGap && (
                     <div>
                       <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide mb-1.5">
                         欄間距 px
@@ -502,8 +458,7 @@ export default function LayoutEditor({
                     </div>
                   )}
                 </div>
-              )}
-            </div>
+            </Accordion>
           )}
 
         {/* ── 容器寬度（僅 root layout） ── */}
@@ -576,16 +531,15 @@ export default function LayoutEditor({
         )}
 
         {/* ── 間距 手風琴 ── */}
-        <div className="flex flex-col gap-2">
-          <AccordionHeader
-            label="間距"
-            open={spacingOpen}
-            onToggle={() => setSpacingOpen(o => !o)}
-          />
-
-          {spacingOpen && (
-            <div className="flex flex-col gap-4 mt-1">
-              <SpacingInput
+        <Accordion
+          open={spacingOpen}
+          onToggle={() => setSpacingOpen(o => !o)}
+          header={
+            <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wide">間距</span>
+          }
+        >
+          <div className="flex flex-col gap-4">
+            <SpacingInput
                 label="Padding（內距）px"
                 value={spacing.padding}
                 onChange={updatePadding}
@@ -596,8 +550,7 @@ export default function LayoutEditor({
                 onChange={updateMargin}
               />
             </div>
-          )}
-        </div>
+        </Accordion>
       </div>
     </div>
   );
