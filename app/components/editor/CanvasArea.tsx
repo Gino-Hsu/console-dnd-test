@@ -13,7 +13,7 @@ import { publishPage, discardDraft } from '@/app/api/pageGraph';
 /*  插入線  */
 export function InsertLine() {
     return (
-        <div className='w-full relative top-1 h-0 pointer-events-none overflow-visible'>
+        <div className='w-full relative top-1 h-0 pointer-events-none overflow-visible mb-2'>
             <div className='absolute inset-x-0 -top-px h-0.5 bg-blue-500 rounded-full'>
                 <div className='absolute -left-1 -top-1.5 w-3 h-3 rounded-full bg-blue-500' />
                 <div className='absolute -right-1 -top-1.5 w-3 h-3 rounded-full bg-blue-500' />
