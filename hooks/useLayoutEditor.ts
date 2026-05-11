@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import {
     createLayout,
     insertIntoSlot,
@@ -18,7 +18,9 @@ import type {
     PageGraph,
 } from '@/types/layout';
 import { graphToTree, flattenToGraph } from '@/lib/layout';
-import getPageGraph from '@/app/api/getPageGraph';
+import { getPageGraph, getDraft, saveDraft } from '@/app/api/pageGraph';
+
+const AUTOSAVE_DELAY_MS = 3000;
 
 export function useLayoutEditor() {
     // SSOT: 以扁平的 PageGraph 作為唯一狀態來源
@@ -28,6 +30,9 @@ export function useLayoutEditor() {
     const [selectedLayoutId, setSelectedLayoutId] = useState<string | null>(
         null,
     );
+    const [isSaving, setIsSaving] = useState(false);
+    const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const isInitialLoadRef = useRef(true);
 
     useEffect(() => {
         let cancelled = false;
@@ -37,10 +42,16 @@ export function useLayoutEditor() {
                 setIsLoading(true);
                 setLoadError(null);
 
-                const fetchedGraph = await getPageGraph();
+                // 優先讀草稿；若無則讀已發布頁面並建立草稿
+                let draft = await getDraft();
+                if (!draft) {
+                    const published = await getPageGraph();
+                    draft = { ...published, status: 'draft' };
+                    await saveDraft(draft);
+                }
 
                 if (!cancelled) {
-                    setGraph(fetchedGraph);
+                    setGraph(draft);
                 }
             } catch (err) {
                 if (!cancelled) {
@@ -49,6 +60,7 @@ export function useLayoutEditor() {
             } finally {
                 if (!cancelled) {
                     setIsLoading(false);
+                    isInitialLoadRef.current = false;
                 }
             }
         }
@@ -59,6 +71,28 @@ export function useLayoutEditor() {
             cancelled = true;
         };
     }, []);
+
+    // Auto-save: debounce 3s after every graph change (skip initial load)
+    useEffect(() => {
+        if (isInitialLoadRef.current || !graph) return;
+
+        if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+        autosaveTimerRef.current = setTimeout(async () => {
+            try {
+                setIsSaving(true);
+                await saveDraft(graph);
+            } catch (err) {
+                console.warn('[autosave] failed:', err);
+            } finally {
+                setIsSaving(false);
+            }
+        }, AUTOSAVE_DELAY_MS);
+
+        return () => {
+            if (autosaveTimerRef.current)
+                clearTimeout(autosaveTimerRef.current);
+        };
+    }, [graph]);
 
     // Selector: 動態產出 tree 供畫面渲染
     const layouts = useMemo(() => {
@@ -320,6 +354,7 @@ export function useLayoutEditor() {
         setLayouts,
         isLoading,
         loadError,
+        isSaving,
         selectedLayoutId,
         selectedLayout,
         handleRemove,

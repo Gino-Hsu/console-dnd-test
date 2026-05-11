@@ -28,7 +28,7 @@ export function flattenToGraph(
     ): void {
         layouts[layout.id] = {
             id: layout.id,
-            type: 'layout',
+            type: layout.type,
             layoutType: layout.layoutType,
             label: layout.label,
             props: layout.props,
@@ -88,8 +88,9 @@ export function flattenToGraph(
  */
 export function graphToTree(graph: PageGraph): NestedLayout[] {
     function buildNode(id: string): CanvasNode {
-        // 先檢查是否為 Layout
+        // 先檢查是否為 Layout（type 為 LayoutType 之一）
         const layout = graph.layouts[id];
+
         if (layout && layout.type === 'layout') {
             const slots = layout.slotIds.map(slotId => {
                 const flatSlot = graph.slots[slotId];

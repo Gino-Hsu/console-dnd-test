@@ -31,6 +31,7 @@ export default function DndBuilder() {
         handleUpdateSlotAlign,
         handleUpdateContainerWidth,
         deselectLayout,
+        isSaving,
     } = useLayoutEditor();
 
     const {
@@ -196,6 +197,7 @@ export default function DndBuilder() {
                     onUpdateGridDimensions={handleUpdateGridDimensions}
                     onUpdateWrapSlotWidth={handleUpdateWrapSlotWidth}
                     onUpdateSlotAlign={handleUpdateSlotAlign}
+                    isSaving={isSaving}
                 />
             </div>
 
