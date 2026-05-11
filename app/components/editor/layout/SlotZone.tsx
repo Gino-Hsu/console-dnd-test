@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import {
     SortableContext,
@@ -157,37 +157,31 @@ export default function SlotZone({
                             )}
                             {slot.children.map((child, idx) => {
                                 return (
-                                    <div
-                                        key={child.id}
-                                        data-canvas-item
-                                        className='w-full'
-                                    >
-                                        <div className='py-1'>
-                                            {isLayoutNode(child) ? (
-                                                <LayoutCard
-                                                    layout={child}
-                                                    depth={depth + 1}
-                                                    isDraggingFromParent={
-                                                        isDragging
-                                                    }
-                                                    {...sp}
-                                                />
-                                            ) : (
-                                                <ComponentCard
-                                                    component={child}
-                                                    depth={depth + 1}
-                                                    isDraggingFromParent={
-                                                        isDragging
-                                                    }
-                                                    {...sp}
-                                                />
-                                            )}
-                                        </div>
+                                    <React.Fragment key={child.id}>
+                                        {isLayoutNode(child) ? (
+                                            <LayoutCard
+                                                layout={child}
+                                                depth={depth + 1}
+                                                isDraggingFromParent={
+                                                    isDragging
+                                                }
+                                                {...sp}
+                                            />
+                                        ) : (
+                                            <ComponentCard
+                                                component={child}
+                                                depth={depth + 1}
+                                                isDraggingFromParent={
+                                                    isDragging
+                                                }
+                                                {...sp}
+                                            />
+                                        )}
                                         {isActive &&
                                             sp.slotInsertIndex === idx + 1 && (
                                                 <InsertLine />
                                             )}
-                                    </div>
+                                    </React.Fragment>
                                 );
                             })}
                         </>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { TextField, SelectField } from '../../../common/FormFields';
+import { RadioWithInput } from '../../../common/RadioWithInput';
 import { Accordion } from '../../../common/Accordion';
 import type { InspectorProps } from '../types';
 
@@ -54,13 +55,16 @@ export default function ImageSimpleInspector({
                     placeholder="e.g. 100%, 300px"
                 />
 
-                <TextField
+                <RadioWithInput
                     label="高度"
                     value={(style.height as string) || 'auto'}
-                    onChange={(value) =>
-                        onUpdateStyle({ ...style, height: value })
-                    }
-                    placeholder="e.g. auto, 200px"
+                    onChange={(value) => onUpdateStyle({ ...style, height: value })}
+                    options={[
+                        { value: 'auto', label: '自動高度 (auto)' },
+                        { value: 'custom', label: '固定高度 (px)', hasInput: true },
+                    ]}
+                    unit="px"
+                    placeholder="200"
                 />
 
                 <TextField
@@ -79,11 +83,11 @@ export default function ImageSimpleInspector({
                         onUpdateStyle({ ...style, objectFit: value })
                     }
                     options={[
-                        { value: 'cover', label: 'Cover' },
-                        { value: 'contain', label: 'Contain' },
-                        { value: 'fill', label: 'Fill' },
-                        { value: 'none', label: 'None' },
-                        { value: 'scale-down', label: 'Scale Down' },
+                        { value: 'cover', label: '覆蓋填滿 (Cover)' },
+                        { value: 'contain', label: '完整顯示 (Contain)' },
+                        { value: 'fill', label: '拉伸填充 (Fill)' },
+                        { value: 'none', label: '原始尺寸 (None)' },
+                        { value: 'scale-down', label: '縮小適應 (Scale Down)' },
                     ]}
                 />
                 </div>

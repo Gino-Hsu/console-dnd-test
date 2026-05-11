@@ -102,34 +102,36 @@ export default function LayoutCard({
     const sp = { ownerId: layout.id, ...shared };
 
     return (
-        <LayoutFrame
-            layout={layout}
-            depth={depth}
-            setNodeRef={setNodeRef}
-            sortStyle={sortStyle}
-            borderColor={borderColor}
-            bgColor={bgColor}
-            isSelected={isSelected}
-        >
-            <LayoutHeader
+        <div data-canvas-item className="w-full">
+            <LayoutFrame
                 layout={layout}
-                listeners={listeners}
-                attributes={attributes}
-                onRemove={shared.onRemove}
-                onSelect={shared.onSelect}
-            />
-            <LayoutContent
-                layout={layout}
-                flexRef={flexRef}
-                gridRef={gridRef}
-                cols={cols}
-                defColW={defColW}
-                sp={sp}
-                onFlexDrag={handleFlexDrag}
-                onColDrag={handleColDrag}
-                isDragging={isDragging || isDraggingFromParent}
                 depth={depth}
-            />
-        </LayoutFrame>
+                setNodeRef={setNodeRef}
+                sortStyle={sortStyle}
+                borderColor={borderColor}
+                bgColor={bgColor}
+                isSelected={isSelected}
+            >
+                <LayoutHeader
+                    layout={layout}
+                    listeners={listeners}
+                    attributes={attributes}
+                    onRemove={shared.onRemove}
+                    onSelect={shared.onSelect}
+                />
+                <LayoutContent
+                    layout={layout}
+                    flexRef={flexRef}
+                    gridRef={gridRef}
+                    cols={cols}
+                    defColW={defColW}
+                    sp={sp}
+                    onFlexDrag={handleFlexDrag}
+                    onColDrag={handleColDrag}
+                    isDragging={isDragging || isDraggingFromParent}
+                    depth={depth}
+                />
+            </LayoutFrame>
+        </div>
     );
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import Image from 'next/image'
 
 export interface ImageSimpleData {
     src: string;
@@ -32,19 +32,29 @@ export const DEFAULT_IMAGE_SIMPLE_STYLE: ImageSimpleStyle = {
 
 export function ImageSimple({ data, style }: ImageSimpleProps) {
     return (
-        <img
-            src={data.src}
-            alt={data.alt}
+        <div
             style={{
-                width: style?.width || DEFAULT_IMAGE_SIMPLE_STYLE.width,
-                height: style?.height || DEFAULT_IMAGE_SIMPLE_STYLE.height,
-                borderRadius:
-                    style?.borderRadius ||
-                    DEFAULT_IMAGE_SIMPLE_STYLE.borderRadius,
-                objectFit:
-                    style?.objectFit || DEFAULT_IMAGE_SIMPLE_STYLE.objectFit,
+                position: "relative",
             }}
-        />
+        >
+            <Image
+                src={data.src}
+                alt={data.alt}
+                width={200}
+                height={200}
+                unoptimized // 跳過優化和網域檢查
+                style={{
+                    width: "100%",
+                    height: style?.height || DEFAULT_IMAGE_SIMPLE_STYLE.height,
+                    borderRadius:
+                        style?.borderRadius ||
+                        DEFAULT_IMAGE_SIMPLE_STYLE.borderRadius,
+                    objectFit:
+                        style?.objectFit ||
+                        DEFAULT_IMAGE_SIMPLE_STYLE.objectFit,
+                }}
+            />
+        </div>
     );
 }
 
