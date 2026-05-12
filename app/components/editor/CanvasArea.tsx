@@ -8,7 +8,7 @@ import {
 import { useCallback, useState } from 'react';
 import LayoutCard from './layout/LayoutCard';
 import type { NestedLayout, PageGraph } from './types';
-import { publishPage, discardDraft } from '@/app/api/pageGraph';
+import { publishPage } from '@/app/api/pageGraph';
 
 /*  插入線  */
 export function InsertLine() {
@@ -81,7 +81,6 @@ export default function CanvasArea({
         setPublishState('loading');
         try {
             await publishPage(graph);
-            await discardDraft();
             setPublishState('success');
             setTimeout(() => setPublishState('idle'), 2000);
             window.open('/frontpage', '_blank');

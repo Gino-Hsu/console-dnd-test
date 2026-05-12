@@ -2,14 +2,20 @@ import { useCallback, useState } from 'react';
 import type { ComponentNode, NestedLayout } from '@/types/layout';
 import { isLayoutNode } from '@/types/layout';
 import { findNodeById, mapLayouts } from '@/lib/layout';
+import type { LoggedSetLayouts } from './useLayoutEditor';
 
 interface UseComponentEditorProps {
     layouts: NestedLayout[];
-    setLayouts: React.Dispatch<React.SetStateAction<NestedLayout[]>>;
+    setLayouts: LoggedSetLayouts;
 }
 
-export function useComponentEditor({ layouts, setLayouts }: UseComponentEditorProps) {
-    const [selectedComponentId, setSelectedComponentId] = useState<string | null>(null);
+export function useComponentEditor({
+    layouts,
+    setLayouts,
+}: UseComponentEditorProps) {
+    const [selectedComponentId, setSelectedComponentId] = useState<
+        string | null
+    >(null);
 
     const selectedComponent = selectedComponentId
         ? (findNodeById(selectedComponentId, layouts) as ComponentNode | null)
@@ -25,18 +31,21 @@ export function useComponentEditor({ layouts, setLayouts }: UseComponentEditorPr
 
     const handleUpdateComponentData = useCallback(
         (componentId: string, data: Record<string, unknown>) => {
-            setLayouts(prev =>
-                mapLayouts(prev, l => ({
-                    ...l,
-                    slots: l.slots.map(s => ({
-                        ...s,
-                        children: s.children.map(c =>
-                            c.id === componentId && !isLayoutNode(c)
-                                ? { ...c, data }
-                                : c,
-                        ),
+            setLayouts(
+                prev =>
+                    mapLayouts(prev, l => ({
+                        ...l,
+                        slots: l.slots.map(s => ({
+                            ...s,
+                            children: s.children.map(c =>
+                                c.id === componentId && !isLayoutNode(c)
+                                    ? { ...c, data }
+                                    : c,
+                            ),
+                        })),
                     })),
-                })),
+                'edit-component',
+                '編輯 Component 內容',
             );
         },
         [setLayouts],
@@ -44,18 +53,21 @@ export function useComponentEditor({ layouts, setLayouts }: UseComponentEditorPr
 
     const handleUpdateComponentStyle = useCallback(
         (componentId: string, style: Record<string, unknown>) => {
-            setLayouts(prev =>
-                mapLayouts(prev, l => ({
-                    ...l,
-                    slots: l.slots.map(s => ({
-                        ...s,
-                        children: s.children.map(c =>
-                            c.id === componentId && !isLayoutNode(c)
-                                ? { ...c, style }
-                                : c,
-                        ),
+            setLayouts(
+                prev =>
+                    mapLayouts(prev, l => ({
+                        ...l,
+                        slots: l.slots.map(s => ({
+                            ...s,
+                            children: s.children.map(c =>
+                                c.id === componentId && !isLayoutNode(c)
+                                    ? { ...c, style }
+                                    : c,
+                            ),
+                        })),
                     })),
-                })),
+                'edit-component',
+                '編輯 Component 樣式',
             );
         },
         [setLayouts],
