@@ -21,7 +21,7 @@ import {
     moveItem,
 } from '@/lib/layout';
 
-import type { LayoutType, NestedLayout } from '@/types/layout';
+import type { LayoutType, NestedLayout, SidebarDragItem } from '@/types/layout';
 import type { ModuleId } from '@/lib/module-registry/module-ids';
 import { isLayoutNode } from '@/types/layout';
 import type { LoggedSetLayouts } from './useLayoutEditor';
@@ -32,8 +32,7 @@ type UseDndBuilderProps = {
 };
 
 export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
-    const [activeSidebarType, setActiveSidebarType] =
-        useState<LayoutType | null>(null);
+    const [activeSidebarItem, setActiveSidebarItem] = useState<SidebarDragItem | null>(null);
 
     const [activeCanvasId, setActiveCanvasId] = useState<string | null>(null);
 
@@ -76,11 +75,28 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
             const data = event.active.data.current;
 
             if (data?.source === 'sidebar') {
-                setActiveSidebarType(data.type as LayoutType);
+                if (data.type === 'module') {
+                    // 從 Sidebar 拖動 Module
+                    setActiveSidebarItem({
+                        type: 'module',
+                        moduleId: data.moduleId as ModuleId,
+                        label: data.label as string,
+                    });
+                } else {
+                    // 從 Sidebar 拖動 Layout
+                    setActiveSidebarItem({
+                        type: 'layout',
+                        layoutType: data.type as LayoutType,
+                        label: data.label as string,
+                    });
+                }
+                setActiveCanvasId(null);
             } else {
+                // 從 Canvas 拖動
                 const id = event.active.id as string;
 
                 setActiveCanvasId(id);
+                setActiveSidebarItem(null);
 
                 activeCanvasIdRef.current = id;
 
@@ -219,7 +235,7 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
             const currentInsertIndex = insertIndex;
 
             // reset
-            setActiveSidebarType(null);
+            setActiveSidebarItem(null);
             setActiveCanvasId(null);
             setInsertIndex(null);
             setInsertSlotId(null);
@@ -404,7 +420,7 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
     // ─────────────────────────────────────
 
     const handleDragCancel = useCallback(() => {
-        setActiveSidebarType(null);
+        setActiveSidebarItem(null);
         setActiveCanvasId(null);
         setInsertIndex(null);
         setInsertSlotId(null);
@@ -418,7 +434,7 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
         handleDragOver,
         handleDragEnd,
         handleDragCancel,
-        activeSidebarType,
+        activeSidebarItem,
         activeCanvasId,
         insertIndex,
         insertSlotId,

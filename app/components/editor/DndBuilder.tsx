@@ -4,8 +4,9 @@ import { DndContext, DragOverlay, pointerWithin } from '@dnd-kit/core';
 import { useCallback, useId } from 'react';
 import { useDndBuilder, useLayoutEditor, useModuleEditor } from '@/hooks';
 import CanvasArea from './CanvasArea';
-import { findLayoutById, findNodeById } from '@/lib/layout';
+import { findNodeById } from '@/lib/layout';
 import Sidebar from './Sidebar';
+import DragOverlayContent from './common/DragOverlayContent';
 import { isLayoutNode } from '@/types/layout';
 
 export default function DndBuilder() {
@@ -49,7 +50,7 @@ export default function DndBuilder() {
         handleDragOver,
         handleDragEnd,
         handleDragCancel,
-        activeSidebarType,
+        activeSidebarItem,
         activeCanvasId,
         insertIndex,
         insertSlotId,
@@ -78,31 +79,9 @@ export default function DndBuilder() {
 
     const dndId = useId();
 
-    const overlayLabel =
-        activeSidebarType === 'block'
-            ? '塊級 Layout'
-            : activeSidebarType === 'flex'
-              ? 'Flex Layout'
-              : 'Grid Layout';
-
-    const overlayColor =
-        activeSidebarType === 'block'
-            ? 'border-violet-400 bg-violet-100 text-violet-700'
-            : activeSidebarType === 'flex'
-              ? 'border-sky-400 bg-sky-100 text-sky-700'
-              : 'border-emerald-400 bg-emerald-100 text-emerald-700';
-
-    const activeCanvasLayout = activeCanvasId
-        ? findLayoutById(activeCanvasId, layouts)
+    const activeCanvasNode = activeCanvasId
+        ? findNodeById(activeCanvasId, layouts)
         : null;
-
-    const canvasOverlayColor = activeCanvasLayout
-        ? activeCanvasLayout.layoutType === 'block'
-            ? 'border-violet-400 bg-violet-100 text-violet-700'
-            : activeCanvasLayout.layoutType === 'flex'
-              ? 'border-sky-400 bg-sky-100 text-sky-700'
-              : 'border-emerald-400 bg-emerald-100 text-emerald-700'
-        : '';
 
     if (isLoading) {
         return (
@@ -202,19 +181,10 @@ export default function DndBuilder() {
             </div>
 
             <DragOverlay dropAnimation={null}>
-                {activeSidebarType ? (
-                    <div
-                        className={`rounded-lg border-2 px-4 py-3 shadow-lg font-semibold text-sm ${overlayColor}`}
-                    >
-                        {overlayLabel}
-                    </div>
-                ) : activeCanvasLayout ? (
-                    <div
-                        className={`rounded-lg border-2 px-4 py-3 shadow-lg font-semibold text-sm opacity-80 ${canvasOverlayColor}`}
-                    >
-                        {activeCanvasLayout.label}
-                    </div>
-                ) : null}
+                <DragOverlayContent
+                    activeSidebarItem={activeSidebarItem}
+                    activeCanvasNode={activeCanvasNode}
+                />
             </DragOverlay>
         </DndContext>
     );
