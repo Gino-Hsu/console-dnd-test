@@ -2,15 +2,15 @@
 
 import { useState } from 'react';
 import LayoutSidebar from './layout/LayoutSidebar';
-import ComponentSidebar from './component/ComponentSidebar';
+import ModuleSidebar from './module/ModuleSidebar';
 import LayoutEditor from './layout/LayoutEditor';
-import ComponentEditor from './component/ComponentEditor';
-import type { LayoutSpacing, NestedLayout, ComponentNode } from './types';
+import ModuleEditor from './module/ModuleEditor';
+import type { LayoutSpacing, NestedLayout, ModuleNode } from './types';
 
 export default function Sidebar({
     selectedLayout,
     selectedLayoutIsRoot = false,
-    selectedComponent,
+    selectedModule,
     onAddSlot,
     onRemoveSlot,
     onUpdateSpacing,
@@ -19,13 +19,13 @@ export default function Sidebar({
     onUpdateFlexRowGap,
     onUpdateFlexWrap,
     onUpdateContainerWidth,
-    onUpdateComponentData,
-    onUpdateComponentStyle,
+    onUpdateModuleData,
+    onUpdateModuleStyle,
     onDeselect,
 }: {
     selectedLayout: NestedLayout | null;
     selectedLayoutIsRoot?: boolean;
-    selectedComponent: ComponentNode | null;
+    selectedModule: ModuleNode | null;
     onAddSlot: (layoutId: string) => void;
     onRemoveSlot: (layoutId: string, slotId: string) => void;
     onUpdateSpacing: (layoutId: string, spacing: LayoutSpacing) => void;
@@ -43,23 +43,23 @@ export default function Sidebar({
         layoutId: string,
         containerWidth: 'full' | 'contained',
     ) => void;
-    onUpdateComponentData: (
-        componentId: string,
+    onUpdateModuleData: (
+        moduleId: string,
         data: Record<string, unknown>,
     ) => void;
-    onUpdateComponentStyle: (
-        componentId: string,
+    onUpdateModuleStyle: (
+        moduleId: string,
         style: Record<string, unknown>,
     ) => void;
     onDeselect: () => void;
 }) {
-    const [activeTab, setActiveTab] = useState<'layouts' | 'components'>(
+    const [activeTab, setActiveTab] = useState<'layouts' | 'modules'>(
         'layouts',
     );
 
     return (
         <aside className='w-64 shrink-0 border-r border-zinc-200 bg-zinc-50 flex flex-col h-full overflow-x-hidden'>
-            {/* 如果有選中的 Layout 或 Component，顯示對應的編輯器 */}
+            {/* 如果有選中的 Layout 或 Module，顯示對應的編輯器 */}
             {selectedLayout ? (
                 <LayoutEditor
                     layout={selectedLayout}
@@ -74,11 +74,11 @@ export default function Sidebar({
                     onUpdateContainerWidth={onUpdateContainerWidth}
                     onDeselect={onDeselect}
                 />
-            ) : selectedComponent ? (
-                <ComponentEditor
-                    component={selectedComponent}
-                    onUpdateData={onUpdateComponentData}
-                    onUpdateStyle={onUpdateComponentStyle}
+            ) : selectedModule ? (
+                <ModuleEditor
+                    module={selectedModule}
+                    onUpdateData={onUpdateModuleData}
+                    onUpdateStyle={onUpdateModuleStyle}
                     onDeselect={onDeselect}
                 />
             ) : (
@@ -97,14 +97,14 @@ export default function Sidebar({
                                 Layouts
                             </button>
                             <button
-                                onClick={() => setActiveTab('components')}
+                                onClick={() => setActiveTab('modules')}
                                 className={`flex-1 px-4 py-3 text-sm font-medium cursor-pointer transition-colors ${
-                                    activeTab === 'components'
+                                    activeTab === 'modules'
                                         ? 'text-blue-600 border-b-2 border-blue-600 bg-white'
                                         : 'text-zinc-600 hover:text-zinc-800'
                                 }`}
                             >
-                                Components
+                                Modules
                             </button>
                         </div>
                     </div>
@@ -113,7 +113,7 @@ export default function Sidebar({
                     {activeTab === 'layouts' ? (
                         <LayoutSidebar />
                     ) : (
-                        <ComponentSidebar />
+                        <ModuleSidebar />
                     )}
                 </>
             )}

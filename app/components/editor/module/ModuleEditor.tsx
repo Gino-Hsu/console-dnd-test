@@ -1,25 +1,25 @@
 'use client';
 
 import { createElement } from 'react';
-import type { ComponentNode } from '@/types/layout';
+import type { ModuleNode } from '@/types/layout';
 import { getInspector } from './inspector';
 
-export default function ComponentEditor({
-    component,
+export default function ModuleEditor({
+    module,
     onUpdateData,
     onUpdateStyle,
     onDeselect,
 }: {
-    component: ComponentNode;
-    onUpdateData: (componentId: string, data: Record<string, unknown>) => void;
+    module: ModuleNode;
+    onUpdateData: (moduleId: string, data: Record<string, unknown>) => void;
     onUpdateStyle: (
-        componentId: string,
+        moduleId: string,
         style: Record<string, unknown>,
     ) => void;
     onDeselect: () => void;
 }) {
-    // 取得對應的 Inspector 元件
-    const InspectorComponent = getInspector(component.componentId);
+    // 取得模組對應的 Inspector
+    const Inspector = getInspector(module.moduleId);
 
     return (
         <div className="flex flex-col h-full">
@@ -27,7 +27,7 @@ export default function ComponentEditor({
             <div className="px-4 py-3 border-b border-zinc-200">
                 <div className="flex items-center justify-between mb-1">
                     <h3 className="text-sm font-bold text-zinc-800">
-                        編輯元件
+                        編輯模組
                     </h3>
                     <button
                         onClick={onDeselect}
@@ -37,19 +37,19 @@ export default function ComponentEditor({
                         ✕
                     </button>
                 </div>
-                <p className="text-xs text-zinc-500">{component.label}</p>
+                <p className="text-xs text-zinc-500">{module.label}</p>
             </div>
 
             {/* 內容 */}
             <div className="flex-1 overflow-y-auto p-4">
-                {InspectorComponent
-                    ? createElement(InspectorComponent, {
-                          data: component.data,
-                          style: component.style,
+                {Inspector
+                    ? createElement(Inspector, {
+                          data: module.data,
+                          style: module.style,
                           onUpdateData: (newData) =>
-                              onUpdateData(component.id, newData),
+                              onUpdateData(module.id, newData),
                           onUpdateStyle: (newStyle) =>
-                              onUpdateStyle(component.id, newStyle),
+                              onUpdateStyle(module.id, newStyle),
                       })
                     : (
                     <div className="text-xs text-zinc-400">

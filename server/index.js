@@ -65,9 +65,9 @@ server.post('/pages/publish/:pageId', (req, res) => {
 
     const layoutCount = Object.keys(graph.layouts || {}).length;
     const slotCount = Object.keys(graph.slots || {}).length;
-    const compCount = Object.keys(graph.components || {}).length;
+    const moduleCount = Object.keys(graph.modules || {}).length;
     console.log(
-        `[POST /pages/publish/${pageId}] v${newVersion} — layouts:${layoutCount} slots:${slotCount} components:${compCount}`,
+        `[POST /pages/publish/${pageId}] v${newVersion} — layouts:${layoutCount} slots:${slotCount} modules:${moduleCount}`,
     );
     return res.json({ ok: true, pageId, version: newVersion });
 });

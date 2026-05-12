@@ -11,7 +11,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
-    createComponent,
+    createModule,
     createLayout,
     findContainer,
     findNodeById,
@@ -22,7 +22,7 @@ import {
 } from '@/lib/layout';
 
 import type { LayoutType, NestedLayout } from '@/types/layout';
-import type { ComponentId } from '@/lib/component-registry/component-ids';
+import type { ModuleId } from '@/lib/module-registry/module-ids';
 import { isLayoutNode } from '@/types/layout';
 import type { LoggedSetLayouts } from './useLayoutEditor';
 
@@ -135,7 +135,7 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
                 if ((overData?.depth ?? 0) >= MAX_DEPTH) {
                     const isDraggingLayout =
                         activeData?.source === 'sidebar'
-                            ? activeData?.type !== 'component'
+                            ? activeData?.type !== 'module'
                             : isLayoutNode(
                                   findNodeById(
                                       activeCanvasIdRef.current ?? '',
@@ -236,11 +236,11 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
             if (activeData?.source === 'sidebar') {
                 const overData = over.data.current;
 
-                // component
-                if (activeData.type === 'component') {
+                // module
+                if (activeData.type === 'module') {
                     if (overData?.type === 'slot') {
-                        const newComponent = createComponent(
-                            activeData.componentId as ComponentId,
+                        const newModule = createModule(
+                            activeData.moduleId as ModuleId,
                             activeData.label as string,
                         );
 
@@ -254,10 +254,10 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
                                     prev,
                                     ownerId,
                                     slotId,
-                                    newComponent,
+                                    newModule,
                                     currentInsertIndex ?? undefined,
                                 ),
-                            'add-component',
+                            'add-module',
                             `新增 ${activeData.label}`,
                             true,
                         );

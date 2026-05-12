@@ -1,5 +1,5 @@
 /**
- * 元件註冊表
+ * 模組註冊表
  */
 
 import {
@@ -16,25 +16,25 @@ import {
     DEFAULT_IMAGE_SIMPLE_STYLE,
 } from "@/ui/components/images";
 import { CATEGORIES } from "./categories";
-import { COMPONENT_IDS } from "./component-ids";
-import type { ComponentRegistry } from "../../types/component-registry";
+import { MODULE_IDS } from "./module-ids";
+import type { ModuleRegistry } from "../../types/module-registry";
 
 /**
- * 取得 componentName
+ * 取得 moduleName
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getComponentName(component: React.ComponentType<any>): string {
-    return component.displayName || component.name || 'unknown';
+function getModuleName(module: React.ComponentType<any>): string {
+    return module.displayName || module.name || 'unknown';
 }
 
 /**
- * 元件註冊表
+ * 模組註冊表
  */
-export const componentRegistry: ComponentRegistry = {
-    [COMPONENT_IDS.H01]: {
-        componentId: COMPONENT_IDS.H01,
-        componentName: getComponentName(HeadingSimple),
-        component: HeadingSimple,
+export const moduleRegistry: ModuleRegistry = {
+    [MODULE_IDS.H01]: {
+        moduleId: MODULE_IDS.H01,
+        moduleName: getModuleName(HeadingSimple),
+        module: HeadingSimple,
         category: CATEGORIES.HEADING,
         label: "基礎標題",
         icon: "📝",
@@ -42,10 +42,10 @@ export const componentRegistry: ComponentRegistry = {
         defaultData: DEFAULT_HEADING_SIMPLE_DATA,
         defaultStyle: DEFAULT_HEADING_SIMPLE_STYLE,
     },
-    [COMPONENT_IDS.H02]: {
-        componentId: COMPONENT_IDS.H02,
-        componentName: getComponentName(HeadingDivided),
-        component: HeadingDivided,
+    [MODULE_IDS.H02]: {
+        moduleId: MODULE_IDS.H02,
+        moduleName: getModuleName(HeadingDivided),
+        module: HeadingDivided,
         category: CATEGORIES.HEADING,
         label: "帶裝飾標題",
         icon: "✨",
@@ -53,10 +53,10 @@ export const componentRegistry: ComponentRegistry = {
         defaultData: DEFAULT_HEADING_DIVIDED_DATA,
         defaultStyle: DEFAULT_HEADING_DIVIDED_STYLE,
     },
-    [COMPONENT_IDS.I01]: {
-        componentId: COMPONENT_IDS.I01,
-        componentName: getComponentName(ImageSimple),
-        component: ImageSimple,
+    [MODULE_IDS.I01]: {
+        moduleId: MODULE_IDS.I01,
+        moduleName: getModuleName(ImageSimple),
+        module: ImageSimple,
         category: CATEGORIES.IMAGE,
         label: "基礎圖片",
         icon: "🖼️",

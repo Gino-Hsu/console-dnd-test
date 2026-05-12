@@ -1,7 +1,7 @@
 import type {
     FlatLayout,
     FlatSlot,
-    FlatComponent,
+    FlatModule,
     NestedLayout,
     CanvasNode,
     PageGraph,
@@ -20,7 +20,7 @@ export function flattenToGraph(
 ): PageGraph {
     const layouts: Record<string, FlatLayout> = {};
     const slots: Record<string, FlatSlot> = {};
-    const components: Record<string, FlatComponent> = {};
+    const modules: Record<string, FlatModule> = {};
 
     function visitLayout(
         layout: NestedLayout,
@@ -54,11 +54,11 @@ export function flattenToGraph(
                 if (isLayoutNode(child)) {
                     visitLayout(child, slot.id);
                 } else {
-                    // 處理 ComponentNode
-                    components[child.id] = {
+                    // 處理 ModuleNode
+                    modules[child.id] = {
                         id: child.id,
-                        type: 'component',
-                        componentId: child.componentId,
+                        type: 'module',
+                        moduleId: child.moduleId,
                         label: child.label,
                         data: child.data,
                         style: child.style,
@@ -78,7 +78,7 @@ export function flattenToGraph(
         rootOrder: rootLayouts.map(l => l.id),
         layouts,
         slots,
-        components,
+        modules,
     };
 }
 
@@ -89,10 +89,10 @@ export function flattenToGraph(
 export function graphToTree(graph: PageGraph): NestedLayout[] {
     function buildNode(id: string): CanvasNode {
         // 先檢查是否為 Layout（type 為 LayoutType 之一）
-        const layout = graph.layouts[id];
+        const layoutItem = graph.layouts[id];
 
-        if (layout && layout.type === 'layout') {
-            const slots = layout.slotIds.map(slotId => {
+        if (layoutItem && layoutItem.type === 'layout') {
+            const slots = layoutItem.slotIds.map(slotId => {
                 const flatSlot = graph.slots[slotId];
                 if (!flatSlot)
                     throw new Error(`graphToTree: slot "${slotId}" not found`);
@@ -110,29 +110,29 @@ export function graphToTree(graph: PageGraph): NestedLayout[] {
             });
 
             return {
-                id: layout.id,
+                id: layoutItem.id,
                 type: 'layout',
-                layoutType: layout.layoutType,
-                label: layout.label,
-                props: layout.props,
-                spacing: layout.spacing,
+                layoutType: layoutItem.layoutType,
+                label: layoutItem.label,
+                props: layoutItem.props,
+                spacing: layoutItem.spacing,
                 slots,
-                flexConfig: layout.flexConfig ?? null,
-                gridConfig: layout.gridConfig ?? null,
-                containerWidth: layout.containerWidth,
+                flexConfig: layoutItem.flexConfig ?? null,
+                gridConfig: layoutItem.gridConfig ?? null,
+                containerWidth: layoutItem.containerWidth,
             };
         }
 
-        // 再檢查是否為 Component
-        const component = graph.components[id];
-        if (component && component.type === 'component') {
+        // 再檢查是否為 Module
+        const moduleItem = graph.modules[id];
+        if (moduleItem && moduleItem.type === 'module') {
             return {
-                id: component.id,
-                type: 'component',
-                componentId: component.componentId,
-                label: component.label,
-                data: component.data,
-                style: component.style,
+                id: moduleItem.id,
+                type: 'module',
+                moduleId: moduleItem.moduleId,
+                label: moduleItem.label,
+                data: moduleItem.data,
+                style: moduleItem.style,
             };
         }
 

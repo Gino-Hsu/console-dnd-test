@@ -1,8 +1,8 @@
 /**
- * 元件分類定義
+ * 模組分類定義
  */
 
-import type { CategoryDefinition } from "../../types/component-registry";
+import type { CategoryDefinition } from "../../types/module-registry";
 
 /**
  * 分類常數

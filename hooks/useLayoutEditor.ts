@@ -26,7 +26,7 @@ import {
 
 const AUTOSAVE_DELAY_MS = 3000;
 
-// Type shared with useDndBuilder and useComponentEditor
+// Type shared with useDndBuilder and useModuleEditor
 export type LoggedSetLayouts = (
     updater: NestedLayout[] | ((prev: NestedLayout[]) => NestedLayout[]),
     action: string,

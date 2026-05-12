@@ -3,10 +3,10 @@ import type {
     LayoutType,
     NestedLayout,
     Slot,
-    ComponentNode,
+    ModuleNode,
 } from '@/types/layout';
 import { DEFAULT_SPACING, LAYOUT_CONFIG, isLayoutNode } from '@/types/layout';
-import { getComponentConfig, type ComponentId } from '@/lib/component-registry';
+import { getModuleConfig, type ModuleId } from '@/lib/module-registry';
 
 export function genId(): string {
     return uuidv4();
@@ -50,25 +50,25 @@ export function createLayout(type: LayoutType, label: string): NestedLayout {
 }
 
 /**
- * 建立一個新的 Component
- * @param componentId Component ID (e.g. 'H01', 'I01')
+ * 建立一個新的 Module
+ * @param moduleId Module ID (e.g. 'H01', 'I01')
  * @param label 顯示標籤
- * @returns ComponentNode
+ * @returns ModuleNode
  */
-export function createComponent(
-    componentId: ComponentId,
+export function createModule(
+    moduleId: ModuleId,
     label: string,
-): ComponentNode {
-    const config = getComponentConfig(componentId);
+): ModuleNode {
+    const config = getModuleConfig(moduleId);
 
     if (!config) {
-        throw new Error(`Invalid component ID: ${componentId}`);
+        throw new Error(`Invalid module ID: ${moduleId}`);
     }
 
     return {
         id: genId(),
-        type: 'component',
-        componentId,
+        type: 'module',
+        moduleId,
         label,
         data: config.defaultData,
         style: config.defaultStyle,

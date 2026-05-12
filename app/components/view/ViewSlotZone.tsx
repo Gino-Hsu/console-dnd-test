@@ -1,8 +1,8 @@
 import { cn } from '@/lib/cn';
 import type { NestedLayout } from '@/types/layout';
-import { isLayoutNode, isComponentNode, ALIGN_CLASS } from '@/types/layout';
+import { isLayoutNode, isModuleNode, ALIGN_CLASS } from '@/types/layout';
 import ViewLayoutCard from './ViewLayoutCard';
-import ViewComponentCard from './ViewComponentCard';
+import ViewModuleCard from './ViewModuleCard';
 
 export default function ViewSlotZone({
     slot,
@@ -33,11 +33,11 @@ export default function ViewSlotZone({
                     if (isLayoutNode(child)) {
                         return <ViewLayoutCard key={child.id} layout={child} />;
                     }
-                    if (isComponentNode(child)) {
+                    if (isModuleNode(child)) {
                         return (
-                            <ViewComponentCard
+                            <ViewModuleCard
                                 key={child.id}
-                                component={child}
+                                module={child}
                             />
                         );
                     }
