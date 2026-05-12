@@ -1,36 +1,36 @@
 import { useCallback, useState } from 'react';
-import type { ComponentNode, NestedLayout } from '@/types/layout';
+import type { ModuleNode, NestedLayout } from '@/types/layout';
 import { isLayoutNode } from '@/types/layout';
 import { findNodeById, mapLayouts } from '@/lib/layout';
 import type { LoggedSetLayouts } from './useLayoutEditor';
 
-interface UseComponentEditorProps {
+interface UseModuleEditorProps {
     layouts: NestedLayout[];
     setLayouts: LoggedSetLayouts;
 }
 
-export function useComponentEditor({
+export function useModuleEditor({
     layouts,
     setLayouts,
-}: UseComponentEditorProps) {
-    const [selectedComponentId, setSelectedComponentId] = useState<
+}: UseModuleEditorProps) {
+    const [selectedModuleId, setSelectedModuleId] = useState<
         string | null
     >(null);
 
-    const selectedComponent = selectedComponentId
-        ? (findNodeById(selectedComponentId, layouts) as ComponentNode | null)
+    const selectedModule = selectedModuleId
+        ? (findNodeById(selectedModuleId, layouts) as ModuleNode | null)
         : null;
 
-    const handleSelectComponent = useCallback((id: string) => {
-        setSelectedComponentId(prev => (prev === id ? null : id));
+    const handleSelectModule = useCallback((id: string) => {
+        setSelectedModuleId(prev => (prev === id ? null : id));
     }, []);
 
-    const deselectComponent = useCallback(() => {
-        setSelectedComponentId(null);
+    const deselectModule = useCallback(() => {
+        setSelectedModuleId(null);
     }, []);
 
-    const handleUpdateComponentData = useCallback(
-        (componentId: string, data: Record<string, unknown>) => {
+    const handleUpdateModuleData = useCallback(
+        (moduleId: string, data: Record<string, unknown>) => {
             setLayouts(
                 prev =>
                     mapLayouts(prev, l => ({
@@ -38,21 +38,21 @@ export function useComponentEditor({
                         slots: l.slots.map(s => ({
                             ...s,
                             children: s.children.map(c =>
-                                c.id === componentId && !isLayoutNode(c)
+                                c.id === moduleId && !isLayoutNode(c)
                                     ? { ...c, data }
                                     : c,
                             ),
                         })),
                     })),
-                'edit-component',
-                '編輯 Component 內容',
+                'edit-module',
+                '編輯 Module 內容',
             );
         },
         [setLayouts],
     );
 
-    const handleUpdateComponentStyle = useCallback(
-        (componentId: string, style: Record<string, unknown>) => {
+    const handleUpdateModuleStyle = useCallback(
+        (moduleId: string, style: Record<string, unknown>) => {
             setLayouts(
                 prev =>
                     mapLayouts(prev, l => ({
@@ -60,25 +60,25 @@ export function useComponentEditor({
                         slots: l.slots.map(s => ({
                             ...s,
                             children: s.children.map(c =>
-                                c.id === componentId && !isLayoutNode(c)
+                                c.id === moduleId && !isLayoutNode(c)
                                     ? { ...c, style }
                                     : c,
                             ),
                         })),
                     })),
-                'edit-component',
-                '編輯 Component 樣式',
+                'edit-module',
+                '編輯 Module 樣式',
             );
         },
         [setLayouts],
     );
 
     return {
-        selectedComponentId,
-        selectedComponent,
-        handleSelectComponent,
-        handleUpdateComponentData,
-        handleUpdateComponentStyle,
-        deselectComponent,
+        selectedModuleId,
+        selectedModule,
+        handleSelectModule,
+        handleUpdateModuleData,
+        handleUpdateModuleStyle,
+        deselectModule,
     };
 }

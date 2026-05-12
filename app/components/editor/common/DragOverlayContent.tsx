@@ -1,6 +1,6 @@
 import type { SidebarDragItem, CanvasNode } from '@/types/layout';
 import { isLayoutNode } from '@/types/layout';
-import { componentRegistry } from '@/lib/component-registry';
+import { moduleRegistry } from '@/lib/module-registry';
 import { CATEGORY_THEMES, DEFAULT_THEME } from '@/lib/theme/category-themes';
 
 interface DragOverlayContentProps {
@@ -27,9 +27,9 @@ export default function DragOverlayContent({
                   ? 'border-sky-400 bg-sky-100 text-sky-700'
                   : 'border-emerald-400 bg-emerald-100 text-emerald-700';
         } else {
-            // Sidebar Component
-            label = activeSidebarItem.label ? `${activeSidebarItem.componentId} ${activeSidebarItem.label}` : undefindedName;
-            const config = componentRegistry[activeSidebarItem.componentId];
+            // Sidebar Module
+            label = activeSidebarItem.label ? `${activeSidebarItem.moduleId} ${activeSidebarItem.label}` : undefindedName;
+            const config = moduleRegistry[activeSidebarItem.moduleId];
             const theme = config
                 ? CATEGORY_THEMES[config.category] || DEFAULT_THEME
                 : DEFAULT_THEME;
@@ -49,9 +49,9 @@ export default function DragOverlayContent({
                   ? 'border-sky-400 bg-sky-100 text-sky-700'
                   : 'border-emerald-400 bg-emerald-100 text-emerald-700';
         } else {
-            // Canvas Component
-            label = activeCanvasNode.label ? `${activeCanvasNode.componentId} ${activeCanvasNode.label}` : undefindedName;
-            const config = componentRegistry[activeCanvasNode.componentId];
+            // Canvas Module
+            label = activeCanvasNode.label ? `${activeCanvasNode.moduleId} ${activeCanvasNode.label}` : undefindedName;
+            const config = moduleRegistry[activeCanvasNode.moduleId];
             const theme = config
                 ? CATEGORY_THEMES[config.category] || DEFAULT_THEME
                 : DEFAULT_THEME;

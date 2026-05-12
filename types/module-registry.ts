@@ -1,22 +1,22 @@
 /**
- * 元件註冊表型別定義
+ * 模組註冊表型別定義
  */
 
 import React from "react";
-import type { CategoryId } from "@/lib/component-registry/categories";
-import type { ComponentId } from "@/lib/component-registry/component-ids";
+import type { CategoryId } from "@/lib/module-registry/categories";
+import type { ModuleId } from "@/lib/module-registry/module-ids";
 
 /**
- * 元件配置介面
+ * 模組配置介面
  */
-export interface ComponentConfig {
-    /** 元件 ID */
-    componentId: ComponentId;
-    /** 元件名稱 */
-    componentName: string;
-    /** React 元件 */
+export interface ModuleConfig {
+    /** 模組 ID */
+    moduleId: ModuleId;
+    /** 模組名稱 */
+    moduleName: string;
+    /** 模組 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    component: React.ComponentType<any>;
+    module: React.ComponentType<any>;
     /** 分類 ID */
     category: CategoryId;
     /** 顯示標籤 */
@@ -36,9 +36,9 @@ export interface ComponentConfig {
 }
 
 /**
- * 元件註冊表型別
+ * 模組註冊表型別
  */
-export type ComponentRegistry = Record<ComponentId, ComponentConfig>;
+export type ModuleRegistry = Record<ModuleId, ModuleConfig>;
 
 /**
  * 分類定義

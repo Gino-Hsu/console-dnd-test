@@ -1,6 +1,6 @@
 // ─── 基礎型別 ────────────────────────────────────────────────
 
-import type { ComponentId } from '@/lib/component-registry/component-ids';
+import type { ModuleId } from '@/lib/module-registry/module-ids';
 
 export type LayoutType = 'block' | 'flex' | 'grid';
 
@@ -10,12 +10,12 @@ export interface LayoutItem {
     label: string;
 }
 
-// ─── Component 型別 ──────────────────────────────────────────
+// ─── Module 型別 ──────────────────────────────────────────────
 
-export interface ComponentNode {
+export interface ModuleNode {
     id: string;
-    type: 'component';
-    componentId: ComponentId;
+    type: 'module';
+    moduleId: ModuleId;
     label: string;
     data: Record<string, unknown>;
     style: Record<string, unknown>;
@@ -23,13 +23,13 @@ export interface ComponentNode {
 
 // ─── 統一節點型別 ────────────────────────────────────────────
 
-export type CanvasNode = NestedLayout | ComponentNode;
+export type CanvasNode = NestedLayout | ModuleNode;
 
 // ─── Drag Overlay 型別 ────────────────────────────────────────
 
 export type SidebarDragItem = 
     | { type: 'layout'; layoutType: LayoutType; label: string }
-    | { type: 'component'; componentId: ComponentId; label: string };
+    | { type: 'module'; moduleId: ModuleId; label: string };
 
 // ─── Slot 型別 ────────────────────────────────────────────────
 
@@ -171,12 +171,12 @@ export interface FlatSlot {
 }
 
 /**
- * 扁平化的 Component 節點
+ * 扁平化的 Module 節點
  */
-export interface FlatComponent {
+export interface FlatModule {
     id: string;
-    type: 'component';
-    componentId: ComponentId;
+    type: 'module';
+    moduleId: ModuleId;
     label: string;
     data: Record<string, unknown>;
     style: Record<string, unknown>;
@@ -194,7 +194,7 @@ export interface PageGraph {
     rootOrder: string[];
     layouts: Record<string, FlatLayout>;
     slots: Record<string, FlatSlot>;
-    components: Record<string, FlatComponent>;
+    modules: Record<string, FlatModule>;
 }
 
 // ─── 側邊欄 ──────────────────────────────────────────────────
@@ -229,6 +229,6 @@ export function isLayoutNode(node: CanvasNode): node is NestedLayout {
     return node.type === 'layout';
 }
 
-export function isComponentNode(node: CanvasNode): node is ComponentNode {
-    return node.type === 'component';
+export function isModuleNode(node: CanvasNode): node is ModuleNode {
+    return node.type === 'module';
 }

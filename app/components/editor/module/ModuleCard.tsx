@@ -2,18 +2,18 @@
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import type { ComponentNode } from '@/types/layout';
+import type { ModuleNode } from '@/types/layout';
 import type { SharedProps } from '../layout/types';
 import { cn } from '@/lib/cn';
-import { getComponentConfig } from '@/lib/component-registry';
+import { getModuleConfig } from '@/lib/module-registry';
 import { getCategoryTheme } from '@/lib/theme';
 
-export default function ComponentCard({
-    component,
+export default function ModuleCard({
+    module,
     isDraggingFromParent = false,
     ...shared
 }: SharedProps & {
-    component: ComponentNode;
+    module: ModuleNode;
     depth?: number;
     isDraggingFromParent?: boolean;
 }) {
@@ -24,7 +24,7 @@ export default function ComponentCard({
         transform,
         transition,
         isDragging,
-    } = useSortable({ id: component.id });
+    } = useSortable({ id: module.id });
 
     // 凍結 sortable dodge transform（與 LayoutCard 相同邏輯）
     const sortStyle: React.CSSProperties = {
@@ -36,25 +36,25 @@ export default function ComponentCard({
     };
 
     // 從 registry 獲取完整配置
-    const config = getComponentConfig(component.componentId);
+    const config = getModuleConfig(module.moduleId);
     
     if (!config) {
         return (
             <div className="text-red-500 p-2 border border-red-300 rounded">
-                Unknown component: {component.componentId}
+                Unknown module: {module.moduleId}
             </div>
         );
     }
 
-    const { icon, label, category, component: Component } = config;
+    const { icon, label, category, module: Module } = config;
     
     // 根據 category 獲取主題配色
     const theme = getCategoryTheme(category);
-    const isSelected = shared.selectedLayoutId === component.id;
+    const isSelected = shared.selectedLayoutId === module.id;
 
     // 計算模組外層寬度
     // TODO: 目前先補上 padding (2層p-3為48px) 和 border (6px)，實際數值待調整
-    const innerWidth = component.style.width || '100%';
+    const innerWidth = module.style.width || '100%';
     const outerWidth = innerWidth === '100%' || innerWidth === 'auto'
         ? innerWidth
         : `calc(${innerWidth} + 48px + 6px)`;
@@ -83,7 +83,7 @@ export default function ComponentCard({
                     >
                         <span className='text-2xl'>{icon}</span>
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ${theme.bgColorDark}`}>
-                            {component.componentId}
+                            {module.moduleId}
                         </span>
                         <span className='text-sm font-semibold text-zinc-700 flex-1 truncate'>
                             {label}
@@ -94,7 +94,7 @@ export default function ComponentCard({
                     <div className='flex items-center gap-1'>
                         <button
                             type='button'
-                            onClick={() => shared.onSelect(component.id)}
+                            onClick={() => shared.onSelect(module.id)}
                             className='px-2 py-1 text-xs rounded hover:bg-zinc-200 transition-colors'
                             title='編輯'
                         >
@@ -102,7 +102,7 @@ export default function ComponentCard({
                         </button>
                         <button
                             type='button'
-                            onClick={() => shared.onRemove(component.id)}
+                            onClick={() => shared.onRemove(module.id)}
                             className='px-2 py-1 text-xs rounded hover:bg-red-100 hover:text-red-600 transition-colors'
                             title='刪除'
                         >
@@ -111,10 +111,10 @@ export default function ComponentCard({
                     </div>
                 </div>
 
-                {/* 實際元件預覽 */}
-                {Component && (
+                {/* 實際模組預覽 */}
+                {Module && (
                     <div className='bg-white rounded p-3 mt-2 border border-zinc-200'>
-                        <Component data={component.data} style={component.style} />
+                        <Module data={module.data} style={module.style} />
                     </div>
                 )}
             </div>

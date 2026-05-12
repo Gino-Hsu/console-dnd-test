@@ -2,7 +2,7 @@
 
 import { DndContext, DragOverlay, pointerWithin } from '@dnd-kit/core';
 import { useCallback, useId } from 'react';
-import { useDndBuilder, useLayoutEditor, useComponentEditor } from '@/hooks';
+import { useDndBuilder, useLayoutEditor, useModuleEditor } from '@/hooks';
 import CanvasArea from './CanvasArea';
 import { findLayoutById, findNodeById } from '@/lib/layout';
 import Sidebar from './Sidebar';
@@ -35,13 +35,13 @@ export default function DndBuilder() {
     } = useLayoutEditor();
 
     const {
-        selectedComponentId,
-        selectedComponent,
-        handleSelectComponent,
-        handleUpdateComponentData,
-        handleUpdateComponentStyle,
-        deselectComponent,
-    } = useComponentEditor({ layouts, setLayouts });
+        selectedModuleId,
+        selectedModule,
+        handleSelectModule,
+        handleUpdateModuleData,
+        handleUpdateModuleStyle,
+        deselectModule,
+    } = useModuleEditor({ layouts, setLayouts });
 
     const {
         sensors,
@@ -55,23 +55,23 @@ export default function DndBuilder() {
         insertSlotId,
     } = useDndBuilder({ layouts, setLayouts });
 
-    // 統一的選取邏輯：判斷是 Layout 還是 Component
+    // 統一的選取邏輯：判斷是 Layout 還是 Module
     const handleSelect = useCallback(
         (id: string) => {
             const node = findNodeById(id, layouts);
             if (node && isLayoutNode(node)) {
                 handleSelectLayout(id);
-                deselectComponent();
+                deselectModule();
             } else {
-                handleSelectComponent(id);
+                handleSelectModule(id);
                 deselectLayout();
             }
         },
         [
             layouts,
             handleSelectLayout,
-            handleSelectComponent,
-            deselectComponent,
+            handleSelectModule,
+            deselectModule,
             deselectLayout,
         ],
     );
@@ -167,7 +167,7 @@ export default function DndBuilder() {
                             ? layouts.some(l => l.id === selectedLayout.id)
                             : false
                     }
-                    selectedComponent={selectedComponent}
+                    selectedModule={selectedModule}
                     onAddSlot={handleAddSlot}
                     onRemoveSlot={handleRemoveSlot}
                     onUpdateSpacing={handleUpdateSpacing}
@@ -176,11 +176,11 @@ export default function DndBuilder() {
                     onUpdateFlexRowGap={handleUpdateFlexRowGap}
                     onUpdateFlexWrap={handleUpdateFlexWrap}
                     onUpdateContainerWidth={handleUpdateContainerWidth}
-                    onUpdateComponentData={handleUpdateComponentData}
-                    onUpdateComponentStyle={handleUpdateComponentStyle}
+                    onUpdateModuleData={handleUpdateModuleData}
+                    onUpdateModuleStyle={handleUpdateModuleStyle}
                     onDeselect={() => {
                         deselectLayout();
-                        deselectComponent();
+                        deselectModule();
                     }}
                 />
                 <CanvasArea

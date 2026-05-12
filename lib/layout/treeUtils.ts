@@ -9,7 +9,7 @@ export const MAX_DEPTH = 3;
 
 // ─── 查詢 ────────────────────────────────────────────────────
 /**
- * 遞迴找出某個 layout 或 component 所在的容器
+ * 遞迴找出某個 layout 或 module 所在的容器
  * 回傳 'root' 或 slotId；找不到回傳 null
  */
 export function findContainer(
@@ -72,7 +72,7 @@ export function isSlotInsideLayout(
 
 // ─── 變換（純函式，不 mutate） ───────────────────────────────
 
-/** 遞迴在指定 slot 內插入一個 node（layout 或 component，可指定位置） */
+/** 遞迴在指定 slot 內插入一個 node（layout 或 module，可指定位置） */
 export function insertIntoSlot(
     items: NestedLayout[],
     ownerId: string,
@@ -96,7 +96,7 @@ export function insertIntoSlot(
         return {
             ...layout,
             slots: layout.slots.map(s => {
-                const components = s.children.filter(c => !isLayoutNode(c));
+                const modules = s.children.filter(c => !isLayoutNode(c));
                 const layouts = s.children.filter(isLayoutNode);
                 const updatedLayouts = insertIntoSlot(
                     layouts,
@@ -107,7 +107,7 @@ export function insertIntoSlot(
                 );
                 return {
                     ...s,
-                    children: [...components, ...updatedLayouts],
+                    children: [...modules, ...updatedLayouts],
                 };
             }),
         };
@@ -115,7 +115,7 @@ export function insertIntoSlot(
 }
 
 /**
- * 遞迴找出指定 id 的 CanvasNode（Layout 或 Component）
+ * 遞迴找出指定 id 的 CanvasNode（Layout 或 Module）
  */
 export function findNodeById(
     id: string,
@@ -137,7 +137,7 @@ export function findNodeById(
 }
 
 /**
- * 遞迴移除任何 node（layout 或 component）
+ * 遞迴移除任何 node（layout 或 module）
  */
 export function removeNode(items: NestedLayout[], id: string): NestedLayout[] {
     return items
@@ -145,12 +145,12 @@ export function removeNode(items: NestedLayout[], id: string): NestedLayout[] {
         .map(layout => ({
             ...layout,
             slots: layout.slots.map(s => {
-                const components = s.children.filter(c => !isLayoutNode(c) && c.id !== id);
+                const modules = s.children.filter(c => !isLayoutNode(c) && c.id !== id);
                 const layouts = s.children.filter(isLayoutNode);
                 const updatedLayouts = removeNode(layouts, id);
                 return {
                     ...s,
-                    children: [...components, ...updatedLayouts],
+                    children: [...modules, ...updatedLayouts],
                 };
             }),
         }));

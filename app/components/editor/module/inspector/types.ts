@@ -1,7 +1,7 @@
-import type { ComponentId } from "@/lib/component-registry/component-ids";
+import type { ModuleId } from "@/lib/module-registry/module-ids";
 
 /**
- * Inspector 元件的 Props 定義
+ * Inspector 的 Props 定義
  */
 export interface InspectorProps {
     data: Record<string, unknown>;
@@ -11,11 +11,11 @@ export interface InspectorProps {
 }
 
 /**
- * Inspector 元件類型
+ * Inspector 類型
  */
 export type InspectorComponent = React.ComponentType<InspectorProps>;
 
 /**
  * Inspector 註冊表類型
  */
-export type InspectorRegistry = Record<ComponentId, InspectorComponent>;
+export type InspectorRegistry = Record<ModuleId, InspectorComponent>;

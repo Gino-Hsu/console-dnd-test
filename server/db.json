@@ -573,11 +573,11 @@
           "align": "left"
         }
       },
-      "components": {
+      "modules": {
         "02d61f41-e191-49d6-9df8-0c90720f2b28": {
           "id": "02d61f41-e191-49d6-9df8-0c90720f2b28",
-          "type": "component",
-          "componentId": "H01",
+          "type": "module",
+          "moduleId": "H01",
           "label": "基礎標題",
           "data": {
             "title": "請輸入標題文字",
@@ -593,8 +593,8 @@
         },
         "c512ad29-e4c8-4647-b759-8349bdedf145": {
           "id": "c512ad29-e4c8-4647-b759-8349bdedf145",
-          "type": "component",
-          "componentId": "H01",
+          "type": "module",
+          "moduleId": "H01",
           "label": "基礎標題",
           "data": {
             "title": "義大利-威尼斯(含乘船導覽)一日遊| 米蘭出發",
@@ -610,8 +610,8 @@
         },
         "19d64acd-146a-42ab-b96c-1f5b036bf7af": {
           "id": "19d64acd-146a-42ab-b96c-1f5b036bf7af",
-          "type": "component",
-          "componentId": "H02",
+          "type": "module",
+          "moduleId": "H02",
           "label": "帶裝飾標題",
           "data": {
             "title": "專屬推薦",
@@ -625,8 +625,8 @@
         },
         "bea99c48-e0c3-4515-aad3-a2a669877e8d": {
           "id": "bea99c48-e0c3-4515-aad3-a2a669877e8d",
-          "type": "component",
-          "componentId": "I01",
+          "type": "module",
+          "moduleId": "I01",
           "label": "基礎圖片",
           "data": {
             "src": "https://static.liontech.com.tw/ConsoleAPData/PublicationStatic/lion_tw_b2c/zh-tw/_ModelFile/Product/3866511/a251ac4acaeb4327bd680cc99226ad46.jpg",
@@ -1254,11 +1254,11 @@
           "align": "left"
         }
       },
-      "components": {
+      "modules": {
         "02d61f41-e191-49d6-9df8-0c90720f2b28": {
           "id": "02d61f41-e191-49d6-9df8-0c90720f2b28",
-          "type": "component",
-          "componentId": "H01",
+          "type": "module",
+          "moduleId": "H01",
           "label": "基礎標題",
           "data": {
             "title": "請輸入標題文字",
@@ -1274,8 +1274,8 @@
         },
         "c512ad29-e4c8-4647-b759-8349bdedf145": {
           "id": "c512ad29-e4c8-4647-b759-8349bdedf145",
-          "type": "component",
-          "componentId": "H01",
+          "type": "module",
+          "moduleId": "H01",
           "label": "基礎標題",
           "data": {
             "title": "義大利-威尼斯(含乘船導覽)一日遊| 米蘭出發",
@@ -1291,8 +1291,8 @@
         },
         "19d64acd-146a-42ab-b96c-1f5b036bf7af": {
           "id": "19d64acd-146a-42ab-b96c-1f5b036bf7af",
-          "type": "component",
-          "componentId": "H02",
+          "type": "module",
+          "moduleId": "H02",
           "label": "帶裝飾標題",
           "data": {
             "title": "專屬推薦",
@@ -1306,8 +1306,8 @@
         },
         "bea99c48-e0c3-4515-aad3-a2a669877e8d": {
           "id": "bea99c48-e0c3-4515-aad3-a2a669877e8d",
-          "type": "component",
-          "componentId": "I01",
+          "type": "module",
+          "moduleId": "I01",
           "label": "基礎圖片",
           "data": {
             "src": "https://static.liontech.com.tw/ConsoleAPData/PublicationStatic/lion_tw_b2c/zh-tw/_ModelFile/Product/3866511/a251ac4acaeb4327bd680cc99226ad46.jpg",
@@ -1329,7 +1329,7 @@
     {
       "id": "9c8b6630-38e4-4ce0-96ec-50c93d06f21f",
       "pageId": "page-1",
-      "action": "add-component",
+      "action": "add-module",
       "description": "新增 基礎標題",
       "timestamp": "2026-05-08T09:31:40.749Z",
       "graph": {
@@ -1946,11 +1946,11 @@
             "align": "left"
           }
         },
-        "components": {
+        "modules": {
           "1047e2cc-561e-4d43-ac67-fbd57dea21aa": {
             "id": "1047e2cc-561e-4d43-ac67-fbd57dea21aa",
-            "type": "component",
-            "componentId": "H01",
+            "type": "module",
+            "moduleId": "H01",
             "label": "基礎標題",
             "data": {
               "title": "請輸入標題文字",
@@ -1966,8 +1966,8 @@
           },
           "02d61f41-e191-49d6-9df8-0c90720f2b28": {
             "id": "02d61f41-e191-49d6-9df8-0c90720f2b28",
-            "type": "component",
-            "componentId": "H01",
+            "type": "module",
+            "moduleId": "H01",
             "label": "基礎標題",
             "data": {
               "title": "請輸入標題文字",
@@ -1983,8 +1983,8 @@
           },
           "c512ad29-e4c8-4647-b759-8349bdedf145": {
             "id": "c512ad29-e4c8-4647-b759-8349bdedf145",
-            "type": "component",
-            "componentId": "H01",
+            "type": "module",
+            "moduleId": "H01",
             "label": "基礎標題",
             "data": {
               "title": "義大利-威尼斯(含乘船導覽)一日遊| 米蘭出發",
@@ -2000,8 +2000,8 @@
           },
           "19d64acd-146a-42ab-b96c-1f5b036bf7af": {
             "id": "19d64acd-146a-42ab-b96c-1f5b036bf7af",
-            "type": "component",
-            "componentId": "H02",
+            "type": "module",
+            "moduleId": "H02",
             "label": "帶裝飾標題",
             "data": {
               "title": "專屬推薦",
@@ -2015,8 +2015,8 @@
           },
           "bea99c48-e0c3-4515-aad3-a2a669877e8d": {
             "id": "bea99c48-e0c3-4515-aad3-a2a669877e8d",
-            "type": "component",
-            "componentId": "I01",
+            "type": "module",
+            "moduleId": "I01",
             "label": "基礎圖片",
             "data": {
               "src": "https://static.liontech.com.tw/ConsoleAPData/PublicationStatic/lion_tw_b2c/zh-tw/_ModelFile/Product/3866511/a251ac4acaeb4327bd680cc99226ad46.jpg",

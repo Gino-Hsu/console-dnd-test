@@ -14,7 +14,7 @@ import type { SlotProps } from './types';
 import { MAX_DEPTH } from '@/lib/layout';
 import SlotEditor from './SlotEditor';
 import LayoutCard from './LayoutCard';
-import ComponentCard from '../component/ComponentCard';
+import ModuleCard from '../module/ModuleCard';
 
 export default function SlotZone({
     slot,
@@ -146,8 +146,8 @@ export default function SlotZone({
                                 }`}
                             >
                                 {atMaxDepth
-                                    ? `已達最大層數(${MAX_DEPTH} 層)，只能放置 Component`
-                                    : '拖曳 Layout 或 Component 到此處'}
+                                    ? `已達最大層數(${MAX_DEPTH} 層)，只能放置 Module`
+                                    : '拖曳 Layout 或 Module 到此處'}
                             </div>
                         </>
                     ) : (
@@ -168,8 +168,8 @@ export default function SlotZone({
                                                 {...sp}
                                             />
                                         ) : (
-                                            <ComponentCard
-                                                component={child}
+                                            <ModuleCard
+                                                module={child}
                                                 depth={depth + 1}
                                                 isDraggingFromParent={
                                                     isDragging
