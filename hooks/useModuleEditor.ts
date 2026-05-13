@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import type { ModuleNode, NestedLayout } from '@/types/layout';
 import { isLayoutNode } from '@/types/layout';
-import { findNodeById, mapLayouts } from '@/lib/layout';
+import { findNodeById, mapLayouts } from '@/lib/page';
 import type { LoggedSetLayouts } from './useLayoutEditor';
 
 interface UseModuleEditorProps {

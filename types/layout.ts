@@ -1,16 +1,66 @@
-// ─── 基礎型別 ────────────────────────────────────────────────
-
-import type { ModuleId } from '@/lib/module-registry/module-ids';
+import type { ModuleId } from '@/lib/module-registry';
 
 export type LayoutType = 'block' | 'flex' | 'grid';
 
-export interface LayoutItem {
-    id: string;
-    type: LayoutType;
-    label: string;
+export type SpacingValue = {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+};
+
+export interface LayoutSpacing {
+    margin: SpacingValue;
+    padding: SpacingValue;
 }
 
-// ─── Module 型別 ──────────────────────────────────────────────
+export const DEFAULT_SPACING: LayoutSpacing = {
+    margin: { top: 0, right: 0, bottom: 0, left: 0 },
+    padding: { top: 0, right: 0, bottom: 0, left: 0 },
+};
+
+export interface FlexConfig {
+    gap: number;
+    rowGap: number;
+    wrap: boolean;
+}
+
+export interface GridConfig {
+    colWidths: number[];
+    rowHeights: number[];
+    colGap: number;
+    rowGap: number;
+}
+
+export interface Slot {
+    id: string;
+    children: CanvasNode[];
+    flexWidthConfig: {
+        flexBasis: number;
+        widthPx: number;
+    };
+    align: SlotAlign;
+}
+
+export type SlotAlign = 'left' | 'center' | 'right';
+export const ALIGN_CLASS: Record<SlotAlign, string> = {
+    left: 'items-start',
+    center: 'items-center',
+    right: 'items-end',
+};
+
+export interface NestedLayout {
+    id: string;
+    type: 'layout';
+    layoutType: LayoutType;
+    label: string;
+    props: Record<string, unknown>;
+    slots: Slot[];
+    spacing: LayoutSpacing;
+    flexConfig: FlexConfig | null;
+    gridConfig: GridConfig | null;
+    containerWidth?: 'full' | 'contained';
+}
 
 export interface ModuleNode {
     id: string;
@@ -21,122 +71,10 @@ export interface ModuleNode {
     style: Record<string, unknown>;
 }
 
-// ─── 統一節點型別 ────────────────────────────────────────────
-
 export type CanvasNode = NestedLayout | ModuleNode;
 
-// ─── Drag Overlay 型別 ────────────────────────────────────────
+// ─── Flat Graph (API & DB Storage) ──────────────────────────
 
-export type SidebarDragItem = 
-    | { type: 'layout'; layoutType: LayoutType; label: string }
-    | { type: 'module'; moduleId: ModuleId; label: string };
-
-// ─── Slot 型別 ────────────────────────────────────────────────
-
-export type SlotAlign = 'left' | 'center' | 'right';
-
-export const ALIGN_CLASS: Record<SlotAlign, string> = {
-    left: 'items-start',
-    center: 'items-center',
-    right: 'items-end',
-};
-
-export interface Slot {
-    id: string;
-    children: CanvasNode[];
-    flexWidthConfig: {
-        /** flex 佔比百分比（僅 flex layout 非換行模式使用），e.g. 50 = 50% */
-        flexBasis: number;
-        /** flex layout 換行模式下各 slot 的像素寬度，預設 200px */
-        widthPx: number;
-    };
-    /** slot 內容的水平對齊方式，預設 left */
-    align: SlotAlign;
-}
-
-export const LAYOUT_CONFIG: Record<LayoutType, { slotCount: number }> = {
-    block: { slotCount: 1 },
-    flex: { slotCount: 2 },
-    grid: { slotCount: 4 },
-};
-
-// ─── 間距 ────────────────────────────────────────────────────
-
-export interface SpacingValue {
-    top: number;
-    right: number;
-    bottom: number;
-    left: number;
-}
-
-export interface LayoutSpacing {
-    padding: SpacingValue;
-    margin: SpacingValue;
-}
-
-export const DEFAULT_SPACING: LayoutSpacing = {
-    padding: { top: 0, right: 0, bottom: 0, left: 0 },
-    margin: { top: 0, right: 0, bottom: 0, left: 0 },
-};
-
-// ─── 巢狀樹狀結構（編輯時使用） ─────────────────────────────
-
-export interface FlexConfig {
-    /** column-gap，像素 */
-    gap: number;
-    /** row-gap（換行時使用），像素 */
-    rowGap: number;
-    /** 是否換行 */
-    wrap: boolean;
-}
-
-export interface GridConfig {
-    /** 欄寬百分比陣列，長度 = 欄數，e.g. [50, 50] */
-    colWidths: number[];
-    /** 列高像素陣列，長度 = 列數，e.g. [120, 120] */
-    rowHeights: number[];
-    /** column-gap，像素 */
-    colGap: number;
-    /** row-gap，像素 */
-    rowGap: number;
-}
-
-export interface NestedLayout {
-    id: string;
-    type: 'layout';
-    layoutType: LayoutType;
-    label: string;
-    props: Record<string, unknown>;
-    slots: Slot[];
-    spacing: LayoutSpacing;
-    /** flex layout 專用設定（layoutType !== 'flex' 時為 null） */
-    flexConfig: FlexConfig | null;
-    /** grid layout 專用設定（layoutType !== 'grid' 時為 null） */
-    gridConfig: GridConfig | null;
-    /**
-     * 僅 root layout（depth === 0）有意義。
-     * 'full'      = 100% 寬（預設）
-     * 'contained' = 置中容器（max-w-5xl mx-auto）
-     */
-    containerWidth?: 'full' | 'contained';
-}
-
-// ─── 版本快照 ─────────────────────────────────────────────────
-
-export type PageVersion = {
-    pageId: string;
-    version: number;
-    status: 'draft' | 'published';
-    data: NestedLayout[];
-    createdAt: string;
-};
-
-// ─── 扁平化 Graph 結構（儲存 / 共編使用） ───────────────────
-
-/**
- * 扁平化的 Layout 節點
- * parentSlotId 為 null 表示位於 root 層
- */
 export interface FlatLayout {
     id: string;
     type: 'layout';
@@ -146,17 +84,11 @@ export interface FlatLayout {
     spacing: LayoutSpacing;
     slotIds: string[];
     parentSlotId: string | null;
-    /** flex layout 專用設定（layoutType !== 'flex' 時為 null） */
     flexConfig: FlexConfig | null;
-    /** grid layout 專用設定（layoutType !== 'grid' 時為 null） */
     gridConfig: GridConfig | null;
-    /** 僅 root layout 有意義 */
     containerWidth?: 'full' | 'contained';
 }
 
-/**
- * 扁平化的 Slot 節點
- */
 export interface FlatSlot {
     id: string;
     childIds: string[];
@@ -165,39 +97,175 @@ export interface FlatSlot {
         flexBasis: number | null;
         widthPx: number | null;
     };
-    /** slot 內容的水平對齊方式 */
-    align: SlotAlign;
-    /** flex 佔比百分比（僅 flex layout 使用），e.g. 50 = 50% */
+    align?: SlotAlign;
 }
 
-/**
- * 扁平化的 Module 節點
- */
 export interface FlatModule {
     id: string;
     type: 'module';
-    moduleId: ModuleId;
+    moduleId: string;
     label: string;
     data: Record<string, unknown>;
     style: Record<string, unknown>;
-    parentSlotId: string | null;
+    parentSlotId: string;
 }
 
-/**
- * 扁平化的頁面 Graph（O(1) 存取，JSON 可序列化）
- */
 export interface PageGraph {
-    pageId: string;
-    version: number;
-    status: 'draft' | 'published';
-    createdAt: string;
     rootOrder: string[];
     layouts: Record<string, FlatLayout>;
     slots: Record<string, FlatSlot>;
     modules: Record<string, FlatModule>;
 }
 
-// ─── 側邊欄 ──────────────────────────────────────────────────
+// ─── Config ──────────────────────────────────────────────────
+
+export const LAYOUT_CONFIG: Record<LayoutType, { slotCount: number }> = {
+    block: { slotCount: 1 },
+    flex: { slotCount: 2 },
+    grid: { slotCount: 4 },
+};
+
+// ─── Edit Log ────────────────────────────────────────────────
+
+export type EditOperation =
+    | {
+          id?: string;
+          type: 'add-layout';
+          label?: string;
+          payload: {
+              layout: NestedLayout;
+              slotId?: string;
+              ownerId?: string;
+              index?: number | null;
+          };
+          createdAt?: string;
+      }
+    | {
+          id?: string;
+          type: 'delete-layout';
+          label?: string;
+          payload: { layoutId: string };
+          createdAt?: string;
+      }
+    | {
+          id?: string;
+          type: 'move-layout';
+          label?: string;
+          payload: {
+              layoutId: string;
+              targetSlotId: string;
+              index?: number | null;
+          };
+          createdAt?: string;
+      }
+    | {
+          id?: string;
+          type: 'update-spacing';
+          label?: string;
+          payload: { layoutId: string; spacing: LayoutSpacing };
+          createdAt?: string;
+      }
+    | {
+          id?: string;
+          type: 'add-slot';
+          label?: string;
+          payload: { layoutId: string };
+          createdAt?: string;
+      }
+    | {
+          id?: string;
+          type: 'remove-slot';
+          label?: string;
+          payload: { layoutId: string; slotId: string };
+          createdAt?: string;
+      }
+    | {
+          id?: string;
+          type: 'update-slot-widths';
+          label?: string;
+          payload: { layoutId: string; widths: number[] };
+          createdAt?: string;
+      }
+    | {
+          id?: string;
+          type: 'update-wrap-slot-width';
+          label?: string;
+          payload: { layoutId: string; slotId: string; widthPx: number };
+          createdAt?: string;
+      }
+    | {
+          id?: string;
+          type: 'update-grid-dimensions';
+          label?: string;
+          payload: {
+              layoutId: string;
+              colWidths: number[];
+              rowHeights: number[];
+              colGap: number | null;
+              rowGap: number | null;
+          };
+          createdAt?: string;
+      }
+    | {
+          id?: string;
+          type: 'update-flex-gap';
+          label?: string;
+          payload: { layoutId: string; gap: number };
+          createdAt?: string;
+      }
+    | {
+          id?: string;
+          type: 'update-flex-wrap';
+          label?: string;
+          payload: { layoutId: string; wrap: boolean };
+          createdAt?: string;
+      }
+    | {
+          id?: string;
+          type: 'update-flex-row-gap';
+          label?: string;
+          payload: { layoutId: string; rowGap: number };
+          createdAt?: string;
+      }
+    | {
+          id?: string;
+          type: 'update-slot-align';
+          label?: string;
+          payload: { layoutId: string; slotId: string; align: SlotAlign };
+          createdAt?: string;
+      }
+    | {
+          id?: string;
+          type: 'update-container-width';
+          label?: string;
+          payload: { layoutId: string; containerWidth: 'full' | 'contained' };
+          createdAt?: string;
+      }
+    | {
+          id?: string;
+          type: 'add-module';
+          label?: string;
+          payload: {
+              module: ModuleNode;
+              slotId: string;
+              ownerId: string;
+              index?: number | null;
+          };
+          createdAt?: string;
+      }
+    | {
+          id?: string;
+          type: 'update-module';
+          label?: string;
+          payload: {
+              moduleId: string;
+              data?: Record<string, unknown>;
+              style?: Record<string, unknown>;
+          };
+          createdAt?: string;
+      };
+
+// ─── Sidebar ──────────────────────────────────────────────────
 
 export interface SidebarItem {
     type: LayoutType;
@@ -205,25 +273,29 @@ export interface SidebarItem {
     description: string;
 }
 
+export type ActiveSidebarItem =
+    | { type: 'module'; moduleId: ModuleId; label: string }
+    | { type: 'layout'; layoutType: LayoutType; label: string };
+
 export const SIDEBAR_ITEMS: SidebarItem[] = [
     {
         type: 'block',
         label: '塊級 Layout',
-        description: 'Block — 元素獨佔整行，垂直排列',
+        description: 'Block — 元素獨佔整行',
     },
     {
         type: 'flex',
         label: 'Flex Layout',
-        description: 'Flex — 子元素水平排列，支援換行',
+        description: 'Flex — 水平排列',
     },
     {
         type: 'grid',
         label: 'Grid Layout',
-        description: 'Grid — 二維格狀排列，同時控制列與欄',
+        description: 'Grid — 二維排列',
     },
 ];
 
-// ─── Type Guards ─────────────────────────────────────────────────
+// ─── Type Guards ───────────────────────────────────────────────
 
 export function isLayoutNode(node: CanvasNode): node is NestedLayout {
     return node.type === 'layout';

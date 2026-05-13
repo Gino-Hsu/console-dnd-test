@@ -11,7 +11,7 @@ import { InsertLine } from '../CanvasArea';
 import type { CanvasNode, SlotAlign } from '@/types/layout';
 import { isLayoutNode, ALIGN_CLASS } from '@/types/layout';
 import type { SlotProps } from './types';
-import { MAX_DEPTH } from '@/lib/layout';
+import { MAX_DEPTH } from '@/lib/page';
 import SlotEditor from './SlotEditor';
 import LayoutCard from './LayoutCard';
 import ModuleCard from '../module/ModuleCard';

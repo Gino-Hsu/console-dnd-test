@@ -1,13 +1,14 @@
-import { graphToTree } from '@/lib/layout';
+import { graphToTree } from '@/lib/page';
 import type { PageGraph } from '@/types/layout';
 import ViewLayoutCard from '@/app/components/view/ViewLayoutCard';
-import { getPageGraph } from '@/app/api/pageGraph';
+import { getPublishedPage } from '@/lib/api/page';
 
 export default async function FrontPage() {
     let pageGraph: PageGraph;
     try {
-        pageGraph = await getPageGraph();
-    } catch {
+        pageGraph = await getPublishedPage();
+    } catch (err) {
+        console.error('[FrontPage] load error:', err);
         return (
             <main className='min-h-screen bg-white flex items-center justify-center'>
                 <div className='text-center text-zinc-400'>

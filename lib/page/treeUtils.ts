@@ -1,4 +1,3 @@
-import { arrayMove } from '@dnd-kit/sortable';
 import type { NestedLayout, CanvasNode } from '@/types/layout';
 import { isLayoutNode } from '@/types/layout';
 

@@ -8,7 +8,7 @@ import {
     useSensor,
     useSensors,
 } from '@dnd-kit/core';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
     createModule,
@@ -19,9 +19,15 @@ import {
     isSlotInsideLayout,
     MAX_DEPTH,
     moveItem,
-} from '@/lib/layout';
+} from '@/lib/page';
 
-import type { LayoutType, NestedLayout, SidebarDragItem } from '@/types/layout';
+import type {
+    LayoutType,
+    NestedLayout,
+    SidebarItem,
+    CanvasNode,
+    ActiveSidebarItem,
+} from '@/types/layout';
 import type { ModuleId } from '@/lib/module-registry/module-ids';
 import { isLayoutNode } from '@/types/layout';
 import type { LoggedSetLayouts } from './useLayoutEditor';
@@ -32,7 +38,7 @@ type UseDndBuilderProps = {
 };
 
 export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
-    const [activeSidebarItem, setActiveSidebarItem] = useState<SidebarDragItem | null>(null);
+    const [activeSidebarItem, setActiveSidebarItem] = useState<ActiveSidebarItem | null>(null);
 
     const [activeCanvasId, setActiveCanvasId] = useState<string | null>(null);
 
@@ -309,6 +315,12 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
                         'add-layout',
                         `新增 ${activeData.label}`,
                         true,
+                        {
+                            layout: newLayout,
+                            slotId,
+                            ownerId,
+                            index: currentInsertIndex,
+                        },
                     );
 
                     return;
@@ -328,6 +340,10 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
                         'add-layout',
                         `新增 ${activeData.label}`,
                         true,
+                        {
+                            layout: newLayout,
+                            index: currentInsertIndex,
+                        },
                     );
 
                     return;
@@ -407,12 +423,23 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
                         currentInsertIndex ?? undefined,
                     );
                 },
-                'move',
+                'move-layout',
                 '移動項目',
                 true,
+                {
+                    layoutId: activeId,
+                    targetSlotId:
+                        over.data.current?.type === 'slot'
+                            ? (over.id as string)
+                            : over.data.current?.type === 'canvas'
+                              ? 'root'
+                              : (findContainer(over.id as string, layouts) ??
+                                'root'),
+                    index: currentInsertIndex,
+                },
             );
         },
-        [insertIndex, setLayouts],
+        [insertIndex, setLayouts, layouts],
     );
 
     // ─────────────────────────────────────
