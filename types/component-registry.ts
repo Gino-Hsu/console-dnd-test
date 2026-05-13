@@ -2,9 +2,9 @@
  * 元件註冊表型別定義
  */
 
-import React from "react";
-import type { CategoryId } from "@/lib/component-registry/categories";
-import type { ComponentId } from "@/lib/component-registry/component-ids";
+import React from 'react';
+import type { CategoryId } from '@/lib/component-registry/categories';
+import type { ComponentId } from '@/lib/component-registry/component-ids';
 
 /**
  * 元件配置介面

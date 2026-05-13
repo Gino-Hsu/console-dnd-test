@@ -1,25 +1,25 @@
 'use client';
 
 import {
-  DragEndEvent,
-  DragOverEvent,
-  DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
+    DragEndEvent,
+    DragOverEvent,
+    DragStartEvent,
+    PointerSensor,
+    useSensor,
+    useSensors,
 } from '@dnd-kit/core';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
-  createComponent,
-  createLayout,
-  findContainer,
-  findNodeById,
-  insertIntoSlot,
-  isSlotInsideLayout,
-  MAX_DEPTH,
-  moveItem,
-} from '@/lib/layout';
+    createComponent,
+    createLayout,
+    findContainer,
+    findNodeById,
+    insertIntoSlot,
+    isSlotInsideLayout,
+    MAX_DEPTH,
+    moveItem,
+} from '@/lib/page';
 
 import type { LayoutType, NestedLayout } from '@/types/layout';
 import type { ComponentId } from '@/lib/component-registry/component-ids';
@@ -27,416 +27,427 @@ import { isLayoutNode } from '@/types/layout';
 import type { LoggedSetLayouts } from './useLayoutEditor';
 
 type UseDndBuilderProps = {
-  layouts: NestedLayout[];
-  setLayouts: LoggedSetLayouts;
+    layouts: NestedLayout[];
+    setLayouts: LoggedSetLayouts;
 };
 
 export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
-  const [activeSidebarType, setActiveSidebarType] = useState<LayoutType | null>(
-    null,
-  );
+    const [activeSidebarType, setActiveSidebarType] =
+        useState<LayoutType | null>(null);
 
-  const [activeCanvasId, setActiveCanvasId] = useState<string | null>(null);
+    const [activeCanvasId, setActiveCanvasId] = useState<string | null>(null);
 
-  const [insertIndex, setInsertIndex] = useState<number | null>(null);
+    const [insertIndex, setInsertIndex] = useState<number | null>(null);
 
-  const [insertSlotId, setInsertSlotId] = useState<string | null>(null);
+    const [insertSlotId, setInsertSlotId] = useState<string | null>(null);
 
-  const activeContainerRef = useRef<string | null>(null);
+    const activeContainerRef = useRef<string | null>(null);
 
-  const activeCanvasIdRef = useRef<string | null>(null);
+    const activeCanvasIdRef = useRef<string | null>(null);
 
-  // ─────────────────────────────────────
-  // mobile sensor
-  // ─────────────────────────────────────
+    // ─────────────────────────────────────
+    // mobile sensor
+    // ─────────────────────────────────────
 
-  const [isMobile, setIsMobile] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsMobile(/iPhone|Android/i.test(navigator.userAgent));
-    }, 0);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsMobile(/iPhone|Android/i.test(navigator.userAgent));
+        }, 0);
 
-    return () => clearTimeout(timer);
-  }, []);
+        return () => clearTimeout(timer);
+    }, []);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: isMobile
-        ? { delay: 180, tolerance: 6 }
-        : { distance: 6 },
-    }),
-  );
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: isMobile
+                ? { delay: 180, tolerance: 6 }
+                : { distance: 6 },
+        }),
+    );
 
-  // ─────────────────────────────────────
-  // drag start
-  // ─────────────────────────────────────
+    // ─────────────────────────────────────
+    // drag start
+    // ─────────────────────────────────────
 
-  const handleDragStart = useCallback(
-    (event: DragStartEvent) => {
-      const data = event.active.data.current;
+    const handleDragStart = useCallback(
+        (event: DragStartEvent) => {
+            const data = event.active.data.current;
 
-      if (data?.source === 'sidebar') {
-        setActiveSidebarType(data.type as LayoutType);
-      } else {
-        const id = event.active.id as string;
+            if (data?.source === 'sidebar') {
+                setActiveSidebarType(data.type as LayoutType);
+            } else {
+                const id = event.active.id as string;
 
-        setActiveCanvasId(id);
+                setActiveCanvasId(id);
 
-        activeCanvasIdRef.current = id;
+                activeCanvasIdRef.current = id;
 
-        activeContainerRef.current = findContainer(id, layouts);
-      }
+                activeContainerRef.current = findContainer(id, layouts);
+            }
 
-      setInsertIndex(null);
-      setInsertSlotId(null);
-    },
-    [layouts],
-  );
+            setInsertIndex(null);
+            setInsertSlotId(null);
+        },
+        [layouts],
+    );
 
-  // ─────────────────────────────────────
-  // drag over
-  // ─────────────────────────────────────
+    // ─────────────────────────────────────
+    // drag over
+    // ─────────────────────────────────────
 
-  const handleDragOver = useCallback(
-    (event: DragOverEvent) => {
-      const activeData = event.active.data.current;
+    const handleDragOver = useCallback(
+        (event: DragOverEvent) => {
+            const activeData = event.active.data.current;
 
-      const isSidebar = activeData?.source === 'sidebar';
+            const isSidebar = activeData?.source === 'sidebar';
 
-      const overData = event.over?.data.current;
+            const overData = event.over?.data.current;
 
-      const translated = event.active.rect.current.translated;
+            const translated = event.active.rect.current.translated;
 
-      if (!translated) return;
+            if (!translated) return;
 
-      const activeMidY = translated.top + translated.height / 2;
+            const activeMidY = translated.top + translated.height / 2;
 
-      // slot
-      if (overData?.type === 'slot') {
-        const slotId = event.over!.id as string;
+            // slot
+            if (overData?.type === 'slot') {
+                const slotId = event.over!.id as string;
 
-        // prevent self nesting
-        if (
-          !isSidebar &&
-          activeCanvasIdRef.current &&
-          isSlotInsideLayout(slotId, activeCanvasIdRef.current, layouts)
-        ) {
-          setInsertSlotId(null);
-          setInsertIndex(null);
+                // prevent self nesting
+                if (
+                    !isSidebar &&
+                    activeCanvasIdRef.current &&
+                    isSlotInsideLayout(
+                        slotId,
+                        activeCanvasIdRef.current,
+                        layouts,
+                    )
+                ) {
+                    setInsertSlotId(null);
+                    setInsertIndex(null);
 
-          return;
-        }
+                    return;
+                }
 
-        // max depth
-        if ((overData?.depth ?? 0) >= MAX_DEPTH) {
-          const isDraggingLayout =
-            activeData?.source === 'sidebar'
-              ? activeData?.type !== 'component'
-              : isLayoutNode(
-                  findNodeById(activeCanvasIdRef.current ?? '', layouts) ??
-                    ({} as never),
-                );
+                // max depth
+                if ((overData?.depth ?? 0) >= MAX_DEPTH) {
+                    const isDraggingLayout =
+                        activeData?.source === 'sidebar'
+                            ? activeData?.type !== 'component'
+                            : isLayoutNode(
+                                  findNodeById(
+                                      activeCanvasIdRef.current ?? '',
+                                      layouts,
+                                  ) ?? ({} as never),
+                              );
 
-          if (isDraggingLayout) {
+                    if (isDraggingLayout) {
+                        setInsertSlotId(null);
+                        setInsertIndex(null);
+
+                        return;
+                    }
+                }
+
+                const elements = Array.from(
+                    document.querySelectorAll(
+                        `[data-slot-id="${slotId}"] [data-canvas-item]`,
+                    ),
+                ) as HTMLElement[];
+
+                let newIndex = elements.length;
+
+                for (let i = 0; i < elements.length; i++) {
+                    const rect = elements[i].getBoundingClientRect();
+
+                    if (activeMidY < rect.top + rect.height / 2) {
+                        newIndex = i;
+                        break;
+                    }
+                }
+
+                setInsertSlotId(slotId);
+                setInsertIndex(newIndex);
+
+                return;
+            }
+
+            // root canvas
+            if (overData?.type === 'canvas') {
+                const elements = Array.from(
+                    document.querySelectorAll(
+                        '[data-root-canvas] > [data-canvas-item]',
+                    ),
+                ) as HTMLElement[];
+
+                let newIndex = elements.length;
+
+                for (let i = 0; i < elements.length; i++) {
+                    const rect = elements[i].getBoundingClientRect();
+
+                    if (activeMidY < rect.top + rect.height / 2) {
+                        newIndex = i;
+                        break;
+                    }
+                }
+
+                setInsertSlotId(null);
+
+                setInsertIndex(prev => (prev === newIndex ? prev : newIndex));
+
+                return;
+            }
+
             setInsertSlotId(null);
             setInsertIndex(null);
+        },
+        [layouts],
+    );
 
-            return;
-          }
-        }
+    // ─────────────────────────────────────
+    // drag end
+    // ─────────────────────────────────────
 
-        const elements = Array.from(
-          document.querySelectorAll(
-            `[data-slot-id="${slotId}"] [data-canvas-item]`,
-          ),
-        ) as HTMLElement[];
+    const handleDragEnd = useCallback(
+        (event: DragEndEvent) => {
+            const { active, over } = event;
 
-        let newIndex = elements.length;
+            const activeData = active.data.current;
 
-        for (let i = 0; i < elements.length; i++) {
-          const rect = elements[i].getBoundingClientRect();
+            const currentInsertIndex = insertIndex;
 
-          if (activeMidY < rect.top + rect.height / 2) {
-            newIndex = i;
-            break;
-          }
-        }
+            // reset
+            setActiveSidebarType(null);
+            setActiveCanvasId(null);
+            setInsertIndex(null);
+            setInsertSlotId(null);
 
-        setInsertSlotId(slotId);
-        setInsertIndex(newIndex);
+            activeContainerRef.current = null;
+            activeCanvasIdRef.current = null;
 
-        return;
-      }
+            if (!over) return;
 
-      // root canvas
-      if (overData?.type === 'canvas') {
-        const elements = Array.from(
-          document.querySelectorAll('[data-root-canvas] > [data-canvas-item]'),
-        ) as HTMLElement[];
+            // ─────────────────────────
+            // sidebar -> canvas
+            // ─────────────────────────
 
-        let newIndex = elements.length;
+            if (activeData?.source === 'sidebar') {
+                const overData = over.data.current;
 
-        for (let i = 0; i < elements.length; i++) {
-          const rect = elements[i].getBoundingClientRect();
+                // component
+                if (activeData.type === 'component') {
+                    if (overData?.type === 'slot') {
+                        const newComponent = createComponent(
+                            activeData.componentId as ComponentId,
+                            activeData.label as string,
+                        );
 
-          if (activeMidY < rect.top + rect.height / 2) {
-            newIndex = i;
-            break;
-          }
-        }
+                        const slotId = over.id as string;
 
-        setInsertSlotId(null);
+                        const ownerId = overData.ownerId as string;
 
-        setInsertIndex(prev => (prev === newIndex ? prev : newIndex));
+                        setLayouts(
+                            prev =>
+                                insertIntoSlot(
+                                    prev,
+                                    ownerId,
+                                    slotId,
+                                    newComponent,
+                                    currentInsertIndex ?? undefined,
+                                ),
+                            'add-component',
+                            `新增 ${activeData.label}`,
+                            true,
+                            {
+                                component: newComponent,
+                                slotId,
+                                ownerId,
+                                index: currentInsertIndex,
+                            },
+                        );
+                    }
 
-        return;
-      }
+                    return;
+                }
 
-      setInsertSlotId(null);
-      setInsertIndex(null);
-    },
-    [layouts],
-  );
+                // layout
+                const newLayout = createLayout(
+                    activeData.type as LayoutType,
+                    activeData.label as string,
+                );
 
-  // ─────────────────────────────────────
-  // drag end
-  // ─────────────────────────────────────
+                if (overData?.type === 'slot') {
+                    if ((overData?.depth ?? 0) >= MAX_DEPTH) {
+                        return;
+                    }
 
-  const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      const { active, over } = event;
+                    const slotId = over.id as string;
 
-      const activeData = active.data.current;
+                    const ownerId = overData.ownerId as string;
 
-      const currentInsertIndex = insertIndex;
+                    setLayouts(
+                        prev =>
+                            insertIntoSlot(
+                                prev,
+                                ownerId,
+                                slotId,
+                                newLayout,
+                                currentInsertIndex ?? undefined,
+                            ),
+                        'add-layout',
+                        `新增 ${activeData.label}`,
+                        true,
+                        {
+                            layout: newLayout,
+                            slotId,
+                            ownerId,
+                            index: currentInsertIndex,
+                        },
+                    );
 
-      // reset
-      setActiveSidebarType(null);
-      setActiveCanvasId(null);
-      setInsertIndex(null);
-      setInsertSlotId(null);
+                    return;
+                }
 
-      activeContainerRef.current = null;
-      activeCanvasIdRef.current = null;
+                if (overData?.type === 'canvas') {
+                    setLayouts(
+                        prev => {
+                            const next = [...prev];
+                            next.splice(
+                                currentInsertIndex ?? prev.length,
+                                0,
+                                newLayout,
+                            );
+                            return next;
+                        },
+                        'add-layout',
+                        `新增 ${activeData.label}`,
+                        true,
+                        {
+                            layout: newLayout,
+                            index: currentInsertIndex,
+                        },
+                    );
 
-      if (!over) return;
+                    return;
+                }
 
-      // ─────────────────────────
-      // sidebar -> canvas
-      // ─────────────────────────
+                return;
+            }
 
-      if (activeData?.source === 'sidebar') {
-        const overData = over.data.current;
+            // ─────────────────────────
+            // canvas move
+            // ─────────────────────────
 
-        // component
-        if (activeData.type === 'component') {
-          if (overData?.type === 'slot') {
-            const newComponent = createComponent(
-              activeData.componentId as ComponentId,
-              activeData.label as string,
-            );
+            const activeId = active.id as string;
 
-            const slotId = over.id as string;
+            const overId = over.id as string;
 
-            const ownerId = overData.ownerId as string;
+            if (activeId === overId) return;
 
             setLayouts(
-              prev =>
-                insertIntoSlot(
-                  prev,
-                  ownerId,
-                  slotId,
-                  newComponent,
-                  currentInsertIndex ?? undefined,
-                ),
-              'add-component',
-              `新增 ${activeData.label}`,
-              true,
-              {
-                component: newComponent,
-                slotId,
-                ownerId,
-                index: currentInsertIndex,
-              },
+                prev => {
+                    const activeContainer = findContainer(activeId, prev);
+
+                    if (!activeContainer) return prev;
+
+                    const overData = over.data.current;
+
+                    let targetContainer: string;
+
+                    if (overData?.type === 'slot') {
+                        targetContainer = over.id as string;
+                    } else if (overData?.type === 'canvas') {
+                        targetContainer = 'root';
+                    } else {
+                        targetContainer =
+                            findContainer(overId, prev) ?? activeContainer;
+                    }
+
+                    // same container
+                    if (activeContainer === targetContainer) {
+                        if (currentInsertIndex === null) {
+                            return prev;
+                        }
+
+                        return moveItem(
+                            prev,
+                            activeId,
+                            targetContainer,
+                            currentInsertIndex,
+                        );
+                    }
+
+                    // prevent self nesting
+                    if (
+                        targetContainer !== 'root' &&
+                        isSlotInsideLayout(targetContainer, activeId, prev)
+                    ) {
+                        return prev;
+                    }
+
+                    // max depth
+                    if (targetContainer !== 'root') {
+                        const activeNode = findNodeById(activeId, prev);
+
+                        if (
+                            activeNode &&
+                            isLayoutNode(activeNode) &&
+                            (overData?.depth ?? 0) >= MAX_DEPTH
+                        ) {
+                            return prev;
+                        }
+                    }
+
+                    return moveItem(
+                        prev,
+                        activeId,
+                        targetContainer,
+                        currentInsertIndex ?? undefined,
+                    );
+                },
+                'move-layout',
+                '移動項目',
+                true,
+                {
+                    layoutId: activeId,
+                    targetSlotId:
+                        over.data.current?.type === 'slot'
+                            ? (over.id as string)
+                            : over.data.current?.type === 'canvas'
+                              ? 'root'
+                              : (findContainer(over.id as string, layouts) ??
+                                'root'),
+                    index: currentInsertIndex,
+                },
             );
-          }
-
-          return;
-        }
-
-        // layout
-        const newLayout = createLayout(
-          activeData.type as LayoutType,
-          activeData.label as string,
-        );
-
-        if (overData?.type === 'slot') {
-          if ((overData?.depth ?? 0) >= MAX_DEPTH) {
-            return;
-          }
-
-          const slotId = over.id as string;
-
-          const ownerId = overData.ownerId as string;
-
-          setLayouts(
-            prev =>
-              insertIntoSlot(
-                prev,
-                ownerId,
-                slotId,
-                newLayout,
-                currentInsertIndex ?? undefined,
-              ),
-            'add-layout',
-            `新增 ${activeData.label}`,
-            true,
-            {
-              layout: newLayout,
-              slotId,
-              ownerId,
-              index: currentInsertIndex,
-            },
-          );
-
-          return;
-        }
-
-        if (overData?.type === 'canvas') {
-          setLayouts(
-            prev => {
-              const next = [...prev];
-              next.splice(currentInsertIndex ?? prev.length, 0, newLayout);
-              return next;
-            },
-            'add-layout',
-            `新增 ${activeData.label}`,
-            true,
-            {
-              layout: newLayout,
-              index: currentInsertIndex,
-            },
-          );
-
-          return;
-        }
-
-        return;
-      }
-
-      // ─────────────────────────
-      // canvas move
-      // ─────────────────────────
-
-      const activeId = active.id as string;
-
-      const overId = over.id as string;
-
-      if (activeId === overId) return;
-
-      setLayouts(
-        prev => {
-          const activeContainer = findContainer(activeId, prev);
-
-          if (!activeContainer) return prev;
-
-          const overData = over.data.current;
-
-          let targetContainer: string;
-
-          if (overData?.type === 'slot') {
-            targetContainer = over.id as string;
-          } else if (overData?.type === 'canvas') {
-            targetContainer = 'root';
-          } else {
-            targetContainer = findContainer(overId, prev) ?? activeContainer;
-          }
-
-          // same container
-          if (activeContainer === targetContainer) {
-            if (currentInsertIndex === null) {
-              return prev;
-            }
-
-            return moveItem(
-              prev,
-              activeId,
-              targetContainer,
-              currentInsertIndex,
-            );
-          }
-
-          // prevent self nesting
-          if (
-            targetContainer !== 'root' &&
-            isSlotInsideLayout(targetContainer, activeId, prev)
-          ) {
-            return prev;
-          }
-
-          // max depth
-          if (targetContainer !== 'root') {
-            const activeNode = findNodeById(activeId, prev);
-
-            if (
-              activeNode &&
-              isLayoutNode(activeNode) &&
-              (overData?.depth ?? 0) >= MAX_DEPTH
-            ) {
-              return prev;
-            }
-          }
-
-          return moveItem(
-            prev,
-            activeId,
-            targetContainer,
-            currentInsertIndex ?? undefined,
-          );
         },
-        'move-layout',
-        '移動項目',
-        true,
-        {
-          layoutId: activeId,
-          targetSlotId:
-            over.data.current?.type === 'slot'
-              ? (over.id as string)
-              : over.data.current?.type === 'canvas'
-                ? 'root'
-                : findContainer(over.id as string, layouts) ?? 'root',
-          index: currentInsertIndex,
-        },
-      );
+        [insertIndex, setLayouts, layouts],
+    );
 
-    },
-    [insertIndex, setLayouts, layouts],
+    // ─────────────────────────────────────
+    // drag cancel
+    // ─────────────────────────────────────
 
-  );
+    const handleDragCancel = useCallback(() => {
+        setActiveSidebarType(null);
+        setActiveCanvasId(null);
+        setInsertIndex(null);
+        setInsertSlotId(null);
+        activeContainerRef.current = null;
+        activeCanvasIdRef.current = null;
+    }, []);
 
-  // ─────────────────────────────────────
-  // drag cancel
-  // ─────────────────────────────────────
-
-  const handleDragCancel = useCallback(() => {
-    setActiveSidebarType(null);
-    setActiveCanvasId(null);
-    setInsertIndex(null);
-    setInsertSlotId(null);
-    activeContainerRef.current = null;
-    activeCanvasIdRef.current = null;
-  }, []);
-
-  return {
-    sensors,
-    handleDragStart,
-    handleDragOver,
-    handleDragEnd,
-    handleDragCancel,
-    activeSidebarType,
-    activeCanvasId,
-    insertIndex,
-    insertSlotId,
-  };
+    return {
+        sensors,
+        handleDragStart,
+        handleDragOver,
+        handleDragEnd,
+        handleDragCancel,
+        activeSidebarType,
+        activeCanvasId,
+        insertIndex,
+        insertSlotId,
+    };
 }

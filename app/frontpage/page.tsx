@@ -1,4 +1,4 @@
-import { graphToTree } from '@/lib/layout';
+import { graphToTree } from '@/lib/page';
 import type { PageGraph } from '@/types/layout';
 import ViewLayoutCard from '@/app/components/view/ViewLayoutCard';
 import { getPublishedPage } from '@/lib/api/page';

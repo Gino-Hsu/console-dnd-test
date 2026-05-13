@@ -1,4 +1,3 @@
-import { arrayMove } from '@dnd-kit/sortable';
 import type { NestedLayout, CanvasNode } from '@/types/layout';
 import { isLayoutNode } from '@/types/layout';
 
@@ -145,7 +144,9 @@ export function removeNode(items: NestedLayout[], id: string): NestedLayout[] {
         .map(layout => ({
             ...layout,
             slots: layout.slots.map(s => {
-                const components = s.children.filter(c => !isLayoutNode(c) && c.id !== id);
+                const components = s.children.filter(
+                    c => !isLayoutNode(c) && c.id !== id,
+                );
                 const layouts = s.children.filter(isLayoutNode);
                 const updatedLayouts = removeNode(layouts, id);
                 return {

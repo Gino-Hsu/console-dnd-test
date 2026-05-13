@@ -4,7 +4,7 @@ import { DndContext, DragOverlay, pointerWithin } from '@dnd-kit/core';
 import { useCallback, useId } from 'react';
 import { useDndBuilder, useLayoutEditor, useComponentEditor } from '@/hooks';
 import CanvasArea from './CanvasArea';
-import { findLayoutById, findNodeById } from '@/lib/layout';
+import { findLayoutById, findNodeById } from '@/lib/page';
 import Sidebar from './Sidebar';
 import { isLayoutNode } from '@/types/layout';
 
