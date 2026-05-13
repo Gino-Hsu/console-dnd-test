@@ -1,6 +1,6 @@
 import { graphToTree } from '@/lib/page';
 import type { PageGraph } from '@/types/layout';
-import ViewLayoutCard from '@/app/components/view/ViewLayoutCard';
+import ViewLayoutCard from '@/components/view/ViewLayoutCard';
 import { getPublishedPage } from '@/lib/api/page';
 
 export default async function FrontPage() {

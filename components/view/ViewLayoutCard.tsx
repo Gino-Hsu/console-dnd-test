@@ -1,9 +1,9 @@
 import { layoutTheme } from '@/lib/layout/resizeUtils';
 import type { NestedLayout } from '@/types/layout';
-import BaseLayoutFrame from '@/app/components/base/BaseLayoutFrame';
-import SharedBlockLayout from '@/app/components/base/BaseBlockLayout';
-import SharedFlexLayout from '@/app/components/base/BaseFlexLayout';
-import SharedGridLayout from '@/app/components/base/BaseGridLayout';
+import BaseLayoutFrame from '@/components/base/BaseLayoutFrame';
+import SharedBlockLayout from '@/components/base/BaseBlockLayout';
+import SharedFlexLayout from '@/components/base/BaseFlexLayout';
+import SharedGridLayout from '@/components/base/BaseGridLayout';
 
 export default function ViewLayoutCard({
     layout,

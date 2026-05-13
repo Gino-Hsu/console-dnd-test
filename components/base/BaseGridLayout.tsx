@@ -3,10 +3,10 @@ import {
     gridColHandleLeft,
     gridContainerStyle,
 } from '@/lib/layout/resizeUtils';
-import ResizeHandle from '@/app/components/editor/ResizeHandle';
-import SlotZone from '@/app/components/editor/layout/SlotZone';
-import ViewSlotZone from '@/app/components/view/ViewSlotZone';
-import type { SlotProps } from '@/app/components/editor/layout/types';
+import ResizeHandle from '@/components/editor/ResizeHandle';
+import SlotZone from '@/components/editor/layout/SlotZone';
+import ViewSlotZone from '@/components/view/ViewSlotZone';
+import type { SlotProps } from '@/components/editor/layout/types';
 import type { NestedLayout } from '@/types/layout';
 
 type SharedGridLayoutProps = {

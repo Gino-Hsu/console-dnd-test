@@ -1,7 +1,7 @@
 'use client';
 
 import type { RefObject } from 'react';
-import SharedGridLayout from '@/app/components/base/BaseGridLayout';
+import SharedGridLayout from '@/components/base/BaseGridLayout';
 import type { NestedLayout } from '@/types/layout';
 import type { SlotProps } from './types';
 
