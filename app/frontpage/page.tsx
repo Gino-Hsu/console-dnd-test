@@ -1,7 +1,7 @@
 import { graphToTree } from '@/lib/page';
 import type { PageGraph } from '@/types/layout';
 import ViewLayoutCard from '@/components/view/ViewLayoutCard';
-import { getPublishedPage } from '@/lib/api/page';
+import { getPublishedPage } from '@/lib/actions/page';
 
 export default async function FrontPage() {
     let pageGraph: PageGraph;

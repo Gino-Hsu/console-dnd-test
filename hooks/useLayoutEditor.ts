@@ -22,7 +22,7 @@ import type {
     EditOperation,
 } from '@/types/layout';
 
-import { getCurrentPage, appendEditLog } from '@/lib/api/page';
+import { getCurrentPage, appendEditLog } from '@/lib/actions/page';
 
 const AUTOSAVE_DELAY_MS = 3000;
 
