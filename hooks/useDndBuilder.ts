@@ -8,10 +8,10 @@ import {
     useSensor,
     useSensors,
 } from '@dnd-kit/core';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
-    createComponent,
+    createModule,
     createLayout,
     findContainer,
     findNodeById,
@@ -19,10 +19,16 @@ import {
     isSlotInsideLayout,
     MAX_DEPTH,
     moveItem,
-} from '@/lib/layout';
+} from '@/lib/page';
 
-import type { LayoutType, NestedLayout } from '@/types/layout';
-import type { ComponentId } from '@/lib/component-registry/component-ids';
+import type {
+    LayoutType,
+    NestedLayout,
+    SidebarItem,
+    CanvasNode,
+    ActiveSidebarItem,
+} from '@/types/layout';
+import type { ModuleId } from '@/lib/module-registry/module-ids';
 import { isLayoutNode } from '@/types/layout';
 import type { LoggedSetLayouts } from './useLayoutEditor';
 
@@ -32,8 +38,7 @@ type UseDndBuilderProps = {
 };
 
 export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
-    const [activeSidebarType, setActiveSidebarType] =
-        useState<LayoutType | null>(null);
+    const [activeSidebarItem, setActiveSidebarItem] = useState<ActiveSidebarItem | null>(null);
 
     const [activeCanvasId, setActiveCanvasId] = useState<string | null>(null);
 
@@ -76,11 +81,28 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
             const data = event.active.data.current;
 
             if (data?.source === 'sidebar') {
-                setActiveSidebarType(data.type as LayoutType);
+                if (data.type === 'module') {
+                    // 從 Sidebar 拖動 Module
+                    setActiveSidebarItem({
+                        type: 'module',
+                        moduleId: data.moduleId as ModuleId,
+                        label: data.label as string,
+                    });
+                } else {
+                    // 從 Sidebar 拖動 Layout
+                    setActiveSidebarItem({
+                        type: 'layout',
+                        layoutType: data.type as LayoutType,
+                        label: data.label as string,
+                    });
+                }
+                setActiveCanvasId(null);
             } else {
+                // 從 Canvas 拖動
                 const id = event.active.id as string;
 
                 setActiveCanvasId(id);
+                setActiveSidebarItem(null);
 
                 activeCanvasIdRef.current = id;
 
@@ -135,7 +157,7 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
                 if ((overData?.depth ?? 0) >= MAX_DEPTH) {
                     const isDraggingLayout =
                         activeData?.source === 'sidebar'
-                            ? activeData?.type !== 'component'
+                            ? activeData?.type !== 'module'
                             : isLayoutNode(
                                   findNodeById(
                                       activeCanvasIdRef.current ?? '',
@@ -219,7 +241,7 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
             const currentInsertIndex = insertIndex;
 
             // reset
-            setActiveSidebarType(null);
+            setActiveSidebarItem(null);
             setActiveCanvasId(null);
             setInsertIndex(null);
             setInsertSlotId(null);
@@ -236,11 +258,11 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
             if (activeData?.source === 'sidebar') {
                 const overData = over.data.current;
 
-                // component
-                if (activeData.type === 'component') {
+                // module
+                if (activeData.type === 'module') {
                     if (overData?.type === 'slot') {
-                        const newComponent = createComponent(
-                            activeData.componentId as ComponentId,
+                        const newModule = createModule(
+                            activeData.moduleId as ModuleId,
                             activeData.label as string,
                         );
 
@@ -254,10 +276,10 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
                                     prev,
                                     ownerId,
                                     slotId,
-                                    newComponent,
+                                    newModule,
                                     currentInsertIndex ?? undefined,
                                 ),
-                            'add-component',
+                            'add-module',
                             `新增 ${activeData.label}`,
                             true,
                         );
@@ -293,6 +315,12 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
                         'add-layout',
                         `新增 ${activeData.label}`,
                         true,
+                        {
+                            layout: newLayout,
+                            slotId,
+                            ownerId,
+                            index: currentInsertIndex,
+                        },
                     );
 
                     return;
@@ -312,6 +340,10 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
                         'add-layout',
                         `新增 ${activeData.label}`,
                         true,
+                        {
+                            layout: newLayout,
+                            index: currentInsertIndex,
+                        },
                     );
 
                     return;
@@ -391,12 +423,23 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
                         currentInsertIndex ?? undefined,
                     );
                 },
-                'move',
+                'move-layout',
                 '移動項目',
                 true,
+                {
+                    layoutId: activeId,
+                    targetSlotId:
+                        over.data.current?.type === 'slot'
+                            ? (over.id as string)
+                            : over.data.current?.type === 'canvas'
+                              ? 'root'
+                              : (findContainer(over.id as string, layouts) ??
+                                'root'),
+                    index: currentInsertIndex,
+                },
             );
         },
-        [insertIndex, setLayouts],
+        [insertIndex, setLayouts, layouts],
     );
 
     // ─────────────────────────────────────
@@ -404,7 +447,7 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
     // ─────────────────────────────────────
 
     const handleDragCancel = useCallback(() => {
-        setActiveSidebarType(null);
+        setActiveSidebarItem(null);
         setActiveCanvasId(null);
         setInsertIndex(null);
         setInsertSlotId(null);
@@ -418,7 +461,7 @@ export function useDndBuilder({ layouts, setLayouts }: UseDndBuilderProps) {
         handleDragOver,
         handleDragEnd,
         handleDragCancel,
-        activeSidebarType,
+        activeSidebarItem,
         activeCanvasId,
         insertIndex,
         insertSlotId,

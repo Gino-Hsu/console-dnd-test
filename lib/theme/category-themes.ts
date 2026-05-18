@@ -1,14 +1,14 @@
 /**
- * Component Category 主題配色
+ * Module Category 主題配色
  *
  * 此文件定義了不同 category 的 UI 樣式主題
- * 所有與 component 顯示相關的顏色配置都集中在這裡管理
+ * 所有與 module 顯示相關的顏色配置都集中在這裡管理
  */
 
 import {
     CATEGORIES,
     type CategoryId,
-} from "@/lib/component-registry/categories";
+} from "@/lib/module-registry/categories";
 
 export interface CategoryTheme {
     bgColor: string;
@@ -18,7 +18,7 @@ export interface CategoryTheme {
 }
 
 /**
- * Component Category 主題配色映射
+ * Module Category 主題配色映射
  * 使用 CategoryId 作為 key，確保所有定義的 category 都有對應的主題
  */
 export const CATEGORY_THEMES: Record<CategoryId, CategoryTheme> = {

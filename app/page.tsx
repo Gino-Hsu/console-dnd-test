@@ -1,4 +1,4 @@
-import DndBuilder from '@/app/components/editor/DndBuilder';
+import DndBuilder from '@/components/editor/DndBuilder';
 
 export default function Home() {
     return <DndBuilder />;

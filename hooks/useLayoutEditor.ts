@@ -9,29 +9,30 @@ import {
     updateField,
     mapLayouts,
     findLayout,
-} from '@/lib/layout';
+    graphToTree,
+    flattenToGraph,
+    applyEditLogAction,
+} from '@/lib/page';
 import type {
     LayoutSpacing,
     LayoutType,
     NestedLayout,
     SlotAlign,
     PageGraph,
+    EditOperation,
 } from '@/types/layout';
-import { graphToTree, flattenToGraph } from '@/lib/layout';
-import {
-    getLatestPage,
-    getLatestEditLog,
-    appendEditLog,
-} from '@/app/api/pageGraph';
+
+import { getCurrentPage, appendEditLog } from '@/lib/actions/page';
 
 const AUTOSAVE_DELAY_MS = 3000;
 
-// Type shared with useDndBuilder and useComponentEditor
+// Type shared with useDndBuilder and useModuleEditor
 export type LoggedSetLayouts = (
     updater: NestedLayout[] | ((prev: NestedLayout[]) => NestedLayout[]),
-    action: string,
+    action: EditOperation['type'],
     description: string,
     immediate?: boolean,
+    payload?: EditOperation['payload'],
 ) => void;
 
 export function useLayoutEditor() {
@@ -59,14 +60,28 @@ export function useLayoutEditor() {
                 setIsLoading(true);
                 setLoadError(null);
 
-                // 優先讀最新的 editLog；若無則讀最新發布版本
-                let graph = await getLatestEditLog();
-                if (!graph) {
-                    graph = await getLatestPage();
+                // 取得基礎發布版與尚未發布的編輯紀錄
+                const { base, editLogs } = await getCurrentPage();
+
+                console.log('base', base);
+                console.log('editLogs', editLogs);
+
+                // base 直接就是 PageGraph，不再有嵌套的 .graph
+                let tree = graphToTree(base as unknown as PageGraph);
+                // 依序套用編輯紀錄
+                for (const operation of editLogs) {
+                    tree = applyEditLogAction(tree, operation);
                 }
 
+                console.log('tree', tree);
+
+                const restoredGraph = flattenToGraph(
+                    tree,
+                    base as unknown as PageGraph,
+                );
+
                 if (!cancelled) {
-                    setGraph(graph);
+                    setGraph(restoredGraph);
                 }
             } catch (err) {
                 if (!cancelled) {
@@ -87,44 +102,35 @@ export function useLayoutEditor() {
         };
     }, []);
 
-    // EditLog dispatch: fires after each graph change (skip initial load)
-    useEffect(() => {
-        if (isInitialLoadRef.current || !graph) return;
+    // Debounced log helper
+    const logTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const performLog = useCallback(
+        (operation: EditOperation, immediate: boolean) => {
+            if (immediate) {
+                if (logTimerRef.current) clearTimeout(logTimerRef.current);
+                setIsSaving(true);
+                appendEditLog(operation)
+                    .catch(err => console.warn('[editLog] failed:', err))
+                    .finally(() => setIsSaving(false));
+            } else {
+                if (logTimerRef.current) clearTimeout(logTimerRef.current);
+                logTimerRef.current = setTimeout(async () => {
+                    try {
+                        setIsSaving(true);
+                        await appendEditLog(operation);
+                    } catch (err) {
+                        console.warn('[editLog] failed:', err);
+                    } finally {
+                        setIsSaving(false);
+                    }
+                }, AUTOSAVE_DELAY_MS);
+            }
+        },
+        [],
+    );
 
-        const pending = pendingLogRef.current;
-        pendingLogRef.current = null;
-
-        const action = pending?.action ?? 'edit';
-        const description = pending?.description ?? '編輯';
-        const immediate = pending?.immediate ?? false;
-
-        if (immediate) {
-            if (autosaveTimerRef.current)
-                clearTimeout(autosaveTimerRef.current);
-            setIsSaving(true);
-            appendEditLog(graph, action, description)
-                .catch(err => console.warn('[editLog] failed:', err))
-                .finally(() => setIsSaving(false));
-        } else {
-            if (autosaveTimerRef.current)
-                clearTimeout(autosaveTimerRef.current);
-            autosaveTimerRef.current = setTimeout(async () => {
-                try {
-                    setIsSaving(true);
-                    await appendEditLog(graph, action, description);
-                } catch (err) {
-                    console.warn('[editLog] failed:', err);
-                } finally {
-                    setIsSaving(false);
-                }
-            }, AUTOSAVE_DELAY_MS);
-        }
-
-        return () => {
-            if (autosaveTimerRef.current)
-                clearTimeout(autosaveTimerRef.current);
-        };
-    }, [graph]);
+    // EffectLog dispatch: no longer needed as a separate effect
+    // We'll call performLog directly in setLayoutsWithLog
 
     // Selector: 動態產出 tree 供畫面渲染
     const layouts = useMemo(() => {
@@ -145,12 +151,7 @@ export function useLayoutEditor() {
                     typeof updater === 'function'
                         ? updater(currentTree)
                         : updater;
-                return flattenToGraph(nextTree, {
-                    pageId: prevGraph.pageId,
-                    version: prevGraph.version,
-                    status: prevGraph.status,
-                    createdAt: prevGraph.createdAt,
-                });
+                return flattenToGraph(nextTree, prevGraph);
             });
         },
         [setGraph],
@@ -158,11 +159,21 @@ export function useLayoutEditor() {
 
     // setLayouts + queues an editLog entry
     const setLayoutsWithLog: LoggedSetLayouts = useCallback(
-        (updater, action, description, immediate = false) => {
-            pendingLogRef.current = { action, description, immediate };
+        (updater, action, description, immediate = false, payload) => {
+            // 1. 更新本地狀態
             setLayouts(updater);
+
+            // 2. 記錄操作日誌 (不再記錄整個 graph)
+            performLog(
+                {
+                    type: action,
+                    label: description,
+                    payload,
+                } as unknown as EditOperation,
+                immediate,
+            );
         },
-        [setLayouts],
+        [setLayouts, performLog],
     );
 
     const selectedLayout = selectedLayoutId
@@ -173,9 +184,10 @@ export function useLayoutEditor() {
         (id: string) => {
             setLayoutsWithLog(
                 prev => removeItem(prev, id),
-                'remove-layout',
+                'delete-layout',
                 '刪除 Layout',
                 true,
+                { layoutId: id },
             );
             setSelectedLayoutId(null);
         },
@@ -196,6 +208,7 @@ export function useLayoutEditor() {
                 'add-slot',
                 '新增 Slot',
                 true,
+                { layoutId },
             );
         },
         [setLayoutsWithLog],
@@ -208,6 +221,7 @@ export function useLayoutEditor() {
                 'remove-slot',
                 '刪除 Slot',
                 true,
+                { layoutId, slotId },
             );
         },
         [setLayoutsWithLog],
@@ -217,8 +231,10 @@ export function useLayoutEditor() {
         (layoutId: string, spacing: LayoutSpacing) => {
             setLayoutsWithLog(
                 prev => updateField(prev, layoutId, { spacing }),
-                'edit-layout',
+                'update-spacing',
                 '調整間距',
+                false,
+                { layoutId, spacing },
             );
         },
         [setLayoutsWithLog],
@@ -243,8 +259,10 @@ export function useLayoutEditor() {
                             })),
                         };
                     }),
-                'edit-slot',
+                'update-slot-widths',
                 '調整欄寬',
+                false,
+                { layoutId, widths },
             );
         },
         [setLayoutsWithLog],
@@ -271,8 +289,10 @@ export function useLayoutEditor() {
                             ),
                         };
                     }),
-                'edit-slot',
+                'update-wrap-slot-width',
                 '調整欄寬',
+                false,
+                { layoutId, slotId, widthPx },
             );
         },
         [setLayoutsWithLog],
@@ -300,8 +320,10 @@ export function useLayoutEditor() {
                             },
                         };
                     }),
-                'edit-layout',
+                'update-grid-dimensions',
                 '調整 Grid',
+                false,
+                { layoutId, colWidths, rowHeights, colGap, rowGap },
             );
         },
         [setLayoutsWithLog],
@@ -316,8 +338,10 @@ export function useLayoutEditor() {
                             ? { ...l, flexConfig: { ...l.flexConfig!, gap } }
                             : l,
                     ),
-                'edit-layout',
+                'update-flex-gap',
                 '調整 Flex 間距',
+                false,
+                { layoutId, gap },
             );
         },
         [setLayoutsWithLog],
@@ -332,8 +356,10 @@ export function useLayoutEditor() {
                             ? { ...l, flexConfig: { ...l.flexConfig!, wrap } }
                             : l,
                     ),
-                'edit-layout',
+                'update-flex-wrap',
                 '調整 Flex 換行',
+                false,
+                { layoutId, wrap },
             );
         },
         [setLayoutsWithLog],
@@ -348,8 +374,10 @@ export function useLayoutEditor() {
                             ? { ...l, flexConfig: { ...l.flexConfig!, rowGap } }
                             : l,
                     ),
-                'edit-layout',
+                'update-flex-row-gap',
                 '調整 Flex 行距',
+                false,
+                { layoutId, rowGap },
             );
         },
         [setLayoutsWithLog],
@@ -368,8 +396,10 @@ export function useLayoutEditor() {
                             ),
                         };
                     }),
-                'edit-slot',
+                'update-slot-align',
                 '調整對齊方式',
+                false,
+                { layoutId, slotId, align },
             );
         },
         [setLayoutsWithLog],
@@ -382,8 +412,10 @@ export function useLayoutEditor() {
                     mapLayouts(prev, l =>
                         l.id === layoutId ? { ...l, containerWidth } : l,
                     ),
-                'edit-layout',
+                'update-container-width',
                 '調整容器寬度',
+                false,
+                { layoutId, containerWidth },
             );
         },
         [setLayoutsWithLog],
@@ -403,9 +435,10 @@ export function useLayoutEditor() {
                         targetContainer,
                         index ?? undefined,
                     ),
-                'move',
+                'move-layout',
                 '移動項目',
                 true,
+                { layoutId: activeId, targetSlotId: targetContainer, index },
             );
         },
         [setLayoutsWithLog],
@@ -434,6 +467,12 @@ export function useLayoutEditor() {
                     'add-layout',
                     `新增 ${label}`,
                     true,
+                    {
+                        layout: newLayout,
+                        slotId: target.slotId,
+                        ownerId: target.ownerId,
+                        index,
+                    },
                 );
             } else {
                 setLayoutsWithLog(
@@ -445,6 +484,7 @@ export function useLayoutEditor() {
                     'add-layout',
                     `新增 ${label}`,
                     true,
+                    { layout: newLayout, index },
                 );
             }
         },
