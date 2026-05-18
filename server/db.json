@@ -135,7 +135,7 @@
       "id": "b1098fc3-8b9e-471a-a55a-ff8837980e5d",
       "pageId": "page-1",
       "version": 2,
-      "status": "published",
+      "status": "archived",
       "createdAt": "2026-05-13T02:38:54.549Z",
       "publishedAt": "2026-05-13T02:38:54.549Z",
       "rootOrder": [
@@ -299,9 +299,2349 @@
           "parentSlotId": "9d23bcc1-5ce2-474f-b672-84746ac8e50c"
         }
       }
+    },
+    {
+      "id": "515d2d3d-5cc4-4ec3-a1d3-82a7b38849b9",
+      "pageId": "page-1",
+      "version": 3,
+      "status": "archived",
+      "createdAt": "2026-05-18T06:43:09.798Z",
+      "publishedAt": "2026-05-18T06:43:09.798Z",
+      "rootOrder": [
+        "3f970230-2f88-4384-9b55-298abf60ed8c",
+        "3cc1fe26-4442-40d6-abd0-835436460a2a",
+        "5f0c30bb-f931-4b77-aa7b-7eb22f672519",
+        "a64867d9-cad3-4464-9ff3-c46a4e4e2f48"
+      ],
+      "layouts": {
+        "3f970230-2f88-4384-9b55-298abf60ed8c": {
+          "id": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "type": "layout",
+          "layoutType": "carousel",
+          "label": "輪播 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "24200263-152b-47d3-ad50-7a26d6269791",
+            "184b37dd-d1c6-4a7e-8317-c629e367b98a",
+            "f14391f7-0409-4c62-bee2-1d4105d055c6",
+            "b602ae5a-3082-49fe-a304-bc95719bdba1",
+            "506fef79-25ca-4289-af8d-14822ba268fb"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": {
+            "visibleCount": 4,
+            "slideCount": 4,
+            "gap": 8
+          },
+          "containerWidth": "full"
+        },
+        "3cc1fe26-4442-40d6-abd0-835436460a2a": {
+          "id": "3cc1fe26-4442-40d6-abd0-835436460a2a",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "5c95a977-de5e-461d-9e4c-168998bc4ecd",
+            "4708a8f3-9c86-4271-baba-24b8bfe620b8"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null,
+          "containerWidth": "contained"
+        },
+        "5f0c30bb-f931-4b77-aa7b-7eb22f672519": {
+          "id": "5f0c30bb-f931-4b77-aa7b-7eb22f672519",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 20,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "ccc40431-7850-49d9-83c1-52719d15c60a"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "a64867d9-cad3-4464-9ff3-c46a4e4e2f48": {
+          "id": "a64867d9-cad3-4464-9ff3-c46a4e4e2f48",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "9d23bcc1-5ce2-474f-b672-84746ac8e50c"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        }
+      },
+      "slots": {
+        "24200263-152b-47d3-ad50-7a26d6269791": {
+          "id": "24200263-152b-47d3-ad50-7a26d6269791",
+          "childIds": [],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "184b37dd-d1c6-4a7e-8317-c629e367b98a": {
+          "id": "184b37dd-d1c6-4a7e-8317-c629e367b98a",
+          "childIds": [],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "center"
+        },
+        "f14391f7-0409-4c62-bee2-1d4105d055c6": {
+          "id": "f14391f7-0409-4c62-bee2-1d4105d055c6",
+          "childIds": [],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "b602ae5a-3082-49fe-a304-bc95719bdba1": {
+          "id": "b602ae5a-3082-49fe-a304-bc95719bdba1",
+          "childIds": [],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "506fef79-25ca-4289-af8d-14822ba268fb": {
+          "id": "506fef79-25ca-4289-af8d-14822ba268fb",
+          "childIds": [],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "5c95a977-de5e-461d-9e4c-168998bc4ecd": {
+          "id": "5c95a977-de5e-461d-9e4c-168998bc4ecd",
+          "childIds": [
+            "add3653f-0ba5-4f41-9cca-22da1d4bc4b1"
+          ],
+          "parentLayoutId": "3cc1fe26-4442-40d6-abd0-835436460a2a",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "4708a8f3-9c86-4271-baba-24b8bfe620b8": {
+          "id": "4708a8f3-9c86-4271-baba-24b8bfe620b8",
+          "childIds": [],
+          "parentLayoutId": "3cc1fe26-4442-40d6-abd0-835436460a2a",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "ccc40431-7850-49d9-83c1-52719d15c60a": {
+          "id": "ccc40431-7850-49d9-83c1-52719d15c60a",
+          "childIds": [],
+          "parentLayoutId": "5f0c30bb-f931-4b77-aa7b-7eb22f672519",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "9d23bcc1-5ce2-474f-b672-84746ac8e50c": {
+          "id": "9d23bcc1-5ce2-474f-b672-84746ac8e50c",
+          "childIds": [
+            "f0161961-c569-4d3c-bc5c-44e7f9300e0f"
+          ],
+          "parentLayoutId": "a64867d9-cad3-4464-9ff3-c46a4e4e2f48",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "right"
+        }
+      },
+      "modules": {
+        "add3653f-0ba5-4f41-9cca-22da1d4bc4b1": {
+          "id": "add3653f-0ba5-4f41-9cca-22da1d4bc4b1",
+          "type": "module",
+          "moduleId": "H01",
+          "label": "基礎標題",
+          "data": {
+            "title": "請輸入標題文字111",
+            "level": "h2"
+          },
+          "style": {
+            "align": "left",
+            "color": "#000000",
+            "fontSize": 24,
+            "fontWeight": "normal"
+          },
+          "parentSlotId": "5c95a977-de5e-461d-9e4c-168998bc4ecd"
+        },
+        "f0161961-c569-4d3c-bc5c-44e7f9300e0f": {
+          "id": "f0161961-c569-4d3c-bc5c-44e7f9300e0f",
+          "type": "module",
+          "moduleId": "I01",
+          "label": "基礎圖片",
+          "data": {
+            "src": "/default.png",
+            "alt": "圖片"
+          },
+          "style": {
+            "width": "50%",
+            "height": "auto",
+            "borderRadius": "8px",
+            "objectFit": "cover"
+          },
+          "parentSlotId": "9d23bcc1-5ce2-474f-b672-84746ac8e50c"
+        }
+      }
+    },
+    {
+      "id": "bf7e1725-57ef-43a2-a811-c4ec10cb5e7f",
+      "pageId": "page-1",
+      "version": 4,
+      "status": "archived",
+      "createdAt": "2026-05-18T06:43:39.374Z",
+      "publishedAt": "2026-05-18T06:43:39.374Z",
+      "rootOrder": [
+        "3f970230-2f88-4384-9b55-298abf60ed8c",
+        "3cc1fe26-4442-40d6-abd0-835436460a2a",
+        "5f0c30bb-f931-4b77-aa7b-7eb22f672519",
+        "a64867d9-cad3-4464-9ff3-c46a4e4e2f48"
+      ],
+      "layouts": {
+        "3f970230-2f88-4384-9b55-298abf60ed8c": {
+          "id": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "type": "layout",
+          "layoutType": "carousel",
+          "label": "輪播 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "24200263-152b-47d3-ad50-7a26d6269791",
+            "184b37dd-d1c6-4a7e-8317-c629e367b98a",
+            "f14391f7-0409-4c62-bee2-1d4105d055c6",
+            "b602ae5a-3082-49fe-a304-bc95719bdba1",
+            "506fef79-25ca-4289-af8d-14822ba268fb"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": {
+            "visibleCount": 4,
+            "slideCount": 4,
+            "gap": 8
+          },
+          "containerWidth": "full"
+        },
+        "014cf03a-84b1-43e6-8aa3-d7ffe244205e": {
+          "id": "014cf03a-84b1-43e6-8aa3-d7ffe244205e",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "bef9399b-5413-4935-bb6c-85d68e4d7bde"
+          ],
+          "parentSlotId": "24200263-152b-47d3-ad50-7a26d6269791",
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "97d88ef4-5f92-4a96-bf2b-33c0660554a3": {
+          "id": "97d88ef4-5f92-4a96-bf2b-33c0660554a3",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "02cbafbc-e8df-4690-8b2a-d86ba7227d37"
+          ],
+          "parentSlotId": "184b37dd-d1c6-4a7e-8317-c629e367b98a",
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "f0383c07-f2ba-4e1d-a52e-d1d1e817eda8": {
+          "id": "f0383c07-f2ba-4e1d-a52e-d1d1e817eda8",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "7ce3f97d-69c6-4370-bc5a-428edb72ebc0"
+          ],
+          "parentSlotId": "f14391f7-0409-4c62-bee2-1d4105d055c6",
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "f0e689d1-87ba-4461-894e-ae3640421a9f": {
+          "id": "f0e689d1-87ba-4461-894e-ae3640421a9f",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "e5524a98-9d71-45c0-b5eb-3f196c994645"
+          ],
+          "parentSlotId": "b602ae5a-3082-49fe-a304-bc95719bdba1",
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "06424bc1-9305-48b4-8804-714904dcbcfa": {
+          "id": "06424bc1-9305-48b4-8804-714904dcbcfa",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "3c6dd1ef-0a5a-4011-9497-2eaf59ee828f"
+          ],
+          "parentSlotId": "506fef79-25ca-4289-af8d-14822ba268fb",
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "3cc1fe26-4442-40d6-abd0-835436460a2a": {
+          "id": "3cc1fe26-4442-40d6-abd0-835436460a2a",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "5c95a977-de5e-461d-9e4c-168998bc4ecd",
+            "4708a8f3-9c86-4271-baba-24b8bfe620b8"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null,
+          "containerWidth": "contained"
+        },
+        "5f0c30bb-f931-4b77-aa7b-7eb22f672519": {
+          "id": "5f0c30bb-f931-4b77-aa7b-7eb22f672519",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 20,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "ccc40431-7850-49d9-83c1-52719d15c60a"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "a64867d9-cad3-4464-9ff3-c46a4e4e2f48": {
+          "id": "a64867d9-cad3-4464-9ff3-c46a4e4e2f48",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "9d23bcc1-5ce2-474f-b672-84746ac8e50c"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        }
+      },
+      "slots": {
+        "24200263-152b-47d3-ad50-7a26d6269791": {
+          "id": "24200263-152b-47d3-ad50-7a26d6269791",
+          "childIds": [
+            "014cf03a-84b1-43e6-8aa3-d7ffe244205e"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "bef9399b-5413-4935-bb6c-85d68e4d7bde": {
+          "id": "bef9399b-5413-4935-bb6c-85d68e4d7bde",
+          "childIds": [],
+          "parentLayoutId": "014cf03a-84b1-43e6-8aa3-d7ffe244205e",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "184b37dd-d1c6-4a7e-8317-c629e367b98a": {
+          "id": "184b37dd-d1c6-4a7e-8317-c629e367b98a",
+          "childIds": [
+            "97d88ef4-5f92-4a96-bf2b-33c0660554a3"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "center"
+        },
+        "02cbafbc-e8df-4690-8b2a-d86ba7227d37": {
+          "id": "02cbafbc-e8df-4690-8b2a-d86ba7227d37",
+          "childIds": [],
+          "parentLayoutId": "97d88ef4-5f92-4a96-bf2b-33c0660554a3",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "f14391f7-0409-4c62-bee2-1d4105d055c6": {
+          "id": "f14391f7-0409-4c62-bee2-1d4105d055c6",
+          "childIds": [
+            "f0383c07-f2ba-4e1d-a52e-d1d1e817eda8"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "7ce3f97d-69c6-4370-bc5a-428edb72ebc0": {
+          "id": "7ce3f97d-69c6-4370-bc5a-428edb72ebc0",
+          "childIds": [],
+          "parentLayoutId": "f0383c07-f2ba-4e1d-a52e-d1d1e817eda8",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "b602ae5a-3082-49fe-a304-bc95719bdba1": {
+          "id": "b602ae5a-3082-49fe-a304-bc95719bdba1",
+          "childIds": [
+            "f0e689d1-87ba-4461-894e-ae3640421a9f"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "e5524a98-9d71-45c0-b5eb-3f196c994645": {
+          "id": "e5524a98-9d71-45c0-b5eb-3f196c994645",
+          "childIds": [],
+          "parentLayoutId": "f0e689d1-87ba-4461-894e-ae3640421a9f",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "506fef79-25ca-4289-af8d-14822ba268fb": {
+          "id": "506fef79-25ca-4289-af8d-14822ba268fb",
+          "childIds": [
+            "06424bc1-9305-48b4-8804-714904dcbcfa"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "3c6dd1ef-0a5a-4011-9497-2eaf59ee828f": {
+          "id": "3c6dd1ef-0a5a-4011-9497-2eaf59ee828f",
+          "childIds": [],
+          "parentLayoutId": "06424bc1-9305-48b4-8804-714904dcbcfa",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "5c95a977-de5e-461d-9e4c-168998bc4ecd": {
+          "id": "5c95a977-de5e-461d-9e4c-168998bc4ecd",
+          "childIds": [
+            "add3653f-0ba5-4f41-9cca-22da1d4bc4b1"
+          ],
+          "parentLayoutId": "3cc1fe26-4442-40d6-abd0-835436460a2a",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "4708a8f3-9c86-4271-baba-24b8bfe620b8": {
+          "id": "4708a8f3-9c86-4271-baba-24b8bfe620b8",
+          "childIds": [],
+          "parentLayoutId": "3cc1fe26-4442-40d6-abd0-835436460a2a",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "ccc40431-7850-49d9-83c1-52719d15c60a": {
+          "id": "ccc40431-7850-49d9-83c1-52719d15c60a",
+          "childIds": [],
+          "parentLayoutId": "5f0c30bb-f931-4b77-aa7b-7eb22f672519",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "9d23bcc1-5ce2-474f-b672-84746ac8e50c": {
+          "id": "9d23bcc1-5ce2-474f-b672-84746ac8e50c",
+          "childIds": [
+            "f0161961-c569-4d3c-bc5c-44e7f9300e0f"
+          ],
+          "parentLayoutId": "a64867d9-cad3-4464-9ff3-c46a4e4e2f48",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "right"
+        }
+      },
+      "modules": {
+        "add3653f-0ba5-4f41-9cca-22da1d4bc4b1": {
+          "id": "add3653f-0ba5-4f41-9cca-22da1d4bc4b1",
+          "type": "module",
+          "moduleId": "H01",
+          "label": "基礎標題",
+          "data": {
+            "title": "請輸入標題文字111",
+            "level": "h2"
+          },
+          "style": {
+            "align": "left",
+            "color": "#000000",
+            "fontSize": 24,
+            "fontWeight": "normal"
+          },
+          "parentSlotId": "5c95a977-de5e-461d-9e4c-168998bc4ecd"
+        },
+        "f0161961-c569-4d3c-bc5c-44e7f9300e0f": {
+          "id": "f0161961-c569-4d3c-bc5c-44e7f9300e0f",
+          "type": "module",
+          "moduleId": "I01",
+          "label": "基礎圖片",
+          "data": {
+            "src": "/default.png",
+            "alt": "圖片"
+          },
+          "style": {
+            "width": "50%",
+            "height": "auto",
+            "borderRadius": "8px",
+            "objectFit": "cover"
+          },
+          "parentSlotId": "9d23bcc1-5ce2-474f-b672-84746ac8e50c"
+        }
+      }
+    },
+    {
+      "id": "7f2d7699-e8f5-4c48-994f-b9d5b23d78e2",
+      "pageId": "page-1",
+      "version": 5,
+      "status": "archived",
+      "createdAt": "2026-05-18T07:29:35.724Z",
+      "publishedAt": "2026-05-18T07:29:35.724Z",
+      "rootOrder": [
+        "3f970230-2f88-4384-9b55-298abf60ed8c",
+        "3cc1fe26-4442-40d6-abd0-835436460a2a",
+        "5f0c30bb-f931-4b77-aa7b-7eb22f672519",
+        "a64867d9-cad3-4464-9ff3-c46a4e4e2f48"
+      ],
+      "layouts": {
+        "3f970230-2f88-4384-9b55-298abf60ed8c": {
+          "id": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "type": "layout",
+          "layoutType": "carousel",
+          "label": "輪播 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 26,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "24200263-152b-47d3-ad50-7a26d6269791",
+            "184b37dd-d1c6-4a7e-8317-c629e367b98a",
+            "f14391f7-0409-4c62-bee2-1d4105d055c6",
+            "b602ae5a-3082-49fe-a304-bc95719bdba1",
+            "506fef79-25ca-4289-af8d-14822ba268fb",
+            "5123ce39-27ae-479b-bfbf-be6cb218dcb9",
+            "295eb4e3-c718-48af-8d16-c2b09db87c44",
+            "4dd9c0e3-bf91-4cf3-8bd7-807f047a5c7d"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": {
+            "visibleCount": 3,
+            "slideCount": 3,
+            "gap": 28
+          },
+          "containerWidth": "full"
+        },
+        "97d88ef4-5f92-4a96-bf2b-33c0660554a3": {
+          "id": "97d88ef4-5f92-4a96-bf2b-33c0660554a3",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "02cbafbc-e8df-4690-8b2a-d86ba7227d37"
+          ],
+          "parentSlotId": "184b37dd-d1c6-4a7e-8317-c629e367b98a",
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "f0383c07-f2ba-4e1d-a52e-d1d1e817eda8": {
+          "id": "f0383c07-f2ba-4e1d-a52e-d1d1e817eda8",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "7ce3f97d-69c6-4370-bc5a-428edb72ebc0"
+          ],
+          "parentSlotId": "f14391f7-0409-4c62-bee2-1d4105d055c6",
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "f0e689d1-87ba-4461-894e-ae3640421a9f": {
+          "id": "f0e689d1-87ba-4461-894e-ae3640421a9f",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "e5524a98-9d71-45c0-b5eb-3f196c994645"
+          ],
+          "parentSlotId": "b602ae5a-3082-49fe-a304-bc95719bdba1",
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "06424bc1-9305-48b4-8804-714904dcbcfa": {
+          "id": "06424bc1-9305-48b4-8804-714904dcbcfa",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "3c6dd1ef-0a5a-4011-9497-2eaf59ee828f"
+          ],
+          "parentSlotId": "506fef79-25ca-4289-af8d-14822ba268fb",
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "3cc1fe26-4442-40d6-abd0-835436460a2a": {
+          "id": "3cc1fe26-4442-40d6-abd0-835436460a2a",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "5c95a977-de5e-461d-9e4c-168998bc4ecd",
+            "4708a8f3-9c86-4271-baba-24b8bfe620b8"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null,
+          "containerWidth": "contained"
+        },
+        "5f0c30bb-f931-4b77-aa7b-7eb22f672519": {
+          "id": "5f0c30bb-f931-4b77-aa7b-7eb22f672519",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 20,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "ccc40431-7850-49d9-83c1-52719d15c60a"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "a64867d9-cad3-4464-9ff3-c46a4e4e2f48": {
+          "id": "a64867d9-cad3-4464-9ff3-c46a4e4e2f48",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "9d23bcc1-5ce2-474f-b672-84746ac8e50c"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        }
+      },
+      "slots": {
+        "24200263-152b-47d3-ad50-7a26d6269791": {
+          "id": "24200263-152b-47d3-ad50-7a26d6269791",
+          "childIds": [],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "184b37dd-d1c6-4a7e-8317-c629e367b98a": {
+          "id": "184b37dd-d1c6-4a7e-8317-c629e367b98a",
+          "childIds": [
+            "97d88ef4-5f92-4a96-bf2b-33c0660554a3"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "center"
+        },
+        "02cbafbc-e8df-4690-8b2a-d86ba7227d37": {
+          "id": "02cbafbc-e8df-4690-8b2a-d86ba7227d37",
+          "childIds": [],
+          "parentLayoutId": "97d88ef4-5f92-4a96-bf2b-33c0660554a3",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "f14391f7-0409-4c62-bee2-1d4105d055c6": {
+          "id": "f14391f7-0409-4c62-bee2-1d4105d055c6",
+          "childIds": [
+            "f0383c07-f2ba-4e1d-a52e-d1d1e817eda8"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "7ce3f97d-69c6-4370-bc5a-428edb72ebc0": {
+          "id": "7ce3f97d-69c6-4370-bc5a-428edb72ebc0",
+          "childIds": [],
+          "parentLayoutId": "f0383c07-f2ba-4e1d-a52e-d1d1e817eda8",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "b602ae5a-3082-49fe-a304-bc95719bdba1": {
+          "id": "b602ae5a-3082-49fe-a304-bc95719bdba1",
+          "childIds": [
+            "f0e689d1-87ba-4461-894e-ae3640421a9f"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "e5524a98-9d71-45c0-b5eb-3f196c994645": {
+          "id": "e5524a98-9d71-45c0-b5eb-3f196c994645",
+          "childIds": [],
+          "parentLayoutId": "f0e689d1-87ba-4461-894e-ae3640421a9f",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "506fef79-25ca-4289-af8d-14822ba268fb": {
+          "id": "506fef79-25ca-4289-af8d-14822ba268fb",
+          "childIds": [
+            "06424bc1-9305-48b4-8804-714904dcbcfa"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "3c6dd1ef-0a5a-4011-9497-2eaf59ee828f": {
+          "id": "3c6dd1ef-0a5a-4011-9497-2eaf59ee828f",
+          "childIds": [],
+          "parentLayoutId": "06424bc1-9305-48b4-8804-714904dcbcfa",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "5123ce39-27ae-479b-bfbf-be6cb218dcb9": {
+          "id": "5123ce39-27ae-479b-bfbf-be6cb218dcb9",
+          "childIds": [],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "295eb4e3-c718-48af-8d16-c2b09db87c44": {
+          "id": "295eb4e3-c718-48af-8d16-c2b09db87c44",
+          "childIds": [],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "4dd9c0e3-bf91-4cf3-8bd7-807f047a5c7d": {
+          "id": "4dd9c0e3-bf91-4cf3-8bd7-807f047a5c7d",
+          "childIds": [],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "5c95a977-de5e-461d-9e4c-168998bc4ecd": {
+          "id": "5c95a977-de5e-461d-9e4c-168998bc4ecd",
+          "childIds": [
+            "add3653f-0ba5-4f41-9cca-22da1d4bc4b1"
+          ],
+          "parentLayoutId": "3cc1fe26-4442-40d6-abd0-835436460a2a",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "4708a8f3-9c86-4271-baba-24b8bfe620b8": {
+          "id": "4708a8f3-9c86-4271-baba-24b8bfe620b8",
+          "childIds": [],
+          "parentLayoutId": "3cc1fe26-4442-40d6-abd0-835436460a2a",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "ccc40431-7850-49d9-83c1-52719d15c60a": {
+          "id": "ccc40431-7850-49d9-83c1-52719d15c60a",
+          "childIds": [],
+          "parentLayoutId": "5f0c30bb-f931-4b77-aa7b-7eb22f672519",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "9d23bcc1-5ce2-474f-b672-84746ac8e50c": {
+          "id": "9d23bcc1-5ce2-474f-b672-84746ac8e50c",
+          "childIds": [
+            "f0161961-c569-4d3c-bc5c-44e7f9300e0f"
+          ],
+          "parentLayoutId": "a64867d9-cad3-4464-9ff3-c46a4e4e2f48",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "right"
+        }
+      },
+      "modules": {
+        "add3653f-0ba5-4f41-9cca-22da1d4bc4b1": {
+          "id": "add3653f-0ba5-4f41-9cca-22da1d4bc4b1",
+          "type": "module",
+          "moduleId": "H01",
+          "label": "基礎標題",
+          "data": {
+            "title": "請輸入標題文字111",
+            "level": "h2"
+          },
+          "style": {
+            "align": "left",
+            "color": "#000000",
+            "fontSize": 24,
+            "fontWeight": "normal"
+          },
+          "parentSlotId": "5c95a977-de5e-461d-9e4c-168998bc4ecd"
+        },
+        "f0161961-c569-4d3c-bc5c-44e7f9300e0f": {
+          "id": "f0161961-c569-4d3c-bc5c-44e7f9300e0f",
+          "type": "module",
+          "moduleId": "I01",
+          "label": "基礎圖片",
+          "data": {
+            "src": "/default.png",
+            "alt": "圖片"
+          },
+          "style": {
+            "width": "50%",
+            "height": "auto",
+            "borderRadius": "8px",
+            "objectFit": "cover"
+          },
+          "parentSlotId": "9d23bcc1-5ce2-474f-b672-84746ac8e50c"
+        }
+      }
+    },
+    {
+      "id": "b9f4a1da-3ac5-49bc-83a1-17e5d3778a49",
+      "pageId": "page-1",
+      "version": 6,
+      "status": "archived",
+      "createdAt": "2026-05-18T07:30:05.086Z",
+      "publishedAt": "2026-05-18T07:30:05.086Z",
+      "rootOrder": [
+        "3f970230-2f88-4384-9b55-298abf60ed8c",
+        "3cc1fe26-4442-40d6-abd0-835436460a2a",
+        "5f0c30bb-f931-4b77-aa7b-7eb22f672519",
+        "a64867d9-cad3-4464-9ff3-c46a4e4e2f48"
+      ],
+      "layouts": {
+        "3f970230-2f88-4384-9b55-298abf60ed8c": {
+          "id": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "type": "layout",
+          "layoutType": "carousel",
+          "label": "輪播 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 26,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "24200263-152b-47d3-ad50-7a26d6269791",
+            "184b37dd-d1c6-4a7e-8317-c629e367b98a",
+            "f14391f7-0409-4c62-bee2-1d4105d055c6",
+            "b602ae5a-3082-49fe-a304-bc95719bdba1",
+            "506fef79-25ca-4289-af8d-14822ba268fb",
+            "5123ce39-27ae-479b-bfbf-be6cb218dcb9",
+            "295eb4e3-c718-48af-8d16-c2b09db87c44",
+            "4dd9c0e3-bf91-4cf3-8bd7-807f047a5c7d"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": {
+            "visibleCount": 3,
+            "slideCount": 3,
+            "gap": 28
+          },
+          "containerWidth": "full"
+        },
+        "97d88ef4-5f92-4a96-bf2b-33c0660554a3": {
+          "id": "97d88ef4-5f92-4a96-bf2b-33c0660554a3",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "02cbafbc-e8df-4690-8b2a-d86ba7227d37"
+          ],
+          "parentSlotId": "184b37dd-d1c6-4a7e-8317-c629e367b98a",
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "f0383c07-f2ba-4e1d-a52e-d1d1e817eda8": {
+          "id": "f0383c07-f2ba-4e1d-a52e-d1d1e817eda8",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "7ce3f97d-69c6-4370-bc5a-428edb72ebc0"
+          ],
+          "parentSlotId": "f14391f7-0409-4c62-bee2-1d4105d055c6",
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "f0e689d1-87ba-4461-894e-ae3640421a9f": {
+          "id": "f0e689d1-87ba-4461-894e-ae3640421a9f",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "e5524a98-9d71-45c0-b5eb-3f196c994645"
+          ],
+          "parentSlotId": "b602ae5a-3082-49fe-a304-bc95719bdba1",
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "06424bc1-9305-48b4-8804-714904dcbcfa": {
+          "id": "06424bc1-9305-48b4-8804-714904dcbcfa",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "3c6dd1ef-0a5a-4011-9497-2eaf59ee828f"
+          ],
+          "parentSlotId": "506fef79-25ca-4289-af8d-14822ba268fb",
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "3cc1fe26-4442-40d6-abd0-835436460a2a": {
+          "id": "3cc1fe26-4442-40d6-abd0-835436460a2a",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "5c95a977-de5e-461d-9e4c-168998bc4ecd",
+            "4708a8f3-9c86-4271-baba-24b8bfe620b8"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null,
+          "containerWidth": "contained"
+        },
+        "5f0c30bb-f931-4b77-aa7b-7eb22f672519": {
+          "id": "5f0c30bb-f931-4b77-aa7b-7eb22f672519",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 20,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "ccc40431-7850-49d9-83c1-52719d15c60a"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "a64867d9-cad3-4464-9ff3-c46a4e4e2f48": {
+          "id": "a64867d9-cad3-4464-9ff3-c46a4e4e2f48",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "9d23bcc1-5ce2-474f-b672-84746ac8e50c"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        }
+      },
+      "slots": {
+        "24200263-152b-47d3-ad50-7a26d6269791": {
+          "id": "24200263-152b-47d3-ad50-7a26d6269791",
+          "childIds": [
+            "2660306c-81d7-4526-8eca-f523c313a655"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "184b37dd-d1c6-4a7e-8317-c629e367b98a": {
+          "id": "184b37dd-d1c6-4a7e-8317-c629e367b98a",
+          "childIds": [
+            "97d88ef4-5f92-4a96-bf2b-33c0660554a3"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "center"
+        },
+        "02cbafbc-e8df-4690-8b2a-d86ba7227d37": {
+          "id": "02cbafbc-e8df-4690-8b2a-d86ba7227d37",
+          "childIds": [
+            "2e302c4d-4814-4b9d-9951-d55ea62908cc"
+          ],
+          "parentLayoutId": "97d88ef4-5f92-4a96-bf2b-33c0660554a3",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "f14391f7-0409-4c62-bee2-1d4105d055c6": {
+          "id": "f14391f7-0409-4c62-bee2-1d4105d055c6",
+          "childIds": [
+            "f0383c07-f2ba-4e1d-a52e-d1d1e817eda8"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "7ce3f97d-69c6-4370-bc5a-428edb72ebc0": {
+          "id": "7ce3f97d-69c6-4370-bc5a-428edb72ebc0",
+          "childIds": [
+            "41d3580f-22cc-4781-a197-2c37efd7459e"
+          ],
+          "parentLayoutId": "f0383c07-f2ba-4e1d-a52e-d1d1e817eda8",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "b602ae5a-3082-49fe-a304-bc95719bdba1": {
+          "id": "b602ae5a-3082-49fe-a304-bc95719bdba1",
+          "childIds": [
+            "f0e689d1-87ba-4461-894e-ae3640421a9f"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "e5524a98-9d71-45c0-b5eb-3f196c994645": {
+          "id": "e5524a98-9d71-45c0-b5eb-3f196c994645",
+          "childIds": [
+            "b23a967f-9a9c-4e7c-8bd5-844359cf876b"
+          ],
+          "parentLayoutId": "f0e689d1-87ba-4461-894e-ae3640421a9f",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "506fef79-25ca-4289-af8d-14822ba268fb": {
+          "id": "506fef79-25ca-4289-af8d-14822ba268fb",
+          "childIds": [
+            "06424bc1-9305-48b4-8804-714904dcbcfa"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "3c6dd1ef-0a5a-4011-9497-2eaf59ee828f": {
+          "id": "3c6dd1ef-0a5a-4011-9497-2eaf59ee828f",
+          "childIds": [
+            "54382c6c-d67b-49a6-8de8-6ffa27ee30ca"
+          ],
+          "parentLayoutId": "06424bc1-9305-48b4-8804-714904dcbcfa",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "5123ce39-27ae-479b-bfbf-be6cb218dcb9": {
+          "id": "5123ce39-27ae-479b-bfbf-be6cb218dcb9",
+          "childIds": [],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "295eb4e3-c718-48af-8d16-c2b09db87c44": {
+          "id": "295eb4e3-c718-48af-8d16-c2b09db87c44",
+          "childIds": [],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "4dd9c0e3-bf91-4cf3-8bd7-807f047a5c7d": {
+          "id": "4dd9c0e3-bf91-4cf3-8bd7-807f047a5c7d",
+          "childIds": [],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "5c95a977-de5e-461d-9e4c-168998bc4ecd": {
+          "id": "5c95a977-de5e-461d-9e4c-168998bc4ecd",
+          "childIds": [
+            "add3653f-0ba5-4f41-9cca-22da1d4bc4b1"
+          ],
+          "parentLayoutId": "3cc1fe26-4442-40d6-abd0-835436460a2a",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "4708a8f3-9c86-4271-baba-24b8bfe620b8": {
+          "id": "4708a8f3-9c86-4271-baba-24b8bfe620b8",
+          "childIds": [],
+          "parentLayoutId": "3cc1fe26-4442-40d6-abd0-835436460a2a",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "ccc40431-7850-49d9-83c1-52719d15c60a": {
+          "id": "ccc40431-7850-49d9-83c1-52719d15c60a",
+          "childIds": [],
+          "parentLayoutId": "5f0c30bb-f931-4b77-aa7b-7eb22f672519",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "9d23bcc1-5ce2-474f-b672-84746ac8e50c": {
+          "id": "9d23bcc1-5ce2-474f-b672-84746ac8e50c",
+          "childIds": [
+            "f0161961-c569-4d3c-bc5c-44e7f9300e0f"
+          ],
+          "parentLayoutId": "a64867d9-cad3-4464-9ff3-c46a4e4e2f48",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "right"
+        }
+      },
+      "modules": {
+        "2660306c-81d7-4526-8eca-f523c313a655": {
+          "id": "2660306c-81d7-4526-8eca-f523c313a655",
+          "type": "module",
+          "moduleId": "H01",
+          "label": "基礎標題",
+          "data": {
+            "title": "請輸入標題文字",
+            "level": "h2"
+          },
+          "style": {
+            "align": "left",
+            "color": "#000000",
+            "fontSize": 24,
+            "fontWeight": "normal"
+          },
+          "parentSlotId": "24200263-152b-47d3-ad50-7a26d6269791"
+        },
+        "2e302c4d-4814-4b9d-9951-d55ea62908cc": {
+          "id": "2e302c4d-4814-4b9d-9951-d55ea62908cc",
+          "type": "module",
+          "moduleId": "H01",
+          "label": "基礎標題",
+          "data": {
+            "title": "請輸入標題文字",
+            "level": "h2"
+          },
+          "style": {
+            "align": "left",
+            "color": "#000000",
+            "fontSize": 24,
+            "fontWeight": "normal"
+          },
+          "parentSlotId": "02cbafbc-e8df-4690-8b2a-d86ba7227d37"
+        },
+        "41d3580f-22cc-4781-a197-2c37efd7459e": {
+          "id": "41d3580f-22cc-4781-a197-2c37efd7459e",
+          "type": "module",
+          "moduleId": "H01",
+          "label": "基礎標題",
+          "data": {
+            "title": "請輸入標題文字",
+            "level": "h2"
+          },
+          "style": {
+            "align": "left",
+            "color": "#000000",
+            "fontSize": 24,
+            "fontWeight": "normal"
+          },
+          "parentSlotId": "7ce3f97d-69c6-4370-bc5a-428edb72ebc0"
+        },
+        "b23a967f-9a9c-4e7c-8bd5-844359cf876b": {
+          "id": "b23a967f-9a9c-4e7c-8bd5-844359cf876b",
+          "type": "module",
+          "moduleId": "H01",
+          "label": "基礎標題",
+          "data": {
+            "title": "請輸入標題文字",
+            "level": "h2"
+          },
+          "style": {
+            "align": "left",
+            "color": "#000000",
+            "fontSize": 24,
+            "fontWeight": "normal"
+          },
+          "parentSlotId": "e5524a98-9d71-45c0-b5eb-3f196c994645"
+        },
+        "54382c6c-d67b-49a6-8de8-6ffa27ee30ca": {
+          "id": "54382c6c-d67b-49a6-8de8-6ffa27ee30ca",
+          "type": "module",
+          "moduleId": "H01",
+          "label": "基礎標題",
+          "data": {
+            "title": "請輸入標題文字",
+            "level": "h2"
+          },
+          "style": {
+            "align": "left",
+            "color": "#000000",
+            "fontSize": 24,
+            "fontWeight": "normal"
+          },
+          "parentSlotId": "3c6dd1ef-0a5a-4011-9497-2eaf59ee828f"
+        },
+        "add3653f-0ba5-4f41-9cca-22da1d4bc4b1": {
+          "id": "add3653f-0ba5-4f41-9cca-22da1d4bc4b1",
+          "type": "module",
+          "moduleId": "H01",
+          "label": "基礎標題",
+          "data": {
+            "title": "請輸入標題文字111",
+            "level": "h2"
+          },
+          "style": {
+            "align": "left",
+            "color": "#000000",
+            "fontSize": 24,
+            "fontWeight": "normal"
+          },
+          "parentSlotId": "5c95a977-de5e-461d-9e4c-168998bc4ecd"
+        },
+        "f0161961-c569-4d3c-bc5c-44e7f9300e0f": {
+          "id": "f0161961-c569-4d3c-bc5c-44e7f9300e0f",
+          "type": "module",
+          "moduleId": "I01",
+          "label": "基礎圖片",
+          "data": {
+            "src": "/default.png",
+            "alt": "圖片"
+          },
+          "style": {
+            "width": "50%",
+            "height": "auto",
+            "borderRadius": "8px",
+            "objectFit": "cover"
+          },
+          "parentSlotId": "9d23bcc1-5ce2-474f-b672-84746ac8e50c"
+        }
+      }
+    },
+    {
+      "id": "8c772887-dda0-4ec3-be03-a03fb0ea4e4e",
+      "pageId": "page-1",
+      "version": 7,
+      "status": "published",
+      "createdAt": "2026-05-18T07:30:10.056Z",
+      "publishedAt": "2026-05-18T07:30:10.056Z",
+      "rootOrder": [
+        "3f970230-2f88-4384-9b55-298abf60ed8c",
+        "3cc1fe26-4442-40d6-abd0-835436460a2a",
+        "5f0c30bb-f931-4b77-aa7b-7eb22f672519",
+        "a64867d9-cad3-4464-9ff3-c46a4e4e2f48"
+      ],
+      "layouts": {
+        "3f970230-2f88-4384-9b55-298abf60ed8c": {
+          "id": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "type": "layout",
+          "layoutType": "carousel",
+          "label": "輪播 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 26,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "24200263-152b-47d3-ad50-7a26d6269791",
+            "184b37dd-d1c6-4a7e-8317-c629e367b98a",
+            "f14391f7-0409-4c62-bee2-1d4105d055c6",
+            "b602ae5a-3082-49fe-a304-bc95719bdba1",
+            "506fef79-25ca-4289-af8d-14822ba268fb",
+            "5123ce39-27ae-479b-bfbf-be6cb218dcb9",
+            "295eb4e3-c718-48af-8d16-c2b09db87c44",
+            "4dd9c0e3-bf91-4cf3-8bd7-807f047a5c7d"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": {
+            "visibleCount": 3,
+            "slideCount": 3,
+            "gap": 28
+          },
+          "containerWidth": "full"
+        },
+        "97d88ef4-5f92-4a96-bf2b-33c0660554a3": {
+          "id": "97d88ef4-5f92-4a96-bf2b-33c0660554a3",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "02cbafbc-e8df-4690-8b2a-d86ba7227d37"
+          ],
+          "parentSlotId": "184b37dd-d1c6-4a7e-8317-c629e367b98a",
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "f0383c07-f2ba-4e1d-a52e-d1d1e817eda8": {
+          "id": "f0383c07-f2ba-4e1d-a52e-d1d1e817eda8",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "7ce3f97d-69c6-4370-bc5a-428edb72ebc0"
+          ],
+          "parentSlotId": "f14391f7-0409-4c62-bee2-1d4105d055c6",
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "f0e689d1-87ba-4461-894e-ae3640421a9f": {
+          "id": "f0e689d1-87ba-4461-894e-ae3640421a9f",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "e5524a98-9d71-45c0-b5eb-3f196c994645"
+          ],
+          "parentSlotId": "b602ae5a-3082-49fe-a304-bc95719bdba1",
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "06424bc1-9305-48b4-8804-714904dcbcfa": {
+          "id": "06424bc1-9305-48b4-8804-714904dcbcfa",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "3c6dd1ef-0a5a-4011-9497-2eaf59ee828f"
+          ],
+          "parentSlotId": "506fef79-25ca-4289-af8d-14822ba268fb",
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "3cc1fe26-4442-40d6-abd0-835436460a2a": {
+          "id": "3cc1fe26-4442-40d6-abd0-835436460a2a",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "5c95a977-de5e-461d-9e4c-168998bc4ecd",
+            "4708a8f3-9c86-4271-baba-24b8bfe620b8"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null,
+          "containerWidth": "contained"
+        },
+        "5f0c30bb-f931-4b77-aa7b-7eb22f672519": {
+          "id": "5f0c30bb-f931-4b77-aa7b-7eb22f672519",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 20,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "ccc40431-7850-49d9-83c1-52719d15c60a"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        },
+        "a64867d9-cad3-4464-9ff3-c46a4e4e2f48": {
+          "id": "a64867d9-cad3-4464-9ff3-c46a4e4e2f48",
+          "type": "layout",
+          "layoutType": "block",
+          "label": "塊級 Layout",
+          "props": {},
+          "spacing": {
+            "margin": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "padding": {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "slotIds": [
+            "9d23bcc1-5ce2-474f-b672-84746ac8e50c"
+          ],
+          "parentSlotId": null,
+          "flexConfig": null,
+          "gridConfig": null,
+          "carouselConfig": null
+        }
+      },
+      "slots": {
+        "24200263-152b-47d3-ad50-7a26d6269791": {
+          "id": "24200263-152b-47d3-ad50-7a26d6269791",
+          "childIds": [
+            "2660306c-81d7-4526-8eca-f523c313a655"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "184b37dd-d1c6-4a7e-8317-c629e367b98a": {
+          "id": "184b37dd-d1c6-4a7e-8317-c629e367b98a",
+          "childIds": [
+            "97d88ef4-5f92-4a96-bf2b-33c0660554a3"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "center"
+        },
+        "02cbafbc-e8df-4690-8b2a-d86ba7227d37": {
+          "id": "02cbafbc-e8df-4690-8b2a-d86ba7227d37",
+          "childIds": [
+            "2e302c4d-4814-4b9d-9951-d55ea62908cc"
+          ],
+          "parentLayoutId": "97d88ef4-5f92-4a96-bf2b-33c0660554a3",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "f14391f7-0409-4c62-bee2-1d4105d055c6": {
+          "id": "f14391f7-0409-4c62-bee2-1d4105d055c6",
+          "childIds": [
+            "f0383c07-f2ba-4e1d-a52e-d1d1e817eda8"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "7ce3f97d-69c6-4370-bc5a-428edb72ebc0": {
+          "id": "7ce3f97d-69c6-4370-bc5a-428edb72ebc0",
+          "childIds": [
+            "41d3580f-22cc-4781-a197-2c37efd7459e"
+          ],
+          "parentLayoutId": "f0383c07-f2ba-4e1d-a52e-d1d1e817eda8",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "b602ae5a-3082-49fe-a304-bc95719bdba1": {
+          "id": "b602ae5a-3082-49fe-a304-bc95719bdba1",
+          "childIds": [
+            "f0e689d1-87ba-4461-894e-ae3640421a9f"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 25,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "e5524a98-9d71-45c0-b5eb-3f196c994645": {
+          "id": "e5524a98-9d71-45c0-b5eb-3f196c994645",
+          "childIds": [
+            "b23a967f-9a9c-4e7c-8bd5-844359cf876b"
+          ],
+          "parentLayoutId": "f0e689d1-87ba-4461-894e-ae3640421a9f",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "506fef79-25ca-4289-af8d-14822ba268fb": {
+          "id": "506fef79-25ca-4289-af8d-14822ba268fb",
+          "childIds": [
+            "06424bc1-9305-48b4-8804-714904dcbcfa"
+          ],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "3c6dd1ef-0a5a-4011-9497-2eaf59ee828f": {
+          "id": "3c6dd1ef-0a5a-4011-9497-2eaf59ee828f",
+          "childIds": [
+            "54382c6c-d67b-49a6-8de8-6ffa27ee30ca"
+          ],
+          "parentLayoutId": "06424bc1-9305-48b4-8804-714904dcbcfa",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "5123ce39-27ae-479b-bfbf-be6cb218dcb9": {
+          "id": "5123ce39-27ae-479b-bfbf-be6cb218dcb9",
+          "childIds": [],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "295eb4e3-c718-48af-8d16-c2b09db87c44": {
+          "id": "295eb4e3-c718-48af-8d16-c2b09db87c44",
+          "childIds": [],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "4dd9c0e3-bf91-4cf3-8bd7-807f047a5c7d": {
+          "id": "4dd9c0e3-bf91-4cf3-8bd7-807f047a5c7d",
+          "childIds": [],
+          "parentLayoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "5c95a977-de5e-461d-9e4c-168998bc4ecd": {
+          "id": "5c95a977-de5e-461d-9e4c-168998bc4ecd",
+          "childIds": [
+            "add3653f-0ba5-4f41-9cca-22da1d4bc4b1"
+          ],
+          "parentLayoutId": "3cc1fe26-4442-40d6-abd0-835436460a2a",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "4708a8f3-9c86-4271-baba-24b8bfe620b8": {
+          "id": "4708a8f3-9c86-4271-baba-24b8bfe620b8",
+          "childIds": [],
+          "parentLayoutId": "3cc1fe26-4442-40d6-abd0-835436460a2a",
+          "flexWidthConfig": {
+            "flexBasis": 50,
+            "widthPx": 200
+          },
+          "align": "left"
+        },
+        "ccc40431-7850-49d9-83c1-52719d15c60a": {
+          "id": "ccc40431-7850-49d9-83c1-52719d15c60a",
+          "childIds": [],
+          "parentLayoutId": "5f0c30bb-f931-4b77-aa7b-7eb22f672519",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "left"
+        },
+        "9d23bcc1-5ce2-474f-b672-84746ac8e50c": {
+          "id": "9d23bcc1-5ce2-474f-b672-84746ac8e50c",
+          "childIds": [
+            "f0161961-c569-4d3c-bc5c-44e7f9300e0f"
+          ],
+          "parentLayoutId": "a64867d9-cad3-4464-9ff3-c46a4e4e2f48",
+          "flexWidthConfig": {
+            "flexBasis": 100,
+            "widthPx": 400
+          },
+          "align": "right"
+        }
+      },
+      "modules": {
+        "2660306c-81d7-4526-8eca-f523c313a655": {
+          "id": "2660306c-81d7-4526-8eca-f523c313a655",
+          "type": "module",
+          "moduleId": "H01",
+          "label": "基礎標題",
+          "data": {
+            "title": "請輸入標題文字",
+            "level": "h2"
+          },
+          "style": {
+            "align": "left",
+            "color": "#000000",
+            "fontSize": 24,
+            "fontWeight": "normal"
+          },
+          "parentSlotId": "24200263-152b-47d3-ad50-7a26d6269791"
+        },
+        "2e302c4d-4814-4b9d-9951-d55ea62908cc": {
+          "id": "2e302c4d-4814-4b9d-9951-d55ea62908cc",
+          "type": "module",
+          "moduleId": "H01",
+          "label": "基礎標題",
+          "data": {
+            "title": "請輸入標題文字",
+            "level": "h2"
+          },
+          "style": {
+            "align": "left",
+            "color": "#000000",
+            "fontSize": 24,
+            "fontWeight": "normal"
+          },
+          "parentSlotId": "02cbafbc-e8df-4690-8b2a-d86ba7227d37"
+        },
+        "41d3580f-22cc-4781-a197-2c37efd7459e": {
+          "id": "41d3580f-22cc-4781-a197-2c37efd7459e",
+          "type": "module",
+          "moduleId": "H01",
+          "label": "基礎標題",
+          "data": {
+            "title": "請輸入標題文字",
+            "level": "h2"
+          },
+          "style": {
+            "align": "left",
+            "color": "#000000",
+            "fontSize": 24,
+            "fontWeight": "normal"
+          },
+          "parentSlotId": "7ce3f97d-69c6-4370-bc5a-428edb72ebc0"
+        },
+        "b23a967f-9a9c-4e7c-8bd5-844359cf876b": {
+          "id": "b23a967f-9a9c-4e7c-8bd5-844359cf876b",
+          "type": "module",
+          "moduleId": "H01",
+          "label": "基礎標題",
+          "data": {
+            "title": "請輸入標題文字",
+            "level": "h2"
+          },
+          "style": {
+            "align": "left",
+            "color": "#000000",
+            "fontSize": 24,
+            "fontWeight": "normal"
+          },
+          "parentSlotId": "e5524a98-9d71-45c0-b5eb-3f196c994645"
+        },
+        "54382c6c-d67b-49a6-8de8-6ffa27ee30ca": {
+          "id": "54382c6c-d67b-49a6-8de8-6ffa27ee30ca",
+          "type": "module",
+          "moduleId": "H01",
+          "label": "基礎標題",
+          "data": {
+            "title": "請輸入標題文字",
+            "level": "h2"
+          },
+          "style": {
+            "align": "left",
+            "color": "#000000",
+            "fontSize": 24,
+            "fontWeight": "normal"
+          },
+          "parentSlotId": "3c6dd1ef-0a5a-4011-9497-2eaf59ee828f"
+        },
+        "add3653f-0ba5-4f41-9cca-22da1d4bc4b1": {
+          "id": "add3653f-0ba5-4f41-9cca-22da1d4bc4b1",
+          "type": "module",
+          "moduleId": "H01",
+          "label": "基礎標題",
+          "data": {
+            "title": "請輸入標題文字111",
+            "level": "h2"
+          },
+          "style": {
+            "align": "left",
+            "color": "#000000",
+            "fontSize": 24,
+            "fontWeight": "normal"
+          },
+          "parentSlotId": "5c95a977-de5e-461d-9e4c-168998bc4ecd"
+        },
+        "f0161961-c569-4d3c-bc5c-44e7f9300e0f": {
+          "id": "f0161961-c569-4d3c-bc5c-44e7f9300e0f",
+          "type": "module",
+          "moduleId": "I01",
+          "label": "基礎圖片",
+          "data": {
+            "src": "/default.png",
+            "alt": "圖片"
+          },
+          "style": {
+            "width": "50%",
+            "height": "auto",
+            "borderRadius": "8px",
+            "objectFit": "cover"
+          },
+          "parentSlotId": "9d23bcc1-5ce2-474f-b672-84746ac8e50c"
+        }
+      }
     }
   ],
-  "editLogs": [],
+  "editLogs": [
+    {
+      "id": "b5ac4fdb-7ea2-4f46-bdf3-72ae10673012",
+      "pageId": "page-1",
+      "type": "update-carousel-config",
+      "label": "調整輪播設定",
+      "payload": {
+        "layoutId": "3f970230-2f88-4384-9b55-298abf60ed8c",
+        "carouselConfig": {
+          "visibleCount": 4,
+          "slideCount": 3,
+          "gap": 28
+        }
+      },
+      "createdAt": "2026-05-18T09:12:15.906Z"
+    }
+  ],
   "publishLogs": [
     {
       "id": "d11e5242-6713-4580-b682-f20b6942b7bf",
@@ -314,6 +2654,36 @@
       "pageId": "page-1",
       "version": 2,
       "publishedAt": "2026-05-13T02:38:54.549Z"
+    },
+    {
+      "id": "742ea63b-9765-495b-9c54-e5818670354a",
+      "pageId": "page-1",
+      "version": 3,
+      "publishedAt": "2026-05-18T06:43:09.798Z"
+    },
+    {
+      "id": "8d5f1f74-0437-4f10-b922-73c03a13369a",
+      "pageId": "page-1",
+      "version": 4,
+      "publishedAt": "2026-05-18T06:43:39.374Z"
+    },
+    {
+      "id": "61d8826f-74e6-4975-ad04-6c8328a6b4e6",
+      "pageId": "page-1",
+      "version": 5,
+      "publishedAt": "2026-05-18T07:29:35.724Z"
+    },
+    {
+      "id": "f4112ee8-f4a6-43a0-b39e-f590812d72f4",
+      "pageId": "page-1",
+      "version": 6,
+      "publishedAt": "2026-05-18T07:30:05.086Z"
+    },
+    {
+      "id": "3a71bb4e-5ba5-405a-ba16-71c64caed58a",
+      "pageId": "page-1",
+      "version": 7,
+      "publishedAt": "2026-05-18T07:30:10.056Z"
     }
   ]
 }

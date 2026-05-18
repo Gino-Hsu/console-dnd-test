@@ -1,6 +1,6 @@
 import type { ModuleId } from '@/lib/module-registry';
 
-export type LayoutType = 'block' | 'flex' | 'grid';
+export type LayoutType = 'block' | 'flex' | 'grid' | 'carousel';
 
 export type SpacingValue = {
     top: number;
@@ -32,6 +32,15 @@ export interface GridConfig {
     rowGap: number;
 }
 
+export interface CarouselConfig {
+    /** 同時顯示幾個 slot */
+    visibleCount: number;
+    /** 每次滑動幾個 slot（不可超過 visibleCount） */
+    slideCount: number;
+    /** slot 間距 px */
+    gap: number;
+}
+
 export interface Slot {
     id: string;
     children: CanvasNode[];
@@ -59,6 +68,7 @@ export interface NestedLayout {
     spacing: LayoutSpacing;
     flexConfig: FlexConfig | null;
     gridConfig: GridConfig | null;
+    carouselConfig: CarouselConfig | null;
     containerWidth?: 'full' | 'contained';
 }
 
@@ -86,6 +96,7 @@ export interface FlatLayout {
     parentSlotId: string | null;
     flexConfig: FlexConfig | null;
     gridConfig: GridConfig | null;
+    carouselConfig: CarouselConfig | null;
     containerWidth?: 'full' | 'contained';
 }
 
@@ -123,6 +134,7 @@ export const LAYOUT_CONFIG: Record<LayoutType, { slotCount: number }> = {
     block: { slotCount: 1 },
     flex: { slotCount: 2 },
     grid: { slotCount: 4 },
+    carousel: { slotCount: 4 }, // initial slot count = default visibleCount
 };
 
 // ─── Edit Log ────────────────────────────────────────────────
@@ -263,6 +275,13 @@ export type EditOperation =
               style?: Record<string, unknown>;
           };
           createdAt?: string;
+      }
+    | {
+          id?: string;
+          type: 'update-carousel-config';
+          label?: string;
+          payload: { layoutId: string; carouselConfig: CarouselConfig };
+          createdAt?: string;
       };
 
 // ─── Sidebar ──────────────────────────────────────────────────
@@ -271,6 +290,8 @@ export interface SidebarItem {
     type: LayoutType;
     label: string;
     description: string;
+    icon: string;
+    className: string;
 }
 
 export type ActiveSidebarItem =
@@ -282,16 +303,32 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
         type: 'block',
         label: '塊級 Layout',
         description: 'Block — 元素獨佔整行',
+        icon: 'B',
+        className: 'bg-violet-100 text-violet-600',
     },
+
     {
         type: 'flex',
         label: 'Flex Layout',
         description: 'Flex — 水平排列',
+        icon: 'F',
+        className: 'bg-sky-100 text-sky-600',
     },
+
     {
         type: 'grid',
         label: 'Grid Layout',
         description: 'Grid — 二維排列',
+        icon: 'G',
+        className: 'bg-emerald-100 text-emerald-600',
+    },
+
+    {
+        type: 'carousel',
+        label: '輪播 Layout',
+        description: 'Carousel — 輪播滑動',
+        icon: 'C',
+        className: 'bg-amber-100 text-amber-600',
     },
 ];
 

@@ -4,6 +4,7 @@ import type { RefObject } from 'react';
 import BlockLayout from './BlockLayout';
 import FlexLayout from './FlexLayout';
 import GridLayout from './GridLayout';
+import CarouselLayout from './CarouselLayout';
 import type { NestedLayout } from '@/types/layout';
 import type { SlotProps } from './types';
 
@@ -11,6 +12,7 @@ export default function LayoutContent({
     layout,
     flexRef,
     gridRef,
+    carouselRef,
     cols,
     defColW,
     sp,
@@ -22,6 +24,7 @@ export default function LayoutContent({
     layout: NestedLayout;
     flexRef: RefObject<HTMLDivElement | null>;
     gridRef: RefObject<HTMLDivElement | null>;
+    carouselRef: RefObject<HTMLDivElement | null>;
     cols: number;
     defColW: number;
     sp: SlotProps;
@@ -61,6 +64,17 @@ export default function LayoutContent({
                 defColW={defColW}
                 sp={sp}
                 onColDrag={onColDrag}
+                isDragging={isDragging}
+                depth={depth}
+            />
+        );
+    }
+    if (layout.layoutType === 'carousel') {
+        return (
+            <CarouselLayout
+                layout={layout}
+                containerRef={carouselRef}
+                sp={sp}
                 isDragging={isDragging}
                 depth={depth}
             />

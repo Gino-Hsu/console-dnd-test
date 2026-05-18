@@ -100,12 +100,14 @@ const BORDER: Record<LayoutType, [string]> = {
     block: ['border-violet-200'],
     flex: ['border-sky-200'],
     grid: ['border-emerald-200'],
+    carousel: ['border-amber-200'],
 };
 
 const BG: Record<LayoutType, [string]> = {
     block: ['bg-violet-50'],
     flex: ['bg-sky-50'],
     grid: ['bg-emerald-50'],
+    carousel: ['bg-amber-50'],
 };
 
 /** 依 layout 類型與巢狀深度回傳 border / bg Tailwind class */

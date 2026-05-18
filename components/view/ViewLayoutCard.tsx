@@ -4,6 +4,7 @@ import BaseLayoutFrame from '@/components/base/BaseLayoutFrame';
 import SharedBlockLayout from '@/components/base/BaseBlockLayout';
 import SharedFlexLayout from '@/components/base/BaseFlexLayout';
 import SharedGridLayout from '@/components/base/BaseGridLayout';
+import BaseCarouselLayout from '@/components/base/BaseCarouselLayout';
 
 export default function ViewLayoutCard({
     layout,
@@ -46,6 +47,10 @@ function ViewLayoutContent({ layout }: { layout: NestedLayout }) {
                 defColW={defColW}
             />
         );
+    }
+
+    if (layout.layoutType === 'carousel') {
+        return <BaseCarouselLayout mode='view' layout={layout} />;
     }
 
     return null;

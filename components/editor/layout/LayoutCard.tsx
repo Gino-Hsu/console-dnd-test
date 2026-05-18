@@ -47,6 +47,7 @@ export default function LayoutCard({
     // ── refs ──────────────────────────────────────────────────────────────────
     const flexRef = useRef<HTMLDivElement>(null);
     const gridRef = useRef<HTMLDivElement>(null);
+    const carouselRef = useRef<HTMLDivElement>(null);
 
     // ── grid 尺寸 ─────────────────────────────────────────────────────────────
     const cols = layout.gridConfig?.colWidths?.length ?? 2;
@@ -102,7 +103,7 @@ export default function LayoutCard({
     const sp = { ownerId: layout.id, ...shared };
 
     return (
-        <div data-canvas-item className="w-full">
+        <div data-canvas-item className='w-full'>
             <LayoutFrame
                 layout={layout}
                 depth={depth}
@@ -123,6 +124,7 @@ export default function LayoutCard({
                     layout={layout}
                     flexRef={flexRef}
                     gridRef={gridRef}
+                    carouselRef={carouselRef}
                     cols={cols}
                     defColW={defColW}
                     sp={sp}

@@ -165,6 +165,13 @@ export function applyEditLogAction(
             );
         }
 
+        case 'update-carousel-config': {
+            const { layoutId, carouselConfig } = operation.payload;
+            return mapLayouts(tree, l =>
+                l.id === layoutId ? { ...l, carouselConfig } : l,
+            );
+        }
+
         case 'add-module': {
             const { module, slotId, ownerId, index } = operation.payload;
             return insertIntoSlot(

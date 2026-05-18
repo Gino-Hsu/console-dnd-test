@@ -46,6 +46,10 @@ export function createLayout(type: LayoutType, label: string): NestedLayout {
                       rowGap: 8,
                   }
                 : null,
+        carouselConfig:
+            type === 'carousel'
+                ? { visibleCount: 4, slideCount: 1, gap: 8 }
+                : null,
     };
 }
 
@@ -55,10 +59,7 @@ export function createLayout(type: LayoutType, label: string): NestedLayout {
  * @param label 顯示標籤
  * @returns ModuleNode
  */
-export function createModule(
-    moduleId: ModuleId,
-    label: string,
-): ModuleNode {
+export function createModule(moduleId: ModuleId, label: string): ModuleNode {
     const config = getModuleConfig(moduleId);
 
     if (!config) {

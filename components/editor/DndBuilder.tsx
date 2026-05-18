@@ -31,6 +31,7 @@ export default function DndBuilder() {
         handleUpdateFlexRowGap,
         handleUpdateSlotAlign,
         handleUpdateContainerWidth,
+        handleUpdateCarouselConfig,
         deselectLayout,
         isSaving,
     } = useLayoutEditor();
@@ -155,6 +156,7 @@ export default function DndBuilder() {
                     onUpdateFlexRowGap={handleUpdateFlexRowGap}
                     onUpdateFlexWrap={handleUpdateFlexWrap}
                     onUpdateContainerWidth={handleUpdateContainerWidth}
+                    onUpdateCarouselConfig={handleUpdateCarouselConfig}
                     onUpdateModuleData={handleUpdateModuleData}
                     onUpdateModuleStyle={handleUpdateModuleStyle}
                     onDeselect={() => {
