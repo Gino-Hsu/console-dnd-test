@@ -21,12 +21,14 @@ export default function LayoutHeader({
         block: 'Block',
         flex: 'Flex',
         grid: 'Grid',
+        carousel: 'Carousel',
     };
 
     const styleMap = {
         block: 'bg-violet-200 text-violet-700',
         flex: 'bg-sky-200 text-sky-700',
         grid: 'bg-emerald-200 text-emerald-700',
+        carousel: 'bg-amber-200 text-amber-700',
     };
 
     return (

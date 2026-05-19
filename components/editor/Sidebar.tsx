@@ -5,7 +5,12 @@ import LayoutSidebar from './layout/LayoutSidebar';
 import ModuleSidebar from './module/ModuleSidebar';
 import LayoutEditor from './layout/LayoutEditor';
 import ModuleEditor from './module/ModuleEditor';
-import type { LayoutSpacing, NestedLayout, ModuleNode } from './types';
+import type {
+    LayoutSpacing,
+    NestedLayout,
+    ModuleNode,
+    CarouselConfig,
+} from './types';
 
 export default function Sidebar({
     selectedLayout,
@@ -19,6 +24,7 @@ export default function Sidebar({
     onUpdateFlexRowGap,
     onUpdateFlexWrap,
     onUpdateContainerWidth,
+    onUpdateCarouselConfig,
     onUpdateModuleData,
     onUpdateModuleStyle,
     onDeselect,
@@ -42,6 +48,10 @@ export default function Sidebar({
     onUpdateContainerWidth?: (
         layoutId: string,
         containerWidth: 'full' | 'contained',
+    ) => void;
+    onUpdateCarouselConfig?: (
+        layoutId: string,
+        carouselConfig: CarouselConfig,
     ) => void;
     onUpdateModuleData: (
         moduleId: string,
@@ -72,6 +82,7 @@ export default function Sidebar({
                     onUpdateFlexRowGap={onUpdateFlexRowGap}
                     onUpdateFlexWrap={onUpdateFlexWrap}
                     onUpdateContainerWidth={onUpdateContainerWidth}
+                    onUpdateCarouselConfig={onUpdateCarouselConfig}
                     onDeselect={onDeselect}
                 />
             ) : selectedModule ? (

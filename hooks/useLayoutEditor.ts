@@ -20,6 +20,7 @@ import type {
     SlotAlign,
     PageGraph,
     EditOperation,
+    CarouselConfig,
 } from '@/types/layout';
 
 import { getCurrentPage, appendEditLog } from '@/lib/actions/page';
@@ -421,6 +422,22 @@ export function useLayoutEditor() {
         [setLayoutsWithLog],
     );
 
+    const handleUpdateCarouselConfig = useCallback(
+        (layoutId: string, carouselConfig: CarouselConfig) => {
+            setLayoutsWithLog(
+                prev =>
+                    mapLayouts(prev, l =>
+                        l.id === layoutId ? { ...l, carouselConfig } : l,
+                    ),
+                'update-carousel-config',
+                '調整輪播設定',
+                false,
+                { layoutId, carouselConfig },
+            );
+        },
+        [setLayoutsWithLog],
+    );
+
     const applyMove = useCallback(
         (
             activeId: string,
@@ -513,6 +530,7 @@ export function useLayoutEditor() {
         handleUpdateFlexRowGap,
         handleUpdateSlotAlign,
         handleUpdateContainerWidth,
+        handleUpdateCarouselConfig,
         applyMove,
         applySidebarDrop,
         deselectLayout: () => setSelectedLayoutId(null),
