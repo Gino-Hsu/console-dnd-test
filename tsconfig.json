@@ -19,7 +19,10 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@/ui/*": ["./ui/*"],
+      "@/ui-components/*": ["./ui/primitive/components/ui/*"],
+      "@/ui-lib/*": ["./ui/primitive/lib/*"]
     }
   },
   "include": [
