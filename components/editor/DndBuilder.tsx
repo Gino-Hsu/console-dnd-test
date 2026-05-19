@@ -1,0 +1,193 @@
+'use client';
+
+import { DndContext, DragOverlay, pointerWithin } from '@dnd-kit/core';
+import { useCallback, useId } from 'react';
+import { useDndBuilder, useLayoutEditor, useModuleEditor } from '@/hooks';
+import CanvasArea from './CanvasArea';
+import { findLayoutById, findNodeById } from '@/lib/page';
+import Sidebar from './Sidebar';
+import DragOverlayContent from './common/DragOverlayContent';
+import { isLayoutNode } from '@/types/layout';
+
+export default function DndBuilder() {
+    const {
+        graph,
+        layouts,
+        setLayouts,
+        isLoading,
+        loadError,
+        selectedLayoutId,
+        selectedLayout,
+        handleRemove,
+        handleSelect: handleSelectLayout,
+        handleAddSlot,
+        handleRemoveSlot,
+        handleUpdateSpacing,
+        handleUpdateSlotWidths,
+        handleUpdateWrapSlotWidth,
+        handleUpdateGridDimensions,
+        handleUpdateFlexGap,
+        handleUpdateFlexWrap,
+        handleUpdateFlexRowGap,
+        handleUpdateSlotAlign,
+        handleUpdateContainerWidth,
+        handleUpdateCarouselConfig,
+        deselectLayout,
+        isSaving,
+    } = useLayoutEditor();
+
+    const {
+        selectedModuleId,
+        selectedModule,
+        handleSelectModule,
+        handleUpdateModuleData,
+        handleUpdateModuleStyle,
+        deselectModule,
+    } = useModuleEditor({ layouts, setLayouts });
+
+    const {
+        sensors,
+        handleDragStart,
+        handleDragOver,
+        handleDragEnd,
+        handleDragCancel,
+        activeSidebarItem,
+        activeCanvasId,
+        insertIndex,
+        insertSlotId,
+    } = useDndBuilder({ layouts, setLayouts });
+
+    // 統一的選取邏輯：判斷是 Layout 還是 Module
+    const handleSelect = useCallback(
+        (id: string) => {
+            const node = findNodeById(id, layouts);
+            if (node && isLayoutNode(node)) {
+                handleSelectLayout(id);
+                deselectModule();
+            } else {
+                handleSelectModule(id);
+                deselectLayout();
+            }
+        },
+        [
+            layouts,
+            handleSelectLayout,
+            handleSelectModule,
+            deselectModule,
+            deselectLayout,
+        ],
+    );
+
+    const dndId = useId();
+
+    const activeCanvasNode = activeCanvasId
+        ? findNodeById(activeCanvasId, layouts)
+        : null;
+
+    if (isLoading) {
+        return (
+            <div className='flex h-screen w-full items-center justify-center bg-zinc-50'>
+                <div className='text-center text-zinc-400'>
+                    <svg
+                        className='animate-spin mx-auto mb-3'
+                        width='28'
+                        height='28'
+                        viewBox='0 0 28 28'
+                        fill='none'
+                        stroke='currentColor'
+                        strokeWidth='2.5'
+                    >
+                        <path
+                            d='M14 3a11 11 0 1 1-7.778 3.222'
+                            strokeLinecap='round'
+                        />
+                    </svg>
+                    <p className='text-sm font-medium'>載入中…</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (loadError) {
+        return (
+            <div className='flex h-screen w-full items-center justify-center bg-zinc-50'>
+                <div className='text-center text-zinc-400'>
+                    <p className='text-2xl mb-2'>⚠️</p>
+                    <p className='font-medium text-zinc-600'>
+                        無法載入頁面資料
+                    </p>
+                    <p className='text-sm mt-1'>
+                        請確認{' '}
+                        <code className='bg-zinc-100 px-1 rounded'>
+                            pnpm db
+                        </code>{' '}
+                        已在執行中
+                    </p>
+                    <p className='text-xs mt-2 text-zinc-300'>{loadError}</p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <DndContext
+            id={dndId}
+            sensors={sensors}
+            collisionDetection={pointerWithin}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+            onDragCancel={handleDragCancel}
+        >
+            <div className='flex h-screen w-full overflow-hidden'>
+                <Sidebar
+                    selectedLayout={selectedLayout}
+                    selectedLayoutIsRoot={
+                        selectedLayout
+                            ? layouts.some(l => l.id === selectedLayout.id)
+                            : false
+                    }
+                    selectedModule={selectedModule}
+                    onAddSlot={handleAddSlot}
+                    onRemoveSlot={handleRemoveSlot}
+                    onUpdateSpacing={handleUpdateSpacing}
+                    onUpdateGridDimensions={handleUpdateGridDimensions}
+                    onUpdateFlexGap={handleUpdateFlexGap}
+                    onUpdateFlexRowGap={handleUpdateFlexRowGap}
+                    onUpdateFlexWrap={handleUpdateFlexWrap}
+                    onUpdateContainerWidth={handleUpdateContainerWidth}
+                    onUpdateCarouselConfig={handleUpdateCarouselConfig}
+                    onUpdateModuleData={handleUpdateModuleData}
+                    onUpdateModuleStyle={handleUpdateModuleStyle}
+                    onDeselect={() => {
+                        deselectLayout();
+                        deselectModule();
+                    }}
+                />
+                <CanvasArea
+                    graph={graph}
+                    layouts={layouts}
+                    onRemove={handleRemove}
+                    onSelect={handleSelect}
+                    selectedLayoutId={selectedLayoutId}
+                    insertIndex={insertSlotId === null ? insertIndex : null}
+                    insertSlotId={insertSlotId}
+                    slotInsertIndex={insertSlotId !== null ? insertIndex : null}
+                    isSomethingDragging={activeCanvasId !== null}
+                    onUpdateSlotWidths={handleUpdateSlotWidths}
+                    onUpdateGridDimensions={handleUpdateGridDimensions}
+                    onUpdateWrapSlotWidth={handleUpdateWrapSlotWidth}
+                    onUpdateSlotAlign={handleUpdateSlotAlign}
+                    isSaving={isSaving}
+                />
+            </div>
+
+            <DragOverlay dropAnimation={null}>
+                <DragOverlayContent
+                    activeSidebarItem={activeSidebarItem}
+                    activeCanvasNode={activeCanvasNode}
+                />
+            </DragOverlay>
+        </DndContext>
+    );
+}

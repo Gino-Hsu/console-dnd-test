@@ -1,0 +1,40 @@
+'use client';
+
+import type { RefObject } from 'react';
+import SharedGridLayout from '@/components/base/BaseGridLayout';
+import type { NestedLayout } from '@/types/layout';
+import type { SlotProps } from './types';
+
+export default function GridLayout({
+    layout,
+    containerRef,
+    cols,
+    defColW,
+    sp,
+    onColDrag,
+    isDragging,
+    depth,
+}: {
+    layout: NestedLayout;
+    containerRef: RefObject<HTMLDivElement | null>;
+    cols: number;
+    defColW: number;
+    sp: SlotProps;
+    onColDrag: (i: number, dx: number) => void;
+    isDragging: boolean;
+    depth: number;
+}) {
+    return (
+        <SharedGridLayout
+            mode='edit'
+            layout={layout}
+            cols={cols}
+            defColW={defColW}
+            containerRef={containerRef}
+            sp={sp}
+            onColDrag={onColDrag}
+            isDragging={isDragging}
+            depth={depth}
+        />
+    );
+}
